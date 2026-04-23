@@ -1,0 +1,4 @@
+.DS_Store
+.codebuddy/integration/
+node_modules/
+*.log

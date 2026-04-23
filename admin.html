@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>问卷后台管理 — Ardot</title>
+  <link rel="icon" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#f5f5fa;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding:24px}
+    .header{display:flex;justify-content:space-between;align-items:center;max-width:1260px;margin:0 auto 12px}
+    .header h1{font-size:20px;font-weight:800}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#333;font-size:13px;font-weight:600;cursor:pointer}
+    .btn:hover{border-color:#bbb}
+    .btn.primary{background:#1a1a2e;border-color:#1a1a2e;color:#fff}
+    .tabs{max-width:1260px;margin:0 auto 12px;display:flex;gap:8px}
+    .tab{height:34px;padding:0 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#555;font-size:13px;font-weight:700;cursor:pointer}
+    .tab.active{background:#1a1a2e;border-color:#1a1a2e;color:#fff}
+    .subtabs{display:flex;gap:8px;margin-bottom:10px}
+    .subtab{height:32px;padding:0 12px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#666;font-size:12px;font-weight:700;cursor:pointer}
+    .subtab.active{background:#fff7ec;border-color:#d7a062;color:#a7651f}
+    .panel{max-width:1260px;margin:0 auto}
+    .hidden{display:none!important}
+    .stats{margin:0 0 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .stat{background:#fff;border:1px solid #ececf2;border-radius:12px;padding:12px 14px}
+    .stat-k{font-size:11px;color:#999;margin-bottom:6px}
+    .stat-v{font-size:22px;font-weight:800;line-height:1.1}
+    .layout{display:grid;grid-template-columns:360px 1fr;gap:14px}
+    .card{background:#fff;border:1px solid #ececf2;border-radius:12px;padding:14px}
+    .card h2{font-size:14px;font-weight:700;margin-bottom:10px}
+    .help{font-size:12px;color:#888;line-height:1.5;margin-bottom:10px}
+    .q-list{display:grid;gap:8px;max-height:70vh;overflow:auto;padding-right:4px}
+    .q-item{border:1px solid #ece8e3;border-radius:10px;padding:10px;cursor:pointer;background:#fff}
+    .q-item:hover{border-color:#d7cec2;background:#fdfbf8}
+    .q-item.active{border-color:#d7a062;background:#fff7ec}
+    .q-item.dragging{opacity:.45}
+    .q-item.drop-target{border-color:#c46a1a;background:#fff3e2}
+    .q-id{font-size:11px;color:#b07f4b;font-weight:700;margin-bottom:4px}
+    .q-title{font-size:13px;font-weight:600;line-height:1.4;color:#333}
+    .q-meta{font-size:11px;color:#999;margin-top:6px}
+    .role-list{display:grid;gap:8px}
+    .role-item{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;border:1px solid #ece8e3;border-radius:10px;padding:10px;cursor:pointer;background:#fff}
+    .role-item:hover{border-color:#d7cec2;background:#fdfbf8}
+    .role-item.active{border-color:#d7a062;background:#fff7ec}
+    .role-thumb{width:36px;height:36px;border-radius:8px;object-fit:cover;background:#f3f3f3}
+    .role-name{font-size:13px;font-weight:600;line-height:1.2;color:#333}
+    .role-meta{font-size:11px;color:#999;margin-top:4px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:12px;color:#666;margin-bottom:6px;font-weight:600}
+    input[type="text"],textarea,select{width:100%;border:1px solid #e3e3ea;border-radius:8px;padding:9px 10px;font-size:13px;outline:none;background:#fff}
+    textarea{min-height:90px;resize:vertical;line-height:1.55}
+    input[type="text"]:focus,textarea:focus,select:focus{border-color:#d5a56d}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .mt{margin-top:10px}
+    .map-box{background:#faf8f5;border:1px solid #eee2d6;border-radius:8px;padding:10px;max-height:180px;overflow:auto}
+    .map-box pre{white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.45;color:#555}
+    .single-map{display:grid;gap:8px}
+    .single-map-row{display:grid;grid-template-columns:1fr 180px 120px;gap:8px;align-items:center;padding:8px;border:1px solid #f1ede7;border-radius:8px;background:#fffdfa}
+    .single-map-opt{font-size:12px;color:#444}
+    .score-input{width:100%;border:1px solid #e3e3ea;border-radius:8px;padding:8px 10px;font-size:13px}
+    .dist-list{display:grid;gap:8px;margin-top:8px}
+    .dist-row{display:grid;grid-template-columns:74px 1fr 44px;align-items:center;gap:8px;font-size:12px;color:#555}
+    .dist-bar{height:8px;border-radius:999px;background:#f0ece6;overflow:hidden}
+    .dist-fill{height:100%;background:linear-gradient(90deg,#c46a1a,#e9ab62)}
+    .stem-stat{border:1px solid #eee7dc;border-radius:8px;padding:8px;background:#fffdfa}
+    .stem-title{font-size:12px;font-weight:700;color:#5c4a36;margin-bottom:6px}
+    .stem-meta{font-size:11px;color:#8a7b6b;margin-bottom:6px}
+    .stem-hist{font-size:11px;color:#6f6458;line-height:1.5}
+    .note{font-size:11px;color:#999;margin-top:6px}
+    .split{height:1px;background:#eee;margin:12px 0}
+    .chart-card{background:#fff;border:1px solid #ececf2;border-radius:12px;padding:14px}
+    .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .img-preview{margin-top:8px;width:120px;height:120px;border-radius:10px;border:1px solid #e8e5e0;background:#fafafa;object-fit:cover;display:block;visibility:hidden}
+    .toolbar{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;margin-bottom:10px}
+    .switch{display:flex;gap:8px}
+    .switch .btn.active{background:#1a1a2e;border-color:#1a1a2e;color:#fff}
+    .chart-wrap{height:360px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #f0f0f4;font-size:13px}
+    th{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.04em}
+    .auto-save-hint{font-size:12px;color:#2d6a4a;margin-left:12px;font-weight:500}
+    @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>问卷后台管理</h1>
+    <div class="actions">
+      <button class="btn" onclick="window.open('quiz-h5.html','_blank','noopener')">打开问卷</button>
+      <button class="btn" onclick="renderStats()">刷新统计</button>
+      <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
+      <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
+      <button class="btn" onclick="resetDefault()">恢复默认</button>
+      <button class="btn primary" onclick="saveAll()">保存配置</button>
+      <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），也可手动点保存配置"></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabManageBtn" onclick="switchTab('manage')">1. 管理问卷内容和结果映射</button>
+    <button class="tab" id="tabStatsBtn" onclick="switchTab('stats')">2. 查看结果数据统计</button>
+  </div>
+
+  <div class="panel" id="manageTab">
+    <div class="subtabs">
+      <button class="subtab active" id="subTabQuestionBtn" onclick="switchManageSubTab('question')">问卷问题管理</button>
+      <button class="subtab" id="subTabRoleBtn" onclick="switchManageSubTab('role')">结果反馈管理</button>
+    </div>
+    <div class="card" id="metaConfigCard" style="margin-bottom:14px">
+      <h2>问卷标题配置</h2>
+      <div class="help">这里修改的是 `quiz` 首页展示的主标题和副标题。</div>
+      <div class="mt">
+        <label>主标题（支持 HTML 换行）</label>
+        <textarea id="metaMainTitle" class="mono" style="min-height:70px"></textarea>
+      </div>
+      <div class="mt">
+        <label>副标题</label>
+        <input id="metaSubtitle" type="text">
+      </div>
+    </div>
+    <div class="layout">
+      <div class="card" id="questionSidebarCard">
+        <h2>问题列表与映射概览</h2>
+        <div class="help">点击任一问题查看并编辑：题干、选项/分项，以及它与角色的分值映射关系。保存后刷新 `quiz` 即可看到新问题。</div>
+        <div class="row mt">
+          <button class="btn" type="button" onclick="addQuestion()">新增问题</button>
+          <button class="btn" type="button" onclick="deleteActiveQuestion()">删除当前问题</button>
+        </div>
+        <div id="qList" class="q-list"></div>
+
+        <div class="split"></div>
+        <h2 style="margin-bottom:6px">当前问题定量分布（快速看）</h2>
+        <div class="help" id="distTitle">按作答数据统计（来自 localStorage）。</div>
+        <div id="distBox" class="dist-list"></div>
+      </div>
+
+      <div class="card hidden" id="roleSidebarCard">
+        <h2>结果角色列表</h2>
+        <div class="help">点击任一角色可切换查看和编辑该角色的结果反馈。</div>
+        <div id="roleList" class="role-list"></div>
+      </div>
+
+      <div class="card" id="questionEditorCard">
+        <h2 id="editorTitle">问题编辑</h2>
+        <div class="row">
+          <div>
+            <label>问题 ID</label>
+            <input id="qid" type="text" disabled>
+          </div>
+          <div>
+            <label>题型</label>
+            <select id="qtype" onchange="onQuestionTypeChange()">
+              <option value="single">单选</option>
+              <option value="multi">多选</option>
+              <option value="text">填空</option>
+              <option value="rank">排序</option>
+              <option value="score">打分</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt">
+          <label>问题标题</label>
+          <input id="qtitle" type="text">
+        </div>
+        <div class="mt">
+          <label>问题说明</label>
+          <input id="qdesc" type="text">
+        </div>
+
+        <div class="split"></div>
+
+        <div id="singleEditor">
+          <label>单选选项（每行 `Key|文案`）</label>
+          <textarea id="singleOptions" class="mono"></textarea>
+          <div class="note">示例：`A|A. 想图形，磨 Logo`</div>
+          <div class="row mt" id="multiEditor" style="display:none">
+            <div>
+              <label>最多可选数量</label>
+              <input id="multiMaxSelect" type="text" value="3">
+            </div>
+          </div>
+        </div>
+
+        <div id="scaleEditor" style="display:none">
+          <label>量表分项（每行一条）</label>
+          <textarea id="scaleStems"></textarea>
+        </div>
+        <div id="textEditor" style="display:none">
+          <label>文本题占位提示</label>
+          <input id="textPlaceholder" type="text" placeholder="例如：请输入你的经验">
+        </div>
+        <div id="scoreEditor" style="display:none">
+          <label>打分题设置</label>
+          <div class="row">
+            <div>
+              <label>最小分</label>
+              <input id="scoreMin" type="text" value="1">
+            </div>
+            <div>
+              <label>最大分</label>
+              <input id="scoreMax" type="text" value="7">
+            </div>
+          </div>
+        </div>
+
+        <div class="split"></div>
+
+        <div class="mt" id="qPriorityWeightBlock" style="display:none">
+          <div id="qPriorityWeightRankOnly" class="note" style="display:none;line-height:1.55;margin-bottom:10px"></div>
+          <label id="qPriorityWeightCbWrap" style="display:none;align-items:flex-start;gap:10px;font-size:13px;color:#444;font-weight:600;line-height:1.45">
+            <input type="checkbox" id="qMapsToRoles" style="margin-top:3px;flex-shrink:0">
+            <span>参与角色映射与得分：按下方映射把选项分记到角色上，并乘以排序题按名次（1、0.75、0.5、0.25）折算出的角色权重。取消勾选则本题不参与角色得分映射。</span>
+          </label>
+        </div>
+
+        <div id="roleMappingSection">
+        <label id="mappingLabel">映射规则</label>
+        <div id="singleMappingEditor" class="single-map"></div>
+        <div id="scaleMappingEditor" style="display:none">
+          <textarea id="mappingEditor" class="mono" style="min-height:180px"></textarea>
+        </div>
+        <div class="note" id="mappingNote">单选题按“选项 -> 角色 + 加分”配置；量表题使用 JSON 数组。</div>
+
+        <div class="split"></div>
+        <h2 style="margin-bottom:8px">当前问题映射可视化</h2>
+        <div class="map-box"><pre id="mappingPreview"></pre></div>
+        </div>
+
+      </div>
+
+      <div class="card hidden" id="roleEditorCard">
+        <h2 style="margin-bottom:8px">问卷结果角色管理</h2>
+        <div class="help">可维护角色名称、描述、图片和维度。保存配置后，quiz 结果页会同步更新。</div>
+        <div class="row">
+          <div>
+            <label>结果反馈开关</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#555;font-weight:600">
+              <input id="feedbackEnabledToggle" type="checkbox">
+              开启测试结果反馈（关闭则只做普通问卷收集）
+            </label>
+          </div>
+        </div>
+        <div class="help hidden" id="feedbackDisabledHint">当前为无反馈模式：用户提交后不展示测试结果，角色编辑暂时关闭。</div>
+        <div id="roleConfigWrap">
+        <div class="row">
+          <div>
+            <label>角色选择</label>
+            <select id="roleSelect"></select>
+          </div>
+          <div>
+            <label>角色 ID</label>
+            <input id="roleId" type="text" disabled readonly>
+          </div>
+        </div>
+        <div class="role-grid mt">
+          <div>
+            <label>角色名称</label>
+            <input id="roleName" type="text">
+          </div>
+          <div>
+            <label>副标题（结果页第二行）</label>
+            <input id="roleReal" type="text">
+          </div>
+        </div>
+        <div class="mt">
+          <label>图片路径</label>
+          <input id="roleImg" type="text" class="mono" placeholder="例如：img/picasso.png">
+          <div class="note">可填 URL/相对路径，或直接上传图片</div>
+          <input id="roleImgUpload" type="file" accept="image/*" class="mt">
+          <img id="roleImgPreview" class="img-preview" alt="角色图片预览">
+        </div>
+        <div class="mt">
+          <label>角色描述</label>
+          <textarea id="roleDesc"></textarea>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel hidden" id="statsTab">
+    <div class="stats">
+      <div class="stat"><div class="stat-k">总提交数</div><div class="stat-v" id="stTotal">0</div></div>
+      <div class="stat"><div class="stat-k">今日提交</div><div class="stat-v" id="stToday">0</div></div>
+      <div class="stat"><div class="stat-k">最近一次提交</div><div class="stat-v" id="stLatest" style="font-size:14px;font-weight:700">-</div></div>
+      <div class="stat"><div class="stat-k">最多出现的设计师类型（Q8）</div><div class="stat-v" id="stTopQ8" style="font-size:16px;font-weight:700">-</div></div>
+    </div>
+
+    <div class="chart-card">
+      <h2 style="font-size:14px;font-weight:700;margin-bottom:10px">问卷数据统计（图表）</h2>
+      <div class="toolbar">
+        <div class="switch">
+          <button class="btn active" id="modeSurveyBtn" onclick="setStatsMode('survey')">普通问卷收集</button>
+          <button class="btn" id="modeResultBtn" onclick="setStatsMode('result')">结果反馈</button>
+        </div>
+        <select id="chartQuestionSelect"></select>
+        <select id="chartStemSelect" class="hidden"></select>
+        <div class="switch">
+          <button class="btn active" id="barBtn" onclick="setChartType('bar')">柱状图</button>
+          <button class="btn" id="pieBtn" onclick="setChartType('pie')">饼图</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="statsChart"></canvas></div>
+      <div class="help" id="chartNote">-</div>
+      <div class="help" id="chartMean">均分：-</div>
+      <table>
+        <thead><tr><th>选项/分项</th><th>数值</th><th>占比</th></tr></thead>
+        <tbody id="chartTable"></tbody>
+      </table>
+      <div id="chartExtra" class="mt"></div>
+    </div>
+  </div>
+
+  <script>
+    const CFG_KEY="ardot_quiz_config_v2";
+    let chartType="bar";
+    let statsMode="survey";
+    let statsChart=null;
+    let activeTab="manage";
+    let activeManageSubTab="question";
+    /** 题库默认与 quiz-h5.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema；Admin 内编辑会写入 localStorage（ardot_quiz_config_v2）。 */
+    function defaultConfig(){
+      return {
+        meta:{badge:"AI Design Survival Quiz",mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",note:"9 题 · 约 6 分钟",feedbackEnabled:true,questionSchema:"prompt_refactor_v12",roleSetVersion:5},
+        roles:[
+          {id:"pica",name:"毕加班索",real:"创意焦虑型生存状态",img:"img/picasso.png",desc:"你脑子里永远有想法，但时间从来不够用。你在追求突破和赶工交付之间反复横跳，最怕灵感来得太快、产能跟不上。"},
+          {id:"mona",name:"莫奈何",real:"审美细节型生存状态",img:"img/hara.png",desc:"你对质感和审美有天然敏感度，但最痛苦的是 AI 每次都差那口气。你不是不会做，而是不能接受“差不多”。"},
+          {id:"dali",name:"达利谱",real:"探索实验型生存状态",img:"img/dali.png",desc:"你喜欢试新工具、尝新玩法，灵感爆发力很强，但方向也容易过载。你不是没方向，是方向太多。"},
+          {id:"slow",name:"唐纳德诺慢",real:"流程效率型生存状态",img:"img/beethoven.png",desc:"你最关注效率和稳定性，核心诉求是“别崩、别慢、别绕”。你希望 AI 真正进入工作流，而不是演示功能。"}
+        ],
+        questions:{
+          q1:{type:"rank",title:"在你的设计流程里，希望 AI 更像哪种角色（排序）--需求优先级？",desc:"请排序（从最希望到最不希望）",options:[{key:"A",label:"A. 会脑暴的灵感搭子"},{key:"B",label:"B. 能出稿的执行工具"},{key:"C",label:"C. 懂上下文的长期助手"},{key:"D",label:"D. 串流程的工作流中枢"}]},
+          q2:{type:"single",title:"方案脑暴时，最让你抓狂的是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. AI 给的建议是平庸套路，毫无新意"},{key:"B",label:"B. 它的响应速度影响工作"},{key:"C",label:"C. 它根本理解不了我们项目核心，总在跑题"},{key:"D",label:"D. 方案光有视觉噱头，完全没考虑落地执行"}]},
+          q3:{type:"single",title:"出稿子时，最想把 AI 哪方面的短板补齐？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 把模糊想法继续发散开"},{key:"B",label:"B. 元素图层散乱，我只能从头画起"},{key:"C",label:"C. 给了参考图和规范，却不按我的要求来"},{key:"D",label:"D. 图是出了，但扩图、补图的质量没跟上"}]},
+          q4:{type:"single",title:"改界面改烦了，AI 最让你崩溃的是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 方案不新或者太新，并没有在优化"},{key:"B",label:"B. 反复出现的组件、色彩偏差，还是得我调整"},{key:"C",label:"C. 我得再告诉 AI 之前的设计逻辑，不如自己改"},{key:"D",label:"D. 改完一处稿子，没帮我同步到其他稿子"}]},
+          q5:{type:"single",title:"做原型、串页面时，你最想让 AI 先解决什么？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 帮我生成交互动效"},{key:"B",label:"B. 减少重复搭建、复制、调整这些机械劳动"},{key:"C",label:"C. 理解和填充我稿子里的图片、占位符素材"},{key:"D",label:"D. 帮我在原型与设计稿之间做同步修改"}]},
+          q6:{type:"single",title:"当你想让 AI 生一张图时，你会怎么和 AI 对话？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 直接描述想要的画面"},{key:"B",label:"B. 结合参考图说明想要的效果"},{key:"C",label:"C. 带着更具体的参数和参考去生成"},{key:"D",label:"D. 先让其他 AI 帮我整理 Prompt，再去生成"}]},
+          q7:{type:"single",title:"当你想让 AI 改一张已经生成好的图时，你更接近下面哪种写法？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 直接说这张图哪里要改"},{key:"B",label:"B. 截图局部，描述想调整成什么方向"},{key:"C",label:"C. 在修改要求里，会明确哪些地方要改、哪些地方不要动，标注参数"},{key:"D",label:"D. 先让其他 AI 帮我整理修改思路，再交给改图 AI"}]},
+          q8:{type:"single",title:"设计师工作类型（单选）",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 图形 / Logo"},{key:"B",label:"B. 界面体验"},{key:"C",label:"C. 角色人设"},{key:"D",label:"D. 流程原型"}]},
+          q9:{type:"multi",maxSelect:3,title:"常用 AI 工具（最多选 3 个）",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Figma"},{key:"B",label:"B. Sketch"},{key:"C",label:"C. Axure"},{key:"D",label:"D. MasterGo"},{key:"E",label:"E. PhotoShop"},{key:"F",label:"F. Pixso"},{key:"G",label:"G. Motiff"},{key:"H",label:"H. Penpot"},{key:"I",label:"I. Adobe XD"}]},
+          q10:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
+        },
+        mappings:{
+          single:{
+            q2:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q3:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q4:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q5:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q6:{A:{pica:1,dali:1},B:{mona:2},C:{dali:2,slow:1},D:{slow:2,mona:1}},
+            q7:{A:{pica:2},B:{mona:2},C:{mona:2,slow:1},D:{slow:2,dali:1}},
+            q8:{A:{pica:2,dali:1},B:{mona:2,slow:1},C:{dali:2,pica:1},D:{slow:3}}
+          },
+          rank:{
+            q1:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}}
+          },
+          multi:{
+            q9:{A:{slow:3},B:{mona:1,slow:1},C:{slow:3},D:{slow:3},E:{pica:2,mona:1},F:{slow:3},G:{slow:3},H:{slow:3},I:{mona:2,slow:1},J:{dali:2,pica:1}}
+          },
+          score:{},
+          scale:{}
+        }
+      };
+    }
+
+    function clone(v){return JSON.parse(JSON.stringify(v))}
+    function mergeQuestionsDeep(baseQ,parsedQ){
+      const out={...baseQ};
+      Object.keys(parsedQ||{}).forEach((id)=>{
+        out[id]={...(baseQ&&baseQ[id]||{}),...(parsedQ[id]||{})};
+      });
+      return out;
+    }
+    function migrateQuestionFlags(questions){
+      Object.keys(questions||{}).forEach((id)=>{
+        const qq=questions[id];
+        if(!qq||typeof qq!=="object")return;
+        if(qq.usePriorityWeight!==undefined){
+          if(qq.mapsToRoles===undefined)qq.mapsToRoles=!!qq.usePriorityWeight;
+          delete qq.usePriorityWeight;
+        }
+      });
+      return questions;
+    }
+    function loadCfg(){
+      try{
+        const raw=localStorage.getItem(CFG_KEY);
+        if(!raw)return defaultConfig();
+        const parsed=JSON.parse(raw);
+        const d=defaultConfig();
+        const roleMap={};
+        (d.roles||[]).forEach((r)=>{roleMap[r.id]=r});
+        const parsedRoleSet=Number((parsed.meta&&parsed.meta.roleSetVersion)||0);
+        const baseRoleSet=Number((d.meta&&d.meta.roleSetVersion)||0);
+        const allowedRoleIds=new Set((d.roles||[]).map((r)=>r.id));
+        const parsedRolesFiltered=(Array.isArray(parsed.roles)?parsed.roles:[]).filter((r)=>r&&allowedRoleIds.has(r.id));
+        const useParsedRoles=parsedRolesFiltered.length>0&&parsedRoleSet===baseRoleSet;
+        const sourceRoles=useParsedRoles?parsedRolesFiltered:d.roles;
+        const mergedRoles=sourceRoles.map((r)=>{
+          const base=roleMap[r.id]||{};
+          const {traits,problems,quote,...rest}=r;
+          return {...base,...rest};
+        });
+        const pm={...(parsed.meta||{})};
+        delete pm.priorityWeightEnabled;
+        const schemaOutdated=((parsed.meta&&parsed.meta.questionSchema)||"")!==d.meta.questionSchema;
+        const mergedQuestions=migrateQuestionFlags(
+          schemaOutdated
+            ? JSON.parse(JSON.stringify(d.questions))
+            : mergeQuestionsDeep(d.questions, parsed.questions||{})
+        );
+        ["q4","q5","q6"].forEach((qid)=>{
+          const q=mergedQuestions[qid];
+          if(!q||q.type!=="scale")return;
+          const desc=String(q.desc||"");
+          q.desc=desc
+            .replace(/1-5/g,"1-7")
+            .replace(/1\s*=\s*完全不像/g,"1 = 完全同意")
+            .replace(/5\s*=\s*就是我/g,"7 = 完全不同意");
+        });
+        return {
+          ...d,
+          ...parsed,
+          meta:{...d.meta,...pm,...(!useParsedRoles?{roleSetVersion:d.meta.roleSetVersion}:{}),questionSchema:d.meta.questionSchema},
+          roles:mergedRoles,
+          questions:mergedQuestions,
+          mappings:schemaOutdated
+            ? JSON.parse(JSON.stringify(d.mappings))
+            :{
+                single:{...d.mappings.single,...((parsed.mappings&&parsed.mappings.single)||{})},
+                rank:{...d.mappings.rank,...((parsed.mappings&&parsed.mappings.rank)||{})},
+                multi:{...d.mappings.multi,...((parsed.mappings&&parsed.mappings.multi)||{})},
+                score:{...d.mappings.score,...((parsed.mappings&&parsed.mappings.score)||{})},
+                scale:{...d.mappings.scale,...((parsed.mappings&&parsed.mappings.scale)||{})}
+              }
+        };
+      }catch(e){return defaultConfig()}
+    }
+
+    let cfg=loadCfg();
+    let activeQid="q1";
+    let activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+    let dragQid="";
+    let dropQid="";
+    function safePositiveInt(v,fallback){
+      const n=Math.round(Number(v));
+      return Number.isFinite(n)&&n>0?n:fallback;
+    }
+    function getSurveyData(){return JSON.parse(localStorage.getItem("ardot_survey")||"[]")}
+    function fillMetaEditor(){
+      if(!cfg.meta)cfg.meta={};
+      document.getElementById("metaMainTitle").value=cfg.meta.mainTitle||"";
+      document.getElementById("metaSubtitle").value=cfg.meta.subtitle||"";
+    }
+    function collectMetaEditorToConfig(){
+      if(!cfg.meta)cfg.meta={};
+      const mt=document.getElementById("metaMainTitle");
+      const st=document.getElementById("metaSubtitle");
+      if(mt)cfg.meta.mainTitle=mt.value.trim();
+      if(st)cfg.meta.subtitle=st.value.trim();
+      const toggle=document.getElementById("feedbackEnabledToggle");
+      if(toggle)cfg.meta.feedbackEnabled=!!toggle.checked;
+      return true;
+    }
+    function isFeedbackEnabled(){
+      return !cfg.meta || cfg.meta.feedbackEnabled!==false;
+    }
+    function applyFeedbackModeUI(){
+      const enabled=isFeedbackEnabled();
+      const toggle=document.getElementById("feedbackEnabledToggle");
+      const hint=document.getElementById("feedbackDisabledHint");
+      const wrap=document.getElementById("roleConfigWrap");
+      const resultBtn=document.getElementById("modeResultBtn");
+      if(toggle)toggle.checked=enabled;
+      if(hint)hint.classList.toggle("hidden",enabled);
+      if(wrap)wrap.classList.toggle("hidden",!enabled);
+      if(resultBtn)resultBtn.classList.toggle("hidden",!enabled);
+      if(!enabled && statsMode==="result")setStatsMode("survey");
+    }
+    function bindFeedbackToggle(){
+      const toggle=document.getElementById("feedbackEnabledToggle");
+      if(!toggle)return;
+      toggle.onchange=()=>{
+        if(!cfg.meta)cfg.meta={};
+        cfg.meta.feedbackEnabled=!!toggle.checked;
+        applyFeedbackModeUI();
+        switchManageSubTab(activeManageSubTab);
+      };
+    }
+    function switchTab(tab){
+      activeTab=tab;
+      document.getElementById("tabManageBtn").classList.toggle("active",tab==="manage");
+      document.getElementById("tabStatsBtn").classList.toggle("active",tab==="stats");
+      document.getElementById("manageTab").classList.toggle("hidden",tab!=="manage");
+      document.getElementById("statsTab").classList.toggle("hidden",tab!=="stats");
+      if(tab==="stats"){
+        renderStats();
+        if(statsMode==="survey")renderChartQuestionSelect();
+        else renderChart();
+      }
+    }
+    function switchManageSubTab(tab){
+      activeManageSubTab=tab;
+      document.getElementById("subTabQuestionBtn").classList.toggle("active",tab==="question");
+      document.getElementById("subTabRoleBtn").classList.toggle("active",tab==="role");
+      document.getElementById("metaConfigCard").classList.toggle("hidden",tab!=="question");
+      document.getElementById("questionSidebarCard").classList.toggle("hidden",tab!=="question");
+      document.getElementById("roleSidebarCard").classList.toggle("hidden",tab!=="role"||!isFeedbackEnabled());
+      document.getElementById("questionEditorCard").classList.toggle("hidden",tab!=="question");
+      document.getElementById("roleEditorCard").classList.toggle("hidden",tab!=="role");
+      applyFeedbackModeUI();
+    }
+
+    function ensureQuestionOrder(){
+      const ids=Object.keys(cfg.questions||{});
+      if(!cfg.meta)cfg.meta={};
+      const ordered=Array.isArray(cfg.meta.questionOrder)?cfg.meta.questionOrder:[];
+      const base=ordered.filter((id)=>ids.includes(id));
+      ids.forEach((id)=>{if(!base.includes(id))base.push(id)});
+      cfg.meta.questionOrder=base;
+      return base;
+    }
+    function questionIds(){return ensureQuestionOrder();}
+    function displayQid(realQid){
+      const order=questionIds();
+      const idx=order.indexOf(realQid);
+      return idx===-1?realQid:("q"+(idx+1));
+    }
+    function mappingFor(qid){
+      const q=cfg.questions[qid];
+      if(!q)return {};
+      if(q.type==="single")return (cfg.mappings.single[qid]||{});
+      if(q.type==="rank")return (cfg.mappings.rank[qid]||{});
+      if(q.type==="multi")return (cfg.mappings.multi[qid]||{});
+      if(q.type==="score")return (cfg.mappings.score[qid]||{});
+      if(q.type==="scale")return (cfg.mappings.scale[qid]||[]);
+      return {};
+    }
+
+    function renderQList(){
+      const list=document.getElementById("qList");
+      list.innerHTML=questionIds().map((qid)=>{
+        const q=cfg.questions[qid];
+        const map=mappingFor(qid);
+        const rel=(q.type==="single"||q.type==="rank"||q.type==="multi")
+          ? Object.keys(map).length+" 个选项映射"
+          : q.type==="scale"
+            ? (Array.isArray(map)?map.length:0)+" 条量表映射"
+            : q.type==="score"
+              ? Object.keys(map||{}).length+" 个分值映射"
+              : "文本题";
+        const typeLabel=q.type==="single"?"单选":(q.type==="multi"?"多选":(q.type==="rank"?"排序":(q.type==="scale"?"量表":(q.type==="score"?"打分":"文本"))));
+        const showId=displayQid(qid);
+        return `<div class="q-item ${qid===activeQid?"active":""}" draggable="true"
+          onclick="selectQ('${qid}')"
+          ondragstart="onQuestionDragStart('${qid}',event)"
+          ondragover="onQuestionDragOver('${qid}',event)"
+          ondrop="onQuestionDrop('${qid}',event)"
+          ondragleave="onQuestionDragLeave('${qid}',event)"
+          ondragend="onQuestionDragEnd(event)">
+          <div class="q-id">${showId.toUpperCase()}</div>
+          <div class="q-title">${q.title}</div>
+          <div class="q-meta">${typeLabel} · ${rel}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function onQuestionDragStart(qid,ev){
+      dragQid=qid;
+      if(ev&&ev.dataTransfer){
+        ev.dataTransfer.effectAllowed="move";
+        ev.dataTransfer.setData("text/plain",qid);
+      }
+      const el=ev&&ev.currentTarget;
+      if(el)el.classList.add("dragging");
+    }
+    function onQuestionDragOver(qid,ev){
+      if(!dragQid||dragQid===qid)return;
+      ev.preventDefault();
+      dropQid=qid;
+      const el=ev&&ev.currentTarget;
+      if(el)el.classList.add("drop-target");
+    }
+    function onQuestionDragLeave(qid,ev){
+      const el=ev&&ev.currentTarget;
+      if(el)el.classList.remove("drop-target");
+    }
+    function onQuestionDrop(qid,ev){
+      ev.preventDefault();
+      const targetQid=qid||dropQid;
+      if(!dragQid||!targetQid||dragQid===targetQid){onQuestionDragEnd(ev);return;}
+      const order=questionIds().slice();
+      const from=order.indexOf(dragQid);
+      const to=order.indexOf(targetQid);
+      if(from===-1||to===-1){onQuestionDragEnd(ev);return;}
+      order.splice(from,1);
+      order.splice(to,0,dragQid);
+      cfg.meta.questionOrder=order;
+      renderQList();
+      onQuestionDragEnd(ev);
+    }
+    function onQuestionDragEnd(ev){
+      dragQid="";
+      dropQid="";
+      document.querySelectorAll(".q-item.dragging,.q-item.drop-target").forEach((el)=>{
+        el.classList.remove("dragging");
+        el.classList.remove("drop-target");
+      });
+    }
+    function createQuestionId(){
+      const ids=Object.keys(cfg.questions||{});
+      let n=1;
+      while(ids.includes("q"+n))n++;
+      return "q"+n;
+    }
+    function addQuestion(){
+      const qid=createQuestionId();
+      if(!cfg.questions)cfg.questions={};
+      cfg.questions[qid]={
+        type:"single",
+        title:"新问题",
+        desc:"单选",
+        options:[
+          {key:"A",label:"A. 选项一"},
+          {key:"B",label:"B. 选项二"}
+        ]
+      };
+      if(!cfg.mappings)cfg.mappings={single:{},multi:{},rank:{},score:{},scale:{}};
+      if(!cfg.mappings.single)cfg.mappings.single={};
+      const fallbackRole=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+      cfg.mappings.single[qid]={
+        A:fallbackRole?{[fallbackRole]:0}:{},
+        B:fallbackRole?{[fallbackRole]:0}:{}
+      };
+      const order=questionIds().slice();
+      order.push(qid);
+      if(!cfg.meta)cfg.meta={};
+      cfg.meta.questionOrder=order;
+      activeQid=qid;
+      renderQList();
+      fillEditor();
+      renderDistribution();
+      renderChartQuestionSelect();
+    }
+    function removeQuestionMappings(qid){
+      if(cfg.mappings&&cfg.mappings.single)delete cfg.mappings.single[qid];
+      if(cfg.mappings&&cfg.mappings.multi)delete cfg.mappings.multi[qid];
+      if(cfg.mappings&&cfg.mappings.rank)delete cfg.mappings.rank[qid];
+      if(cfg.mappings&&cfg.mappings.score)delete cfg.mappings.score[qid];
+      if(cfg.mappings&&cfg.mappings.scale)delete cfg.mappings.scale[qid];
+    }
+    function deleteActiveQuestion(){
+      const ids=questionIds();
+      if(ids.length<=1){
+        alert("至少保留 1 个问题");
+        return;
+      }
+      const qid=activeQid;
+      const showId=displayQid(qid).toUpperCase();
+      if(!confirm(`确认删除 ${showId} 吗？`))return;
+      const idx=ids.indexOf(qid);
+      delete cfg.questions[qid];
+      removeQuestionMappings(qid);
+      const nextOrder=ids.filter((id)=>id!==qid);
+      if(!cfg.meta)cfg.meta={};
+      cfg.meta.questionOrder=nextOrder;
+      activeQid=nextOrder[Math.max(0,idx-1)]||nextOrder[0];
+      renderQList();
+      fillEditor();
+      renderDistribution();
+      renderChartQuestionSelect();
+    }
+
+    function selectQ(qid){
+      if(qid===activeQid)return;
+      if(!flushCfgToLocalStorage({refreshUI:false,silent:true,alertStorageError:false})){
+        alert("当前题目映射 JSON 有误，请先修正后再切换");
+        return;
+      }
+      activeQid=qid;
+      renderQList();
+      fillEditor();
+      renderDistribution();
+      renderChartQuestionSelect();
+    }
+
+    function onQuestionTypeChange(){
+      const q=cfg.questions[activeQid];
+      if(!q)return;
+      const nextType=document.getElementById("qtype").value||"single";
+      if(q.type===nextType)return;
+      q.type=nextType;
+      if(nextType==="single"||nextType==="rank"||nextType==="multi"){
+        q.options=Array.isArray(q.options)&&q.options.length?q.options:[{key:"A",label:"A. 选项一"},{key:"B",label:"B. 选项二"}];
+        if(nextType==="multi")q.maxSelect=safePositiveInt(q.maxSelect,3);
+        else delete q.maxSelect;
+        delete q.stems;
+        delete q.placeholder;
+        delete q.min;
+        delete q.max;
+      }else if(nextType==="scale"){
+        q.stems=Array.isArray(q.stems)&&q.stems.length?q.stems:["请填写分项 1","请填写分项 2"];
+        delete q.options;
+        delete q.maxSelect;
+        delete q.placeholder;
+        delete q.min;
+        delete q.max;
+      }else if(nextType==="score"){
+        q.min=Number(q.min||1);
+        q.max=Number(q.max||7);
+        delete q.options;
+        delete q.maxSelect;
+        delete q.stems;
+        delete q.placeholder;
+      }else{
+        q.placeholder=q.placeholder||"请输入";
+        delete q.options;
+        delete q.maxSelect;
+        delete q.stems;
+        delete q.min;
+        delete q.max;
+      }
+      if(!(nextType==="single"||nextType==="multi"||nextType==="score"||nextType==="scale"||nextType==="rank"))
+        delete q.mapsToRoles;
+      fillEditor();
+      renderQList();
+    }
+
+    function syncRoleMappingSection(){
+      const sec=document.getElementById("roleMappingSection");
+      if(!sec)return;
+      const q=cfg.questions[activeQid];
+      if(!q||q.type==="text"){
+        sec.style.display="none";
+        return;
+      }
+      if(q.type==="rank"&&activeQid==="q1"){
+        sec.style.display="";
+        return;
+      }
+      const mappedTypes=["single","multi","rank","score","scale"];
+      if(!mappedTypes.includes(q.type)){
+        sec.style.display="none";
+        return;
+      }
+      sec.style.display=q.mapsToRoles===false?"none":"";
+    }
+    function adminMapsToRolesChange(){
+      const q=cfg.questions[activeQid];
+      const cb=document.getElementById("qMapsToRoles");
+      if(!q||!cb)return;
+      q.mapsToRoles=!!cb.checked;
+      syncRoleMappingSection();
+      scheduleConfigAutoSave();
+    }
+
+    function fillEditor(){
+      if(!cfg.questions[activeQid]){
+        const ids=questionIds();
+        activeQid=ids[0];
+      }
+      const q=cfg.questions[activeQid];
+      if(!q)return;
+      const showId=displayQid(activeQid);
+      document.getElementById("editorTitle").textContent="编辑 "+showId.toUpperCase();
+      document.getElementById("qid").value=showId;
+      document.getElementById("qtype").value=q.type||"single";
+      document.getElementById("qtitle").value=q.title||"";
+      document.getElementById("qdesc").value=q.desc||"";
+      const isSingle=q.type==="single";
+      const isMulti=q.type==="multi";
+      const isRank=q.type==="rank";
+      const isScale=q.type==="scale";
+      const isScore=q.type==="score";
+      const isText=q.type==="text";
+      document.getElementById("singleEditor").style.display=(isSingle||isRank||isMulti)?"block":"none";
+      document.getElementById("multiEditor").style.display=isMulti?"grid":"none";
+      document.getElementById("scaleEditor").style.display=isScale?"block":"none";
+      document.getElementById("textEditor").style.display=isText?"block":"none";
+      document.getElementById("scoreEditor").style.display=isScore?"block":"none";
+      document.getElementById("singleMappingEditor").style.display=(isSingle||isRank||isMulti)?"grid":"none";
+      document.getElementById("scaleMappingEditor").style.display=(isScale||isScore)?"block":"none";
+      document.getElementById("mappingLabel").textContent=(isSingle||isRank||isMulti)?"选项映射到角色与加分":(isScale?"分项到角色映射（JSON 数组）":(isScore?"分值到角色映射（JSON）":"文本题不参与映射"));
+      document.getElementById("mappingNote").textContent=(isSingle||isRank||isMulti)
+        ?(isRank
+          ?"排序题：第 1～4 名依次乘以 1、0.75、0.5、0.25；下方选项→角色+加分与名次一起折算各角色权重，再乘到已勾选「参与角色映射」的题目得分上。"
+          :"每个选项可映射到 1 个角色并设置加分值；最终结果输出总分最高角色。")
+        :isScale
+          ?"量表题按分项权重配置，例如：[{\"mona\":1.2}, ...]"
+          :isScore
+            ?"示例：{\"1\":{\"slow\":1},\"7\":{\"dali\":1}}"
+          :"文本题用于收集开放回答，不参与角色映射。";
+      if(isSingle||isRank||isMulti){
+        document.getElementById("singleOptions").value=(q.options||[]).map(o=>`${o.key}|${o.label}`).join("\n");
+        if(isMulti)document.getElementById("multiMaxSelect").value=String(safePositiveInt(q.maxSelect,3));
+        renderSingleMappingEditor(q.options||[], mappingFor(activeQid));
+      }else if(isScale){
+        document.getElementById("scaleStems").value=(q.stems||[]).join("\n");
+        document.getElementById("mappingEditor").value=JSON.stringify(mappingFor(activeQid),null,2);
+      }else if(isScore){
+        document.getElementById("scoreMin").value=String(Number(q.min||1));
+        document.getElementById("scoreMax").value=String(Number(q.max||7));
+        document.getElementById("mappingEditor").value=JSON.stringify(mappingFor(activeQid),null,2);
+      }else{
+        document.getElementById("textPlaceholder").value=q.placeholder||"";
+      }
+      const pwb=document.getElementById("qPriorityWeightBlock");
+      const rankNote=document.getElementById("qPriorityWeightRankOnly");
+      const cbWrap=document.getElementById("qPriorityWeightCbWrap");
+      const pdcb=document.getElementById("qMapsToRoles");
+      if(pwb&&rankNote&&cbWrap&&pdcb){
+        if(isRank){
+          pwb.style.display="block";
+          if(activeQid==="q1"){
+            rankNote.style.display="block";
+            cbWrap.style.display="none";
+            rankNote.textContent="排序题（权重源）：第 1～4 名依次乘以 1、0.75、0.5、0.25，与下方「选项→角色+加分」一起折算各角色权重系数；该系数会乘到已勾选「参与角色映射」的其他题目映射得分上。";
+          }else{
+            rankNote.style.display="none";
+            cbWrap.style.display="flex";
+            pdcb.checked=q.mapsToRoles!==false;
+          }
+        }else if(isSingle||isMulti||isScale||isScore){
+          pwb.style.display="block";
+          rankNote.style.display="none";
+          cbWrap.style.display="flex";
+          pdcb.checked=q.mapsToRoles!==false;
+        }else{
+          pwb.style.display="none";
+        }
+      }
+      document.getElementById("mappingPreview").textContent=JSON.stringify(mappingFor(activeQid),null,2);
+      if(pdcb)pdcb.onchange=adminMapsToRolesChange;
+      syncRoleMappingSection();
+    }
+
+    function renderSingleMappingEditor(options,map){
+      const box=document.getElementById("singleMappingEditor");
+      if(!box)return;
+      const roleOptions=(cfg.roles||[]).map((r)=>`<option value="${r.id}">${r.name} (${r.id})</option>`).join("");
+      box.innerHTML=(options||[]).map((opt)=>{
+        const roleScores=(map&&map[opt.key])||{};
+        const first=Object.entries(roleScores)[0]||[];
+        const roleId=first[0]||((cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"");
+        const score=Number(first[1]||0);
+        return `<div class="single-map-row">
+          <div class="single-map-opt">${opt.key} · ${opt.label}</div>
+          <select data-map-key="${opt.key}" class="single-map-role">${roleOptions}</select>
+          <input data-score-key="${opt.key}" class="score-input single-map-score" type="number" step="0.1" value="${score}">
+        </div>`;
+      }).join("");
+      (options||[]).forEach((opt)=>{
+        const roleScores=(map&&map[opt.key])||{};
+        const first=Object.entries(roleScores)[0]||[];
+        const roleId=first[0]||((cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"");
+        const sel=box.querySelector(`select[data-map-key="${opt.key}"]`);
+        if(sel)sel.value=roleId;
+      });
+    }
+
+    function collectSingleMappingFromEditor(options){
+      const box=document.getElementById("singleMappingEditor");
+      const next={};
+      if(!box)return next;
+      (options||[]).forEach((opt)=>{
+        const roleSel=box.querySelector(`select[data-map-key="${opt.key}"]`);
+        const scoreInput=box.querySelector(`input[data-score-key="${opt.key}"]`);
+        const roleId=roleSel&&roleSel.value;
+        const score=Number(scoreInput&&scoreInput.value);
+        if(roleId && Number.isFinite(score)){
+          next[opt.key]={[roleId]:score};
+        }
+      });
+      return next;
+    }
+
+    function roleById(id){
+      return (cfg.roles||[]).find((r)=>r.id===id);
+    }
+
+    function renderRoleList(){
+      const box=document.getElementById("roleList");
+      if(!box)return;
+      box.innerHTML=(cfg.roles||[]).map((r)=>{
+        const raw=(r.img||"").trim();
+        const imgSrc=!raw ? "" : (raw.startsWith("http://")||raw.startsWith("https://")||raw.startsWith("/")||raw.startsWith("./") ? raw : "./"+raw);
+        return `<div class="role-item ${r.id===activeRoleId?"active":""}" onclick="selectRole('${r.id}')">
+          <img class="role-thumb" src="${imgSrc}" alt="${r.name||r.id}" onerror="this.style.opacity='0.35'">
+          <div>
+            <div class="role-name">${r.name||r.id}</div>
+            <div class="role-meta">${r.id}${r.real?` · ${r.real}`:""}</div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    function selectRole(roleId){
+      if(roleId===activeRoleId)return;
+      if(!flushCfgToLocalStorage({refreshUI:false,silent:true,alertStorageError:false})){
+        alert("当前题目映射 JSON 或角色信息有误，请先修正后再切换");
+        return;
+      }
+      activeRoleId=roleId;
+      fillRoleEditor();
+      renderRoleSelect();
+      renderRoleList();
+    }
+
+    function renderRoleSelect(){
+      if(!isFeedbackEnabled()){applyFeedbackModeUI();return;}
+      const sel=document.getElementById("roleSelect");
+      if(!sel)return;
+      sel.innerHTML=(cfg.roles||[]).map((r)=>`<option value="${r.id}">${r.name} (${r.id})</option>`).join("");
+      if(!activeRoleId||!roleById(activeRoleId)){
+        activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+      }
+      sel.value=activeRoleId;
+      sel.onchange=()=>{
+        selectRole(sel.value);
+      };
+      fillRoleEditor();
+      renderRoleList();
+    }
+
+    function fillRoleEditor(){
+      const r=roleById(activeRoleId);
+      if(!r)return;
+      document.getElementById("roleId").value=r.id||"";
+      document.getElementById("roleName").value=r.name||"";
+      document.getElementById("roleReal").value=r.real||"";
+      document.getElementById("roleImg").value=r.img||"";
+      document.getElementById("roleDesc").value=r.desc||"";
+      updateRoleImgPreview();
+      document.getElementById("roleImg").oninput=()=>updateRoleImgPreview();
+      document.getElementById("roleImgUpload").onchange=uploadRoleImage;
+    }
+    function updateRoleImgPreview(){
+      const input=document.getElementById("roleImg");
+      const img=document.getElementById("roleImgPreview");
+      if(!input||!img)return;
+      const raw=(input.value||"").trim();
+      if(!raw){img.src="";img.style.visibility="hidden";return;}
+      img.style.visibility="visible";
+      const resolved=raw.startsWith("http://")||raw.startsWith("https://")||raw.startsWith("/")||raw.startsWith("./")?raw:"./"+raw;
+      img.src=resolved;
+      img.onerror=()=>{img.style.opacity="0.35";};
+      img.onload=()=>{img.style.opacity="1";};
+    }
+
+    function uploadRoleImage(ev){
+      const file=ev&&ev.target&&ev.target.files&&ev.target.files[0];
+      if(!file)return;
+      if(!file.type.startsWith("image/")){
+        alert("请选择图片文件");
+        ev.target.value="";
+        return;
+      }
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const dataUrl=String(reader.result||"");
+        document.getElementById("roleImg").value=dataUrl;
+        updateRoleImgPreview();
+        collectRoleEditorToConfig(true);
+        renderRoleList();
+      };
+      reader.onerror=()=>alert("图片读取失败，请重试");
+      reader.readAsDataURL(file);
+      ev.target.value="";
+    }
+
+    function collectRoleEditorToConfig(silent, refreshUI){
+      if(!isFeedbackEnabled())return true;
+      const ids=(cfg.roles||[]).map((x)=>x.id).filter(Boolean);
+      if(!ids.length)return true;
+      if(!activeRoleId||!roleById(activeRoleId))activeRoleId=ids[0];
+      const r=roleById(activeRoleId);
+      if(!r)return true;
+      // Role id is immutable in admin; always lock it to current selection.
+      r.id=activeRoleId;
+      document.getElementById("roleId").value=activeRoleId;
+      r.name=document.getElementById("roleName").value.trim();
+      r.real=document.getElementById("roleReal").value.trim();
+      r.img=document.getElementById("roleImg").value.trim();
+      r.desc=document.getElementById("roleDesc").value.trim();
+      delete r.traits;
+      delete r.problems;
+      delete r.quote;
+      if(!r.name){
+        if(!silent)alert("角色名称不能为空");
+        return false;
+      }
+      if(refreshUI!==false){
+        renderRoleSelect();
+        renderRoleList();
+      }
+      return true;
+    }
+
+    function normalizeSurveyValue(item,qid){
+      if(qid==="q8"){
+        if(item&&item.answers&&item.answers.q8!==undefined)return item.answers.q8;
+        if(item&&item.q8_designer_type)return item.q8_designer_type;
+        if(item&&item.q10_designer_type)return item.q10_designer_type;
+        const t=item&&item.answers&&item.answers.q10;
+        if(t!==undefined&&/^[ABCD]$/i.test(String(t).trim()))return String(t).trim().toUpperCase();
+      }
+      if(qid==="q9"){
+        if(item&&item.answers&&item.answers.q9!==undefined)return item.answers.q9;
+        if(item&&Array.isArray(item.q9_ai_tools_top3))return item.q9_ai_tools_top3;
+        if(item&&item.answers&&item.answers.q11!==undefined)return item.answers.q11;
+        if(item&&Array.isArray(item.q11_ai_tools_top3))return item.q11_ai_tools_top3;
+      }
+      if(qid==="q10"){
+        if(item&&item.answers&&item.answers.q12!==undefined){
+          const s=String(item.answers.q12).trim();
+          if(s)return item.answers.q12;
+        }
+        if(item&&item.q12_ai_wish){
+          const s=String(item.q12_ai_wish).trim();
+          if(s)return item.q12_ai_wish;
+        }
+        if(item&&item.q10_ai_wish){
+          const s=String(item.q10_ai_wish).trim();
+          if(s)return item.q10_ai_wish;
+        }
+        if(item&&item.answers&&item.answers.q10!==undefined){
+          const s=String(item.answers.q10).trim();
+          if(s&&!/^[ABCD]$/i.test(s))return item.answers.q10;
+        }
+        return "";
+      }
+      if(item&&item.answers&&item.answers[qid]!==undefined){
+        const v=item.answers[qid];
+        return Array.isArray(v)?(v[0]||""):v;
+      }
+      const keyMap={
+        q1:["q1_task_focus","q1_design_tool"],
+        q8:["q8_designer_type","q10_designer_type","q8_current_state"],
+        q9:["q9_ai_tools_top3","q11_ai_tools_top3"],
+        q10:["q10_ai_wish","q12_ai_wish"]
+      };
+      const keys=keyMap[qid]||[];
+      for(const k of keys){if(item&&item[k])return item[k]}
+      return "";
+    }
+
+    function renderStats(){
+      const data=getSurveyData();
+      const n=data.length;
+      document.getElementById("stTotal").textContent=n;
+      const today=new Date().toISOString().slice(0,10);
+      document.getElementById("stToday").textContent=data.filter(d=>(d.timestamp||"").startsWith(today)).length;
+      if(!n){
+        document.getElementById("stLatest").textContent="-";
+        document.getElementById("stTopQ8").textContent="-";
+        renderDistribution();
+        return;
+      }
+      const sorted=[...data].filter(d=>d.timestamp).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+      document.getElementById("stLatest").textContent=sorted[0]&&sorted[0].timestamp?new Date(sorted[0].timestamp).toLocaleString("zh-CN"):"-";
+      const q8Map={};
+      data.forEach((d)=>{const v=normalizeSurveyValue(d,"q8");if(v)q8Map[v]=(q8Map[v]||0)+1});
+      const top=Object.entries(q8Map).sort((a,b)=>b[1]-a[1])[0];
+      document.getElementById("stTopQ8").textContent=top?`${top[0]} (${top[1]})`:"-";
+      renderDistribution();
+    }
+
+    function renderDistribution(){
+      const q=cfg.questions[activeQid];
+      if(!q)return;
+      const ds=getQuestionStats(activeQid);
+      const box=document.getElementById("distBox");
+      const title=document.getElementById("distTitle");
+      if(!ds.total){
+        title.textContent="暂无作答数据。";
+        box.innerHTML="<div class='note'>暂无数据</div>";
+        return;
+      }
+      if(q.type==="single"){
+        const entries=ds.labels.map((l,idx)=>({label:ds.shortLabels[idx],val:ds.values[idx],full:l})).sort((a,b)=>b.val-a.val);
+        const max=Math.max(...entries.map(e=>e.val),1);
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 单选分布（${ds.valid}/${ds.total} 有效）`;
+        box.innerHTML=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+      }else if(q.type==="multi"){
+        const entries=ds.labels.map((l,idx)=>({label:ds.shortLabels[idx],val:ds.values[idx],full:l})).sort((a,b)=>b.val-a.val);
+        const max=Math.max(...entries.map(e=>e.val),1);
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 多选分布（最多选 ${ds.maxSelect}，${ds.valid}/${ds.total} 有效）`;
+        box.innerHTML=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+      }else if(q.type==="rank"){
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 排序分布（按名次统计）`;
+        box.innerHTML=ds.matrix.map((row,posIdx)=>{
+          const entries=ds.labels.map((label,optIdx)=>({label:ds.shortLabels[optIdx],full:label,val:row[optIdx]||0})).sort((a,b)=>b.val-a.val);
+          const max=Math.max(...entries.map((e)=>e.val),1);
+          const rows=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+          return `<div class="stem-stat"><div class="stem-title">第 ${posIdx+1} 位（${ds.validByPos[posIdx]||0}/${ds.total} 有效）</div>${rows}</div>`;
+        }).join("");
+      }else if(q.type==="score"){
+        const entries=ds.labels.map((l,idx)=>({label:l,val:ds.values[idx]}));
+        const max=Math.max(...entries.map(e=>e.val),1);
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 打分分布（均分 ${ds.mean}）`;
+        box.innerHTML=entries.map((e)=>`<div class="dist-row"><span>${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+      }else if(q.type==="scale"){
+        const stemStats=getScaleStemStats(activeQid);
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 量表分项统计（每个分项独立显示分布+均分）`;
+        box.innerHTML=stemStats.map((s)=>`
+          <div class="stem-stat">
+            <div class="stem-title">${s.label}</div>
+            <div class="stem-meta">均分 ${s.mean} · 打分次数 ${s.scoreCount}</div>
+            <div class="stem-hist">${s.labels.map((lb,idx)=>`${lb}:${s.values[idx]}`).join(" ｜ ")}</div>
+          </div>
+        `).join("");
+      }else{
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 文本题填写统计`;
+        const entries=ds.labels.map((l,idx)=>({label:l,val:ds.values[idx]}));
+        const max=Math.max(...entries.map(e=>e.val),1);
+        const ratioHtml=entries.map((e)=>`<div class="dist-row"><span>${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+        const textRows=(ds.entries||[]).slice(0,80).map((item)=>{
+          const t=item.timestamp?new Date(item.timestamp).toLocaleString("zh-CN"):"-";
+          const safe=item.text
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;");
+          return `<div class="stem-stat"><div class="stem-meta">#${item.index} · ${t}</div><div class="stem-title" style="font-weight:500">${safe}</div></div>`;
+        }).join("");
+        box.innerHTML=ratioHtml
+          + `<div class="split"></div>`
+          + `<div class="stem-title">文本原始回答（最新优先，最多显示 80 条）</div>`
+          + (textRows||"<div class='note'>暂无文本回答</div>");
+      }
+    }
+
+    function getScaleStemStats(qid){
+      const data=getSurveyData();
+      const q=cfg.questions[qid];
+      const stems=(q&&q.stems)||[];
+      const keyMap={q4:"q4_breakdown",q5:"q5_expectation",q6:"q6_prompt_relation"};
+      return stems.map((stem,stemIdx)=>{
+        const counts=new Array(7).fill(0);
+        let sum=0,count=0;
+        data.forEach((d)=>{
+          const obj=(d&&d[keyMap[qid]])||{};
+          const v=Number(obj[stemIdx]);
+          if(v>=1&&v<=7){
+            counts[v-1]+=1;
+            sum+=v;
+            count+=1;
+          }
+        });
+        return {
+          stemIndex:stemIdx,
+          label:stem,
+          labels:["1分","2分","3分","4分","5分","6分","7分"],
+          values:counts,
+          scoreCount:count,
+          mean:count?Number((sum/count).toFixed(2)):0,
+          total:data.length
+        };
+      });
+    }
+
+    function getQuestionStats(qid, stemIndex){
+      const data=getSurveyData();
+      const q=cfg.questions[qid];
+      if(!q)return {type:"single",labels:[],shortLabels:[],values:[],valid:0,total:data.length};
+      if(q.type==="single"){
+        const cnt={};(q.options||[]).forEach(o=>cnt[o.key]=0);
+        let valid=0;
+        data.forEach((d)=>{
+          let v=normalizeSurveyValue(d,qid);
+          if(Array.isArray(v))v=v[0];
+          if(v&&cnt[v]!==undefined){cnt[v]++;valid++;}
+        });
+        const labels=(q.options||[]).map(o=>o.label);
+        const shortLabels=(q.options||[]).map(o=>o.key);
+        const values=(q.options||[]).map(o=>cnt[o.key]||0);
+        return {type:"single",labels,shortLabels,values,valid,total:data.length};
+      }
+      if(q.type==="multi"){
+        const cnt={};(q.options||[]).forEach(o=>cnt[o.key]=0);
+        let valid=0;
+        data.forEach((d)=>{
+          const raw=(d&&d.answers&&d.answers[qid]!==undefined)?d.answers[qid]:normalizeSurveyValue(d,qid);
+          const arr=Array.isArray(raw)?raw:(raw?[raw]:[]);
+          if(arr.length)valid++;
+          arr.forEach((v)=>{if(v&&cnt[v]!==undefined)cnt[v]++;});
+        });
+        const labels=(q.options||[]).map(o=>o.label);
+        const shortLabels=(q.options||[]).map(o=>o.key);
+        const values=(q.options||[]).map(o=>cnt[o.key]||0);
+        return {type:"multi",labels,shortLabels,values,valid,total:data.length,maxSelect:safePositiveInt(q.maxSelect,3)};
+      }
+      if(q.type==="rank"){
+        const options=(q.options||[]);
+        const keys=options.map((o)=>o.key);
+        const labels=options.map((o)=>o.label);
+        const rankCount=Math.max(1,Math.min(Number(q.topN||keys.length),keys.length));
+        const matrix=new Array(rankCount).fill(0).map(()=>new Array(keys.length).fill(0));
+        const validByPos=new Array(rankCount).fill(0);
+        data.forEach((d)=>{
+          const raw=(d&&d.answers&&d.answers[qid]!==undefined)?d.answers[qid]:normalizeSurveyValue(d,qid);
+          const order=Array.isArray(raw)?raw:(raw?[raw]:[]);
+          const limited=order.slice(0,rankCount);
+          limited.forEach((key,posIdx)=>{
+            const optIdx=keys.indexOf(key);
+            if(optIdx===-1)return;
+            matrix[posIdx][optIdx]+=1;
+            validByPos[posIdx]+=1;
+          });
+        });
+        const idx=Math.max(0,Math.min(keys.length-1,Number(stemIndex)||0));
+        return {
+          type:"rank",
+          labels,
+          shortLabels:keys,
+          values:matrix[idx]||new Array(keys.length).fill(0),
+          valid:validByPos[idx]||0,
+          total:data.length,
+          rankIndex:idx,
+          rankCount,
+          matrix,
+          validByPos
+        };
+      }
+      if(q.type==="text"){
+        let filled=0;
+        const entries=[];
+        data.forEach((d,idx)=>{
+          const raw=normalizeSurveyValue(d,qid);
+          const txt=String(raw||"").trim();
+          if(txt){
+            filled++;
+            entries.push({
+              index:idx+1,
+              timestamp:(d&&d.timestamp)||"",
+              text:txt
+            });
+          }
+        });
+        entries.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+        return {
+          type:"text",
+          labels:["已填写","未填写"],
+          shortLabels:["已填写","未填写"],
+          values:[filled,Math.max(0,data.length-filled)],
+          valid:filled,
+          total:data.length,
+          entries
+        };
+      }
+      if(q.type==="score"){
+        const min=Math.max(1,Number(q.min||1));
+        const max=Math.max(min,Number(q.max||7));
+        const counts=new Array(max-min+1).fill(0);
+        let sum=0,valid=0;
+        data.forEach((d)=>{
+          const v=Number(normalizeSurveyValue(d,qid));
+          if(v>=min&&v<=max){counts[v-min]+=1;sum+=v;valid+=1;}
+        });
+        const labels=new Array(max-min+1).fill(0).map((_,i)=>`${min+i}分`);
+        const mean=valid?Number((sum/valid).toFixed(2)):0;
+        return {type:"score",labels,shortLabels:labels,values:counts,valid,total:data.length,mean};
+      }
+      const stems=getScaleStemStats(qid);
+      const idx=Math.max(0,Math.min(stems.length-1,Number(stemIndex)||0));
+      const s=stems[idx]||{labels:["1 分","2 分","3 分","4 分","5 分","6 分","7 分"],values:new Array(7).fill(0),scoreCount:0,mean:0,label:""};
+      return {
+        type:"scale",
+        labels:s.labels,
+        shortLabels:s.labels,
+        values:s.values,
+        valid:s.scoreCount,
+        total:s.total||data.length,
+        mean:s.mean,
+        scoreCount:s.scoreCount,
+        stemLabel:s.label,
+        stemIndex:idx
+      };
+    }
+
+    function palette(n){
+      const base=["#c46a1a","#e8a050","#5b8def","#7bc1a8","#b889d8","#f28c8c","#7fb5ff","#9bc96b","#f0b94d","#8ec9d6"];
+      const arr=[];for(let i=0;i<n;i++)arr.push(base[i%base.length]);return arr;
+    }
+
+    function setStatsMode(mode){
+      if(mode==="result" && !isFeedbackEnabled())mode="survey";
+      statsMode=mode==="result"?"result":"survey";
+      document.getElementById("modeSurveyBtn").classList.toggle("active",statsMode==="survey");
+      document.getElementById("modeResultBtn").classList.toggle("active",statsMode==="result");
+      document.getElementById("chartQuestionSelect").classList.toggle("hidden",statsMode==="result");
+      document.getElementById("chartStemSelect").classList.add("hidden");
+      if(statsMode==="survey")renderChartQuestionSelect();
+      else renderChart();
+    }
+
+    function renderChartQuestionSelect(){
+      const sel=document.getElementById("chartQuestionSelect");
+      if(statsMode!=="survey"){
+        sel.classList.add("hidden");
+        return;
+      }
+      sel.classList.remove("hidden");
+      const current=sel.value||activeQid||questionIds()[0];
+      sel.innerHTML=questionIds().map((qid)=>`<option value="${qid}">${displayQid(qid).toUpperCase()} · ${cfg.questions[qid].title}</option>`).join("");
+      sel.value=questionIds().includes(current)?current:questionIds()[0];
+      sel.onchange=()=>{
+        renderChartStemSelect();
+        renderChart();
+      };
+      renderChartStemSelect();
+      renderChart();
+    }
+
+    function renderChartStemSelect(){
+      if(statsMode!=="survey"){
+        const stemSel=document.getElementById("chartStemSelect");
+        if(stemSel)stemSel.classList.add("hidden");
+        return;
+      }
+      const qid=document.getElementById("chartQuestionSelect").value;
+      const q=cfg.questions[qid];
+      const stemSel=document.getElementById("chartStemSelect");
+      if(!stemSel||!q||(q.type!=="scale"&&q.type!=="rank")){
+        if(stemSel)stemSel.classList.add("hidden");
+        return;
+      }
+      stemSel.classList.remove("hidden");
+      const current=Number(stemSel.value||0);
+      if(q.type==="scale"){
+        const stats=getScaleStemStats(qid);
+        stemSel.innerHTML=stats.map((s)=>`<option value="${s.stemIndex}">分项 ${s.stemIndex+1} · ${s.label}</option>`).join("");
+        stemSel.value=Number.isFinite(current)&&stats[current]?String(current):"0";
+      }else{
+        const count=Math.max(1,Math.min(Number(q.topN||(q.options||[]).length),(q.options||[]).length));
+        const opts=[];
+        for(let i=0;i<count;i++)opts.push(`<option value="${i}">第 ${i+1} 位</option>`);
+        stemSel.innerHTML=opts.join("");
+        stemSel.value=(Number.isFinite(current)&&current>=0&&current<count)?String(current):"0";
+      }
+      stemSel.onchange=()=>renderChart();
+    }
+
+    function getResultRoleStats(){
+      const data=getSurveyData();
+      const roleCounts={};
+      const roleNameById={};
+      (cfg.roles||[]).forEach((r)=>{roleNameById[r.id]=r.name;roleCounts[r.id]=0;});
+      let valid=0;
+      data.forEach((d)=>{
+        const rid=(d&&d.result_role_id)||"";
+        if(!rid)return;
+        if(roleCounts[rid]===undefined)roleCounts[rid]=0;
+        roleCounts[rid]+=1;
+        if(d.result_role_name)roleNameById[rid]=d.result_role_name;
+        valid+=1;
+      });
+      const ids=Object.keys(roleCounts).sort((a,b)=>(roleCounts[b]||0)-(roleCounts[a]||0));
+      return {
+        type:"result",
+        labels:ids.map((id)=>roleNameById[id]||id),
+        values:ids.map((id)=>roleCounts[id]||0),
+        valid,
+        total:data.length
+      };
+    }
+
+    function setChartType(type){
+      chartType=type;
+      document.getElementById("barBtn").classList.toggle("active",type==="bar");
+      document.getElementById("pieBtn").classList.toggle("active",type==="pie");
+      renderChart();
+    }
+
+    function renderChartTable(labels,values){
+      const tbody=document.getElementById("chartTable");
+      const sum=values.reduce((a,b)=>a+b,0);
+      tbody.innerHTML=labels.map((l,i)=>{
+        const v=values[i]||0;
+        const pct=sum?((v/sum)*100).toFixed(1)+"%":"-";
+        return `<tr><td>${l}</td><td>${v}</td><td>${pct}</td></tr>`;
+      }).join("");
+    }
+    function escapeHtml(v){
+      return String(v==null?"":v)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+    }
+    function renderChartExtra(ds,qid){
+      const box=document.getElementById("chartExtra");
+      if(!box)return;
+      if(statsMode==="result"){
+        box.innerHTML="";
+        return;
+      }
+      const q=cfg.questions[qid]||{};
+      if(ds.type==="rank" && Array.isArray(ds.matrix)){
+        const header=["名次",...ds.shortLabels.map((k,idx)=>`${k}`),"有效样本"];
+        const rows=ds.matrix.map((row,idx)=>{
+          const cells=row.map((v)=>`<td>${v||0}</td>`).join("");
+          const valid=ds.validByPos&&ds.validByPos[idx]?ds.validByPos[idx]:0;
+          return `<tr><td>第 ${idx+1} 位</td>${cells}<td>${valid}</td></tr>`;
+        }).join("");
+        box.innerHTML=`<div class="help">排序题完整矩阵（每一行代表该名次被选到各选项的次数）</div>
+<table><thead><tr>${header.map((h)=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+        return;
+      }
+      if(ds.type==="text"){
+        const lines=(ds.entries||[]).slice(0,80).map((item)=>{
+          const t=item.timestamp?new Date(item.timestamp).toLocaleString("zh-CN"):"-";
+          return `<div class="stem-stat"><div class="stem-meta">#${item.index} · ${t}</div><div class="stem-title" style="font-weight:500">${escapeHtml(item.text)}</div></div>`;
+        }).join("");
+        box.innerHTML=`<div class="help">文本原始回答（最新优先，最多显示 80 条）</div>${lines||"<div class='note'>暂无文本回答</div>"}`;
+        return;
+      }
+      box.innerHTML="";
+    }
+
+    function renderChart(){
+      const sel=document.getElementById("chartQuestionSelect");
+      if(!sel)return;
+      let ds=null;
+      let labels=[];
+      if(statsMode==="result"){
+        ds=getResultRoleStats();
+        labels=ds.labels;
+      }else{
+        const qid=sel.value;
+        const q=cfg.questions[qid];
+        const stemSel=document.getElementById("chartStemSelect");
+        const stemIndex=(q&&(q.type==="scale"||q.type==="rank")&&stemSel&&!stemSel.classList.contains("hidden"))?Number(stemSel.value||0):0;
+        ds=getQuestionStats(qid, stemIndex);
+        labels=(ds.type==="single"||ds.type==="rank"||ds.type==="multi")?ds.labels:ds.shortLabels;
+      }
+      const values=ds.values;
+      renderChartTable(ds.labels, values);
+      renderChartExtra(ds, statsMode==="survey"?document.getElementById("chartQuestionSelect").value:"");
+      if(statsMode==="result"){
+        document.getElementById("chartNote").textContent=`结果反馈分布（${ds.valid}/${ds.total} 有效）`;
+        document.getElementById("chartMean").textContent="均分：-";
+      }else{
+        const qid=sel.value;
+        document.getElementById("chartNote").textContent=ds.type==="single"
+          ? `${displayQid(qid).toUpperCase()} 单选分布（${ds.valid}/${ds.total} 有效）`
+          : ds.type==="multi"
+            ? `${displayQid(qid).toUpperCase()} 多选分布（最多选 ${ds.maxSelect}，${ds.valid}/${ds.total} 有效）`
+          : ds.type==="rank"
+            ? `${displayQid(qid).toUpperCase()} 排序分布 · 第 ${Number(ds.rankIndex||0)+1} 位（${ds.valid}/${ds.total} 有效）`
+          : ds.type==="score"
+            ? `${displayQid(qid).toUpperCase()} 打分分布（${ds.valid}/${ds.total} 有效）`
+          : ds.type==="text"
+            ? `${displayQid(qid).toUpperCase()} 文本题填写率（${ds.valid}/${ds.total} 已填写）`
+            : `${displayQid(qid).toUpperCase()} 分项统计：${ds.stemLabel||"-"}（1~7 分布，均分 ${ds.mean}，${ds.scoreCount} 次打分）`;
+        document.getElementById("chartMean").textContent=(ds.type==="scale"||ds.type==="score") ? `均分：${ds.mean}` : "均分：-";
+      }
+      const ctx=document.getElementById("statsChart");
+      if(statsChart){statsChart.destroy();statsChart=null}
+      statsChart=new Chart(ctx,{
+        type:chartType,
+        data:{labels,datasets:[{label:chartType==="bar"?"数值":"占比",data:values,backgroundColor:palette(labels.length)}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true}}:{}}
+      });
+    }
+
+    let configAutoSaveTimer=null;
+    function flushCfgToLocalStorage(opts){
+      opts=opts||{};
+      const refreshUI=opts.refreshUI!==false;
+      collectMetaEditorToConfig();
+      if(!collectCurrentEditorToConfig(opts.silent!==false,refreshUI)){
+        return false;
+      }
+      if(!collectRoleEditorToConfig(opts.silent!==false,refreshUI)){
+        return false;
+      }
+      try{
+        localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+        return true;
+      }catch(e){
+        console.error(e);
+        if(opts.alertStorageError)alert("写入本地失败："+(e.message||e));
+        return false;
+      }
+    }
+    function scheduleConfigAutoSave(){
+      clearTimeout(configAutoSaveTimer);
+      configAutoSaveTimer=setTimeout(()=>{
+        configAutoSaveTimer=null;
+        if(flushCfgToLocalStorage({refreshUI:false,silent:true,alertStorageError:false})){
+          const el=document.getElementById("autoSaveHint");
+          if(el)el.textContent="已自动保存 · "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+        }
+      },850);
+    }
+    function bindConfigAutoSave(){
+      ["metaConfigCard","questionEditorCard","roleEditorCard"].forEach((id)=>{
+        const el=document.getElementById(id);
+        if(!el)return;
+        el.addEventListener("input",scheduleConfigAutoSave);
+        el.addEventListener("change",scheduleConfigAutoSave);
+      });
+      window.addEventListener("beforeunload",()=>{
+        clearTimeout(configAutoSaveTimer);
+        try{
+          collectMetaEditorToConfig();
+          collectCurrentEditorToConfig(true,false);
+          collectRoleEditorToConfig(true,false);
+          localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+        }catch(e){/* ignore */}
+      });
+    }
+
+    function collectCurrentEditorToConfig(silent,refreshUI){
+      const ids=Object.keys(cfg.questions||{});
+      if(!ids.length)return true;
+      if(!cfg.questions[activeQid])activeQid=ids[0];
+      const q=cfg.questions[activeQid];
+      if(!q)return true;
+      const qt=document.getElementById("qtitle");
+      const qd=document.getElementById("qdesc");
+      if(qt)q.title=qt.value.trim();
+      if(qd)q.desc=qd.value.trim();
+      if(activeQid==="q1"&&q.type==="rank"){
+        delete q.mapsToRoles;
+      }else if(q.type==="single"||q.type==="multi"||q.type==="score"||q.type==="scale"||q.type==="rank"){
+        const cb=document.getElementById("qMapsToRoles");
+        if(cb)q.mapsToRoles=!!cb.checked;
+      }else{
+        delete q.mapsToRoles;
+      }
+      function editorRoleMappingOpen(qq,qid){
+        if(!qq||qq.type==="text")return false;
+        if(qq.type==="rank"&&qid==="q1")return true;
+        return qq.mapsToRoles!==false;
+      }
+      const mapOpen=editorRoleMappingOpen(q,activeQid);
+      if(q.type==="single"||q.type==="rank"||q.type==="multi"){
+        const so=document.getElementById("singleOptions");
+        const rows=(so?so.value:"").split("\n").map(s=>s.trim()).filter(Boolean);
+        q.options=rows.map((r)=>{
+          const idx=r.indexOf("|");
+          if(idx===-1)return {key:r.slice(0,1),label:r};
+          return {key:r.slice(0,idx).trim(),label:r.slice(idx+1).trim()};
+        }).filter(o=>o.key&&o.label);
+        if(mapOpen){
+          const currentMap=collectSingleMappingFromEditor(q.options||[]);
+          const fallbackRole=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+          const nextMap={};
+          q.options.forEach((o)=>{
+            const old=currentMap[o.key];
+            if(old){nextMap[o.key]=old;return;}
+            if(fallbackRole){nextMap[o.key]={[fallbackRole]:0};}
+          });
+          if(q.type==="single")cfg.mappings.single[activeQid]=nextMap;
+          else if(q.type==="rank")cfg.mappings.rank[activeQid]=nextMap;
+          else{
+            q.maxSelect=safePositiveInt(document.getElementById("multiMaxSelect").value,3);
+            cfg.mappings.multi[activeQid]=nextMap;
+          }
+        }else if(q.type==="multi"){
+          q.maxSelect=safePositiveInt(document.getElementById("multiMaxSelect").value,3);
+        }
+      }else if(q.type==="scale"){
+        q.stems=document.getElementById("scaleStems").value.split("\n").map(s=>s.trim()).filter(Boolean);
+        if(mapOpen){
+          try{
+            const parsed=JSON.parse(document.getElementById("mappingEditor").value||"{}");
+            cfg.mappings.scale[activeQid]=parsed;
+          }catch(e){
+            if(!silent)alert("映射 JSON 格式错误，请修正后再保存");
+            return false;
+          }
+        }
+      }else if(q.type==="score"){
+        q.min=Math.max(1,Number(document.getElementById("scoreMin").value||1));
+        q.max=Math.max(q.min,Number(document.getElementById("scoreMax").value||7));
+        if(mapOpen){
+          try{
+            const parsed=JSON.parse(document.getElementById("mappingEditor").value||"{}");
+            cfg.mappings.score[activeQid]=parsed;
+          }catch(e){
+            if(!silent)alert("映射 JSON 格式错误，请修正后再保存");
+            return false;
+          }
+        }
+      }else{
+        q.placeholder=document.getElementById("textPlaceholder").value.trim();
+      }
+      if(refreshUI!==false){
+        renderQList();
+        fillEditor();
+        renderStats();
+        renderChartQuestionSelect();
+      }
+      return true;
+    }
+
+    function saveAll(){
+      try{
+        if(!flushCfgToLocalStorage({refreshUI:true,silent:true,alertStorageError:true})){
+          alert("映射配置有误，请修正后再保存（打分/量表题需为合法 JSON）；或角色信息不完整。");
+          return;
+        }
+        const el=document.getElementById("autoSaveHint");
+        if(el)el.textContent="已保存 · "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+        alert("已保存到本地配置（键名 ardot_quiz_config_v2，与 quiz 共用）。请刷新 quiz。\n注意：admin 与 quiz 须在同一来源打开（同为本地文件，或同一 http(s) 地址），否则 localStorage 不互通。");
+      }catch(e){
+        console.error(e);
+        alert("保存失败："+(e&&e.message?e.message:String(e)));
+      }
+    }
+
+    function clearSurveyData(){
+      if(!confirm("确认要清空所有已收集的问卷数据吗？此操作不可撤销。"))return;
+      localStorage.removeItem("ardot_survey");
+      renderStats();
+      renderDistribution();
+      renderChart();
+      alert("已清空所有收集到的数据");
+    }
+
+    function csvEscape(v){
+      const s=String(v==null?"":v);
+      if(/[",\n]/.test(s))return `"${s.replace(/"/g,'""')}"`;
+      return s;
+    }
+    function rawAnswerToCsvCell(qid,item){
+      const q=cfg.questions[qid]||{};
+      const direct=q.type==="text"
+        ? normalizeSurveyValue(item,qid)
+        :(item&&item.answers&&item.answers[qid]!==undefined ? item.answers[qid] : normalizeSurveyValue(item,qid));
+      if(Array.isArray(direct)){
+        if(q.type==="rank"){
+          const labels=(q.options||[]).reduce((acc,opt)=>{acc[opt.key]=opt.label;return acc;},{});
+          return direct.map((key)=>labels[key]?`${key}:${labels[key]}`:String(key)).join(" > ");
+        }
+        return direct.join(" | ");
+      }
+      if(direct&&typeof direct==="object"){
+        try{return JSON.stringify(direct);}catch(e){return String(direct);}
+      }
+      return String(direct==null?"":direct);
+    }
+    function exportRawAnswerOrderCsv(){
+      const rows=getSurveyData();
+      if(!rows.length){
+        alert("暂无数据可导出");
+        return;
+      }
+      const ids=questionIds();
+      const headers=[
+        "序号",
+        "提交时间",
+        "结果角色ID",
+        "结果角色名称",
+        ...ids.map((qid)=>`${displayQid(qid).toUpperCase()}_${qid}_原始作答`)
+      ];
+      const lines=[headers.map(csvEscape).join(",")];
+      rows.forEach((item,idx)=>{
+        const row=[
+          idx+1,
+          item&&item.timestamp?item.timestamp:"",
+          item&&item.result_role_id?item.result_role_id:"",
+          item&&item.result_role_name?item.result_role_name:"",
+          ...ids.map((qid)=>rawAnswerToCsvCell(qid,item))
+        ];
+        lines.push(row.map(csvEscape).join(","));
+      });
+      const csv="\uFEFF"+lines.join("\n");
+      const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      const ts=new Date().toISOString().replace(/[:T]/g,"-").slice(0,19);
+      a.href=url;
+      a.download=`ardot_raw_answers_${ts}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function resetDefault(){
+      if(!confirm("确认恢复默认问卷配置？"))return;
+      cfg=defaultConfig();
+      localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+      activeQid="q1";
+      activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+      renderQList();
+      fillMetaEditor();
+      fillEditor();
+      bindFeedbackToggle();
+      applyFeedbackModeUI();
+      renderRoleSelect();
+      renderStats();
+      setStatsMode(statsMode);
+      alert("已恢复默认配置");
+    }
+
+    renderQList();
+    fillMetaEditor();
+    fillEditor();
+    bindFeedbackToggle();
+    applyFeedbackModeUI();
+    renderRoleSelect();
+    renderStats();
+    setStatsMode(statsMode);
+    bindConfigAutoSave();
+    switchTab("manage");
+    switchManageSubTab("question");
+  </script>
+</body>
+</html>

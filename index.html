@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>腾讯设计 Ardot — AI 驱动的智能设计工具</title>
+  <link rel="icon" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#fff;color:#1a1a2e;-webkit-font-smoothing:antialiased}
+
+    .navbar{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:1000}
+    .nav-left{display:flex;align-items:center;gap:36px}
+    .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:#1a1a2e;font-size:16px;font-weight:600}
+    .nav-logo-icon{width:26px;height:26px;background:linear-gradient(135deg,#2b5aed,#5b8def);border-radius:6px;display:flex;align-items:center;justify-content:center}
+    .nav-logo-icon svg{width:14px;height:14px}
+    .nav-links{display:flex;gap:28px}
+    .nav-links a{color:#666;text-decoration:none;font-size:14px;transition:color .2s}
+    .nav-links a:hover{color:#1a1a2e}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .btn-nav{height:34px;padding:0 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;text-decoration:none}
+    .btn-download{border:1px solid #ddd;background:#fff;color:#333}
+    .btn-download:hover{border-color:#bbb;background:#fafafa}
+    .btn-free{border:none;background:#1a1a2e;color:#fff}
+    .btn-free:hover{background:#2d2d4a}
+
+    .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 40px 60px;background:linear-gradient(180deg,#f8f9ff 0%,#fff 50%)}
+    .hero-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:100px;background:#f0f0f7;font-size:12px;color:#666;margin-bottom:28px;font-weight:500}
+    .hero h1{font-size:52px;font-weight:700;line-height:1.15;letter-spacing:-.02em;color:#1a1a2e;margin-bottom:20px}
+    .hero p{font-size:17px;color:#888;max-width:480px;line-height:1.6;margin-bottom:40px}
+    .hero-actions{display:flex;gap:14px}
+    .btn-hero{height:48px;padding:0 30px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .btn-hero-primary{border:none;background:#1a1a2e;color:#fff}
+    .btn-hero-primary:hover{background:#2d2d4a;transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,26,46,.15)}
+    .btn-hero-secondary{border:1px solid #ddd;background:#fff;color:#333}
+    .btn-hero-secondary:hover{border-color:#bbb}
+
+    .features{padding:80px 48px;max-width:1100px;margin:0 auto}
+    .features-header{text-align:center;margin-bottom:56px}
+    .features-header h2{font-size:32px;font-weight:700;margin-bottom:12px}
+    .features-header p{font-size:16px;color:#888}
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .feature-card{padding:32px 28px;border-radius:14px;border:1px solid #eee;background:#fafafa;transition:all .25s}
+    .feature-card:hover{border-color:#e0d4f5;background:#fcfaff;transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.04)}
+    .feature-icon{width:40px;height:40px;border-radius:10px;background:#f0f0f7;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+    .feature-icon svg{width:20px;height:20px;color:#5b3e9e}
+    .feature-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
+    .feature-card p{font-size:14px;color:#888;line-height:1.6}
+
+    .footer{padding:48px;text-align:center;border-top:1px solid #eee;color:#bbb;font-size:13px}
+
+    .quiz-float{position:fixed;right:20px;bottom:20px;z-index:2000;width:min(340px,calc(100vw - 32px));pointer-events:none}
+    .quiz-float-inner{pointer-events:auto;display:flex;gap:14px;align-items:flex-end;padding:14px 16px 14px 12px;border-radius:16px;border:1px solid #f0cfa0;background:linear-gradient(145deg,#fffbf5,#fff3e4);box-shadow:0 10px 40px rgba(196,106,26,.14),0 2px 0 rgba(255,255,255,.8) inset}
+    .quiz-float-mascot{flex-shrink:0;width:86px;margin-top:-28px;margin-bottom:-6px;position:relative}
+    .quiz-float-mascot img{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 12px rgba(0,0,0,.08));animation:mascotWave 2.4s ease-in-out infinite;transform-origin:72% 88%}
+    @keyframes mascotWave{0%,100%{transform:rotate(0deg)}12%{transform:rotate(11deg)}24%{transform:rotate(-7deg)}36%{transform:rotate(9deg)}48%{transform:rotate(-5deg)}60%{transform:rotate(6deg)}72%{transform:rotate(-2deg)}84%,100%{transform:rotate(0deg)}}
+    @media (prefers-reduced-motion: reduce){.quiz-float-mascot img{animation:none}}
+    .quiz-float-body{flex:1;min-width:0;padding-top:4px}
+    .quiz-float-body h3{font-size:15px;font-weight:700;line-height:1.35;color:#8b4518;margin-bottom:10px;letter-spacing:-.01em}
+    .quiz-float-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 16px;border-radius:8px;border:none;background:#1a1a2e;color:#fff;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:background .2s,transform .2s,box-shadow .2s}
+    .quiz-float-btn:hover{background:#2d2d4a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,26,46,.2)}
+    .quiz-float-btn .hot{width:5px;height:5px;border-radius:50%;background:#e67e22}
+
+    @media(max-width:768px){.navbar{padding:0 16px}.hero h1{font-size:32px}.features-grid{grid-template-columns:1fr}.nav-links{display:none}.quiz-float{right:12px;bottom:12px}.quiz-float-mascot{width:72px;margin-top:-22px}.quiz-float-body h3{font-size:14px}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 14 14" fill="none"><path d="M3 11L7 3L11 11H3Z" fill="white"/></svg></div>
+        腾讯设计 Ardot
+      </a>
+      <div class="nav-links">
+        <a href="#">产品</a><a href="#">AI 能力</a><a href="#">企业服务</a><a href="#">资源</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="btn-nav btn-download">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7m0 0L3.5 5.5M6 8l2.5-2.5M1.5 10.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        下载客户端
+      </button>
+      <button class="btn-nav btn-free">免费使用</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag">智能设计工具</div>
+    <h1>让灵感<br>鲜活落地</h1>
+    <p>腾讯设计 Ardot 是一款面向设计师和产品团队的智能设计工具，支持 macOS 客户端和网页端，免费使用。</p>
+    <div class="hero-actions">
+      <button class="btn-hero btn-hero-primary">开始设计 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L8 4m3 3L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn-hero btn-hero-secondary">了解更多</button>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-header"><h2>从创意到落地</h2><p>从文字到界面，协同落地每一个想法</p></div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M6 10h8M10 6v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><h3>文生 UI，描述即生成</h3><p>用自然语言描述需求，自动生成布局与组件。</p></div>
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 16V6l4 3 4-3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>图片秒变设计稿</h3><p>上传图片，智能分层，转为可编辑设计稿。</p></div>
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>智能协作助手</h3><p>智能重命名、生成图片、链接转 UI。</p></div>
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M2 6h16M2 10h16M2 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><h3>动态布局系统</h3><p>Grid 布局、百分比定位，任何尺寸完美呈现。</p></div>
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg></div><h3>自由的设计系统</h3><p>组件、颜色、文本样式全局同步，一键复用。</p></div>
+      <div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v16M2 10h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg></div><h3>设计到开发交付</h3><p>标注信息、组件变体、快速复制代码。</p></div>
+    </div>
+  </section>
+  <footer class="footer"><p>腾讯设计 Ardot — 智能设计工具，让灵感鲜活落地</p></footer>
+
+  <aside class="quiz-float" aria-label="创作状态测试入口">
+    <div class="quiz-float-inner">
+      <div class="quiz-float-mascot">
+        <img src="img/hara.png" width="172" height="172" alt="角色示意：招手邀请参与测试">
+      </div>
+      <div class="quiz-float-body">
+        <h3>AI 时代设计师创作状态测试</h3>
+        <a href="quiz-h5.html" class="quiz-float-btn"><span class="hot" aria-hidden="true"></span>开始测试</a>
+      </div>
+    </div>
+  </aside>
+</body>
+</html>

@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no,email=no,address=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>AI时代，你活成了哪种大师 — Ardot</title>
+  <link rel="icon" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+
+  <!-- 分享卡片元数据（统一：同一张 400×400 正方形缩略图，兼容微信聊天/朋友圈/电脑微信/老版客户端） -->
+  <meta name="description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态，看看你是毕加班索、莫奈何，还是达利谱、唐纳德诺慢。">
+  <meta name="keywords" content="AI设计,艺术家测试,创意人格测试,Ardot">
+  <!-- Open Graph（微信 / Facebook / 大部分社交平台主抓） -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ardot">
+  <meta property="og:title" content="AI时代，你活成了哪种大师？">
+  <meta property="og:description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
+  <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
+  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="400">
+  <meta property="og:image:height" content="400">
+  <meta property="og:image:alt" content="AI时代，你活成了哪种大师 — Ardot">
+  <!-- Twitter Card（部分抓取引擎 fallback） -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI时代，你活成了哪种大师？">
+  <meta name="twitter:description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
+  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <!-- Schema.org（部分场景 fallback） -->
+  <meta itemprop="name" content="AI时代，你活成了哪种大师？">
+  <meta itemprop="description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
+  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
+  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <!-- 微信 / QQ 专属 thumbnail 提示（非官方但部分版本有效） -->
+  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
+  <meta name="application-name" content="Ardot · 艺术家测试">
+
+  <!-- 微信 JSSDK（需要后端签名才能真正调用 wx.config；未签名时仅作占位，不影响页面可用性） -->
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" onerror="window.__wxSDKFailed=true"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    .nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(250,249,247,.92);backdrop-filter:blur(16px);border-bottom:1px solid #e8e5e0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:1000}
+    .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:#1a1a2e;font-size:15px;font-weight:600}
+    .nav-logo-icon{width:24px;height:24px;background:linear-gradient(135deg,#2b5aed,#5b8def);border-radius:5px;display:flex;align-items:center;justify-content:center}
+    .nav-logo-icon svg{width:12px;height:12px}
+    .nav-back{display:flex;align-items:center;gap:4px;color:#999;text-decoration:none;font-size:13px;transition:color .2s}
+    .nav-back:hover{color:#333}
+    .bar{position:fixed;top:56px;left:0;right:0;height:2px;background:#e8e5e0;z-index:999}
+    .bar-fill{height:100%;width:0;background:#c46a1a;transition:width .5s cubic-bezier(.4,0,.2,1)}
+    .wrap{max-width:720px;margin:0 auto;padding:96px 20px 80px}
+    .scene{display:none;animation:fadeUp .45s ease}
+    .scene.active{display:block}
+    .welcome.scene.active{display:flex}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    .welcome{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:70vh;justify-content:center}
+    .welcome-cover{width:120px;height:120px;border-radius:24px;margin-bottom:20px;box-shadow:0 10px 30px rgba(196,106,26,.18);object-fit:cover;display:block}
+    .welcome-sub{font-size:12px;color:#b0a898;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:20px}
+    .welcome h1{font-size:34px;font-weight:800;line-height:1.25;margin-bottom:16px}
+    .welcome h1 em{font-style:normal;color:#c46a1a}
+    .welcome>p{font-size:15px;color:#888;line-height:1.6;max-width:520px;margin-bottom:34px}
+    .welcome-cta{display:flex;flex-direction:column;align-items:center;width:100%;max-width:560px;margin:0 auto;gap:22px}
+    .master-preview{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;margin:0}
+    .welcome.quiz-started .welcome-cta{display:none}
+    .welcome.quiz-started .welcome-note{display:none}
+    .welcome.quiz-started .welcome-cover{display:none}
+    .chip{padding:8px 12px;border:1px solid #e8e5e0;border-radius:999px;background:#fff;font-size:12px;color:#555}
+    .btn-go{height:50px;padding:0 36px;border-radius:10px;border:none;background:#1a1a2e;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .btn-go:hover{background:#2d2d4a;transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,26,46,.15)}
+    .welcome-note{margin-top:14px;font-size:12px;color:#ccc}
+    .qh{margin-bottom:24px}
+    .q-num{font-size:12px;color:#c46a1a;font-weight:600;letter-spacing:.04em;margin-bottom:10px}
+    .q-title{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:8px}
+    .q-desc{font-size:14px;color:#999;line-height:1.5}
+    body.quiz-on-q .wrap{padding-top:58px;padding-bottom:56px}
+    body.quiz-on-q .qh{margin-bottom:12px}
+    body.quiz-on-q .q-num{font-size:11px;margin-bottom:4px;letter-spacing:.06em;color:#b89572}
+    body.quiz-on-q .q-title{font-size:17px;font-weight:600;line-height:1.32;margin-bottom:4px;color:#3d3d4a}
+    body.quiz-on-q .q-desc{font-size:12px;color:#9a9a9a;line-height:1.45}
+    body.quiz-on-q .opts{gap:12px}
+    body.quiz-on-q .opt{padding:16px 18px;border-radius:12px}
+    body.quiz-on-q .opt-t{font-size:15px}
+    body.quiz-on-q .scale-help{margin-bottom:8px}
+    body.quiz-on-q .scale-list{gap:10px}
+    body.quiz-on-q .scale-item{padding:16px}
+    body.quiz-on-q .scale-st{font-size:15px}
+    body.quiz-on-q .qa{margin-top:22px}
+    .opts{display:grid;gap:10px}
+    .opts.c2{grid-template-columns:1fr 1fr}
+    .opt{padding:14px 16px;border-radius:10px;border:1px solid #e8e5e0;background:#fff;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;user-select:none}
+    .opt:hover{border-color:#d5cfc5;background:#fdfcfa}
+    .opt.sel{border-color:#e0b87a;background:#fdf8f0;box-shadow:0 0 0 1px #e0b87a}
+    .opt-r{width:18px;height:18px;border-radius:50%;border:2px solid #d5cfc5;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .opt.sel .opt-r{border-color:#c46a1a;background:#c46a1a}
+    .opt.sel .opt-r::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+    .opt-t{font-size:14px;font-weight:500;color:#333;line-height:1.45;word-break:break-word}
+    /* ====== 多选芯片网格（q9 常用工具） ====== */
+    .chip-wrap{display:block}
+    .chip-counter{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;padding:10px 14px;border-radius:10px;background:#faf6ef;border:1px solid #eee3d2;transition:background .2s,border-color .2s}
+    .chip-counter-txt{font-size:13px;color:#6b5a3e}
+    .chip-counter-txt b{font-size:16px;color:#c46a1a;margin:0 2px;font-weight:700}
+    .chip-counter-hint{font-size:11px;color:#b3a894}
+    .chip-counter.full{background:#fff4e0;border-color:#e0b87a}
+    .chip-counter.full .chip-counter-txt b{color:#a05b16}
+    .chip-counter.full .chip-counter-hint{color:#a46d30}
+    .chip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .chip{position:relative;display:flex;align-items:center;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;border:1.5px solid #e8e5e0;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .15s cubic-bezier(.2,.7,.3,1),border-color .18s,background .18s,box-shadow .18s,color .18s;text-align:center}
+    .chip:hover{border-color:#d5cfc5;background:#fdfcfa;transform:translateY(-1px)}
+    .chip:active{transform:translateY(0) scale(.97)}
+    .chip-name{font-size:14px;font-weight:600;color:#3d3d4a;line-height:1.2;word-break:break-word}
+    .chip-check{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#c46a1a;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700;opacity:0;transform:scale(.5);transition:opacity .18s,transform .22s cubic-bezier(.2,1.6,.4,1)}
+    .chip.sel{border-color:#c46a1a;background:#fff7ed;box-shadow:0 0 0 1px #c46a1a,0 4px 12px rgba(196,106,26,.12)}
+    .chip.sel .chip-name{color:#8f4a10}
+    .chip.sel .chip-check{opacity:1;transform:scale(1)}
+    @keyframes chipShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+    .chip.shake{animation:chipShake .28s cubic-bezier(.36,.07,.19,.97)}
+    .rank-wrap{display:grid;gap:10px}
+    .rank-help{font-size:12px;color:#888}
+    .rank-list{display:grid;gap:8px;position:relative;touch-action:pan-y}
+    .rank-item{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1px solid #e8e5e0;background:#fff;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .22s cubic-bezier(.2,.7,.3,1),border-color .15s ease,box-shadow .2s ease,background .2s ease;will-change:transform}
+    .rank-item:hover{border-color:#dac8b3}
+    .rank-item:hover .rank-handle{color:#8a6a3a;transform:scale(1.15)}
+    /* 长按激活前的"蓄力"提示：轻微缩小 + 背景微变 */
+    .rank-item.press{transform:scale(.98);background:#faf6ef}
+    .rank-item.press .rank-handle{color:#a46d30;transform:scale(1.2)}
+    /* 激活后：浮起、加阴影、置于最上、关闭过渡（跟手） */
+    .rank-item.lift{transition:box-shadow .18s ease,background .18s ease;transform:scale(1.04);box-shadow:0 14px 28px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.08);background:#fff;z-index:20;position:relative;border-color:#c88f4f;cursor:grabbing}
+    .rank-item.lift .rank-handle{color:#c88f4f;font-size:24px;transform:scale(1.35);letter-spacing:-1px}
+    .rank-index{width:26px;height:26px;border-radius:50%;background:#f4ede3;color:#a46d30;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .rank-label{font-size:14px;color:#333;line-height:1.45}
+    .rank-handle{color:#bfb6a8;font-size:18px;line-height:1;letter-spacing:-2px;text-align:right;user-select:none;-webkit-user-select:none;transition:transform .18s cubic-bezier(.2,.7,.3,1),color .18s ease,font-size .18s ease;transform-origin:center}
+    .btn-rank{height:38px;border:1px solid #e1d6c7;border-radius:8px;background:#fff7ed;color:#8f5d24;font-size:13px;font-weight:600;cursor:pointer;justify-self:start;padding:0 14px}
+    .btn-rank:hover{background:#ffefdc}
+    .mn{font-size:12px;color:#bbb;margin-bottom:10px}
+    .scale-list{display:grid;gap:12px}
+    .scale-item{border:1px solid #ece8e3;background:#fff;border-radius:10px;padding:14px;transition:opacity .2s ease,border-color .2s ease,background .2s ease}
+    .scale-item.active-step{opacity:1;border-color:#e2d5c4;background:#fffdfa}
+    .scale-item.muted-step{opacity:.28}
+    .scale-st{font-size:15px;color:#333;line-height:1.55;margin-bottom:14px}
+    .scale-no{font-size:11px;color:#b58a5b;font-weight:700;margin-bottom:8px}
+    .scale-likert{display:grid;grid-template-columns:72px 1fr 86px;align-items:center;gap:8px}
+    .scale-side{font-size:34px;font-size:13px;color:#818181}
+    .scale-side.agree{color:#b98549}
+    .scale-side.disagree{color:#8f6f4b;text-align:right}
+    .scale-dots{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .scale-dot{width:var(--sz);height:var(--sz);border-radius:999px;border:3px solid var(--dot);background:transparent;cursor:pointer;transition:all .15s}
+    .scale-dot:hover{transform:translateY(-1px)}
+    .scale-dot.sel{background:var(--dot);border-color:var(--dot);box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+    .scale-help{font-size:11px;color:#aaa;margin-bottom:8px}
+    .qa{display:flex;justify-content:space-between;margin-top:30px}
+    .btn-b{height:42px;padding:0 18px;border-radius:8px;border:1px solid #e8e5e0;background:#fff;color:#999;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+    .btn-b:hover{border-color:#ccc;color:#333}
+    .btn-n{height:42px;padding:0 22px;border-radius:8px;border:none;background:#1a1a2e;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-left:auto}
+    .btn-n:hover{background:#2d2d4a}
+    .btn-n:disabled{opacity:.3;cursor:not-allowed}
+    .ld{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center}
+    .ld.active{display:flex}
+    .spinner{width:44px;height:44px;border-radius:50%;border:3px solid #e8e5e0;border-top-color:#c46a1a;animation:spin .7s linear infinite;margin-bottom:24px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ld-t{font-size:16px;font-weight:600;margin-bottom:6px}
+    .ld-s{font-size:13px;color:#bbb}
+    .ld-dots::after{content:'';animation:dots 1.5s infinite}
+    @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+    .res{display:none;animation:fadeUp .6s ease}
+    .res.active{display:block}
+    .res-card{border-radius:20px;border:1px solid #e8e5e0;background:#fff;overflow:hidden;margin-bottom:24px}
+    .res-top{padding:36px 32px 0;text-align:center}
+    .res-avatar{width:128px;height:128px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:0 8px 32px rgba(0,0,0,.1);border:4px solid #fff}
+    .res-name{font-size:34px;font-weight:900;color:#1a1a2e;margin-bottom:4px;letter-spacing:.02em}
+    .res-real{font-size:14px;color:#b0a898;margin-bottom:14px;font-weight:500}
+    .res-desc{font-size:14px;color:#888;line-height:1.7;max-width:460px;margin:0 auto;padding-bottom:24px}
+    .match-bar{margin-bottom:12px}
+    .match-bar:last-child{margin-bottom:0}
+    .match-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+    .match-name{font-weight:500;color:#333}
+    .match-val{font-weight:600;color:#c46a1a}
+    .match-track{height:6px;border-radius:3px;background:#f0ece6;overflow:hidden}
+    .match-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#c46a1a,#e8a050);transition:width 1s cubic-bezier(.4,0,.2,1);width:0}
+    .wish-box{margin:0 32px 24px;padding:16px;border:1px solid #f0e6d4;background:#fff8ee;border-radius:12px}
+    .wish-title{font-size:13px;font-weight:700;color:#8f5d24;margin-bottom:8px}
+    .wish-desc{font-size:12px;color:#9a845f;margin-bottom:10px}
+    .wish-box textarea{width:100%;min-height:92px;border:1px solid #e4d7c5;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6;outline:none;resize:vertical;background:#fff}
+    .wish-actions{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+    .wish-btn{height:36px;padding:0 14px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+    .wish-result{font-size:12px;color:#8f5d24}
+    .others-title{font-size:11px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;padding:0 32px}
+    .others{display:flex;gap:12px;overflow-x:auto;padding:0 32px 20px;-webkit-overflow-scrolling:touch}
+    .others::-webkit-scrollbar{display:none}
+    .other-card{flex-shrink:0;width:108px;text-align:center;cursor:default}
+    .other-card img{width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:6px;border:2px solid #f0ece6;opacity:.65;filter:grayscale(.3)}
+    .other-card .oc-name{font-size:11px;font-weight:600;color:#999}
+    .other-card .oc-pct{font-size:10px;color:#ccc}
+    .res-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+    .btn-share{height:42px;padding:0 22px;border-radius:8px;border:none;background:#1a1a2e;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+    .btn-share:hover{background:#2d2d4a}
+    .btn-redo{height:42px;padding:0 22px;border-radius:8px;border:1px solid #e8e5e0;background:#fff;color:#666;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+    .btn-redo:hover{border-color:#ccc}
+    .btn-explore{height:42px;padding:0 22px;border-radius:8px;border:none;background:linear-gradient(135deg,#f6a85e 0%,#c46a1a 100%);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;box-shadow:0 4px 12px rgba(196,106,26,.25)}
+    .btn-explore:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(196,106,26,.35)}
+    .btn-explore .arr{font-size:15px;line-height:1;transition:transform .2s}
+    .btn-explore:hover .arr{transform:translate(2px,-2px)}
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);padding:10px 20px;border-radius:8px;background:#1a1a2e;color:#fff;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:9999}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    /* 微信分享引导遮罩 */
+    .share-mask{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;display:none;align-items:flex-start;justify-content:flex-end;padding:16px}
+    .share-mask.show{display:flex}
+    .share-mask-inner{color:#fff;max-width:280px;text-align:right;padding-right:8px}
+    .share-mask-arrow{font-size:48px;line-height:1;margin-bottom:8px}
+    .share-mask-title{font-size:16px;font-weight:600;margin-bottom:6px}
+    .share-mask-desc{font-size:13px;color:#e0e0e0;line-height:1.6}
+    .share-mask-close{margin-top:20px;display:inline-block;padding:8px 18px;border:1px solid #fff;border-radius:20px;font-size:13px;cursor:pointer}
+    /* 非微信环境顶部提示条 */
+    .wx-hint{position:fixed;top:0;left:0;right:0;background:#fff8ee;border-bottom:1px solid #f0e6d4;color:#8f5d24;font-size:12px;padding:8px 16px;text-align:center;z-index:1001;display:none}
+    .wx-hint.show{display:block}
+    .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
+    @media(max-width:640px){.wrap{padding:80px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:20px;padding-right:20px}.res-name{font-size:28px}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:52px}body.quiz-on-q .q-title{font-size:16px}}
+    /* ====== 桌面/平板响应式增强（≥768px 启用桌面布局） ====== */
+    @media(min-width:768px){
+      .wrap{max-width:780px;padding:110px 32px 96px}
+      .wx-hint{display:none !important} /* 桌面端隐藏"请在微信打开"提示条 */
+      .nav{padding:0 48px}
+      .welcome{min-height:calc(100vh - 180px)}
+      .welcome-cover{width:160px;height:160px;border-radius:28px;margin-bottom:28px}
+      .welcome h1{font-size:44px;line-height:1.2}
+      .welcome>p{font-size:16px;max-width:560px;margin-bottom:40px}
+      .welcome-note{font-size:13px}
+      .chip{padding:10px 16px;font-size:13px}
+      .btn-go{height:54px;padding:0 42px;font-size:16px}
+      .q-title{font-size:26px;line-height:1.3}
+      .q-desc{font-size:15px}
+      .opts{gap:14px}
+      .opts.c2{grid-template-columns:1fr 1fr}
+      .opt{padding:18px 22px;border-radius:12px}
+      .opt:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,26,46,.06)}
+      .opt-t{font-size:15px}
+      .chip-grid{grid-template-columns:repeat(4,1fr);gap:12px}
+      .chip{min-height:66px;padding:12px 14px;border-radius:14px}
+      .chip-name{font-size:15px}
+      body.quiz-on-q .wrap{padding-top:96px;padding-bottom:80px}
+      body.quiz-on-q .q-title{font-size:22px}
+      body.quiz-on-q .opt{padding:18px 22px}
+      body.quiz-on-q .opt-t{font-size:15px}
+      .rank-item{padding:14px 18px}
+      .rank-label{font-size:15px}
+      .scale-item{padding:22px 24px}
+      .scale-st{font-size:16px}
+      .scale-likert{grid-template-columns:88px 1fr 100px;gap:14px}
+      .scale-side{font-size:13px}
+      .qa{margin-top:36px}
+      .btn-b,.btn-n{height:46px;font-size:14px}
+      .btn-b{padding:0 22px}
+      .btn-n{padding:0 28px}
+      .res-card{border-radius:24px}
+      .res-top{padding:48px 40px 0}
+      .res-avatar{width:148px;height:148px}
+      .res-name{font-size:40px}
+      .res-desc{font-size:15px;max-width:520px}
+      .wish-box{margin:0 40px 28px;padding:20px}
+      .others-title{padding:0 40px}
+      .others{padding:0 40px 24px}
+    }
+    /* ≥1024px 再宽一点，给桌面更舒服的阅读区 */
+    @media(min-width:1024px){
+      .wrap{max-width:860px}
+      .welcome h1{font-size:50px}
+    }
+  </style>
+</head>
+<body>
+  <!-- 非微信环境提示条：仅在 ?force=wx 调试时显示 -->
+  <div class="wx-hint" id="wxHint">
+    当前为微信调试模式，请在微信内打开以体验完整分享功能。
+  </div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L6 2.5L9.5 9.5H2.5Z" fill="white"/></svg></div>
+      Ardot
+    </a>
+    <a href="javascript:;" class="nav-back" onclick="handleBackToHome()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回
+    </a>
+  </nav>
+
+  <div class="bar"><div class="bar-fill" id="bar"></div></div>
+
+  <div class="wrap">
+    <div class="welcome scene active" id="s0">
+      <img class="welcome-cover"
+           src="https://ardot-quiz.edgeone.dev/img/picasso.png"
+           alt="AI时代，你活成了哪种大师"
+           width="400" height="400">
+      <div class="welcome-sub">AI Design Survival Quiz</div>
+      <h1>《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》</h1>
+      <p>来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。</p>
+      <div class="welcome-cta">
+        <div class="master-preview">
+          <span class="chip">毕加班索</span>
+          <span class="chip">莫奈何</span>
+          <span class="chip">达利谱</span>
+          <span class="chip">唐纳德诺慢</span>
+        </div>
+        <button type="button" class="btn-go" id="welcomeStart" onclick="start()">开始测测看 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L8 4m3 3L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="welcome-note">9 题 · 约 6 分钟</div>
+    </div>
+
+    <div class="scene" id="s1">
+      <div class="qh"><div class="q-num">01 / 08</div><h2 class="q-title">你最近最常被哪种活拴住？</h2><p class="q-desc">单选</p></div>
+      <div class="opts c2" data-q="q1" data-t="s">
+        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 想图形，磨 Logo</span></div>
+        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 调界面，盯感觉</span></div>
+        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 画角色，保人设</span></div>
+        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 搭流程，做原型</span></div>
+      </div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b1" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s2">
+      <div class="qh"><div class="q-num">02 / 08</div><h2 class="q-title">你现在把 AI 当什么使？</h2><p class="q-desc">单选</p></div>
+      <div class="opts c2" data-q="q2" data-t="s">
+        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 炸灵感</span></div>
+        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 补细节</span></div>
+        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 想让它干活</span></div>
+        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 想接工作流</span></div>
+      </div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b2" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s3">
+      <div class="qh"><div class="q-num">03 / 08</div><h2 class="q-title">你最近最常用的是哪一路？</h2><p class="q-desc">单选</p></div>
+      <div class="opts c2" data-q="q3" data-t="s">
+        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. Midjourney / DALL·E</span></div>
+        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. SD / ComfyUI</span></div>
+        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. Firefly / Figma AI / Copilot</span></div>
+        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 通义 / 文心 / 其他</span></div>
+      </div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b3" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s4">
+      <div class="qh"><div class="q-num">04 / 08</div><h2 class="q-title">下面这些破防时刻，像不像你？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
+      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
+      <div class="scale-list" id="q4Scale"></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b4" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s5">
+      <div class="qh"><div class="q-num">05 / 08</div><h2 class="q-title">真让 AI 争口气，你最希望它先补哪块？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
+      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
+      <div class="scale-list" id="q5Scale"></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b5" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s6">
+      <div class="qh"><div class="q-num">06 / 08</div><h2 class="q-title">你现在和 Prompt 的关系，更像哪种？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
+      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
+      <div class="scale-list" id="q6Scale"></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b6" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s7">
+      <div class="qh"><div class="q-num">07 / 08</div><h2 class="q-title">说真的，你更信哪句？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
+      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
+      <div class="scale-list" id="q7Scale"></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b7" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s8">
+      <div class="qh"><div class="q-num">08 / 08</div><h2 class="q-title">下面哪句最像你现在的状态？</h2><p class="q-desc">单选</p></div>
+      <div class="opts" data-q="q8" data-t="s">
+        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 我不是没想法，我是没下班</span></div>
+        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 我不是没审美，是它不争气</span></div>
+        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 我不是没流程，是流程太慢</span></div>
+        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 我不是没方向，是方向太多</span></div>
+      </div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b8" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="scene" id="s9">
+      <div class="qh"><div class="q-num">09 / 09</div><h2 class="q-title">常用 AI 工具（最多选 3 个）</h2><p class="q-desc">多选（最多 3 项）</p></div>
+      <div class="opts" data-q="q9" data-t="s"></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b9" disabled onclick="nx()">继续</button></div>
+    </div>
+
+    <div class="ld" id="ld">
+      <div class="spinner"></div>
+      <div class="ld-t">正在匹配你的生存角色<span class="ld-dots"></span></div>
+      <p class="ld-s">从四种 AI 时代设计生存状态中匹配你</p>
+    </div>
+
+    <div class="res" id="res">
+      <div class="res-card">
+        <div class="res-top">
+          <img class="res-avatar" id="rImg" src="" alt>
+          <div class="res-name" id="rName">毕加班索</div>
+          <div class="res-real" id="rReal">创意焦虑型生存状态</div>
+          <p class="res-desc" id="rDesc">描述</p>
+        </div>
+        <div class="wish-box" id="wishBox">
+          <div class="wish-title" id="wishTitle">从「毕加班索」到「毕加索」</div>
+          <div class="wish-desc" id="wishDesc">请填写你需要的 AI 功能，提交后可参与抽奖</div>
+          <textarea id="wishInput" placeholder="我希望 AI 有这样的能力..."></textarea>
+          <div class="wish-actions">
+            <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿并抽奖</button>
+            <span class="wish-result" id="wishResult"></span>
+          </div>
+        </div>
+        <div class="others-title" id="othersTitle">其他可能接近的状态</div>
+        <div class="others" id="othersRow"></div>
+      </div>
+      <div class="res-actions">
+        <a class="btn-explore" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer">探索 AI 设计<span class="arr" aria-hidden="true">↗</span></a>
+        <button class="btn-share" onclick="share()">分享结果</button>
+        <button class="btn-redo" onclick="location.reload()">再测一次</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 微信分享引导遮罩：点击"分享结果"按钮后提示用户点击右上角 -->
+  <div class="share-mask" id="shareMask" onclick="hideShareMask()">
+    <div class="share-mask-inner">
+      <div class="share-mask-arrow">↗</div>
+      <div class="share-mask-title">点击右上角</div>
+      <div class="share-mask-desc">选择「发送给朋友」或<br>「分享到朋友圈」</div>
+      <div class="share-mask-close">我知道了</div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+     * 环境检测（自适应版 · 一个页面跑全平台）
+     * - 微信/小程序 webview：启用微信分享 SDK
+     * - 普通浏览器（桌面或手机）：直接在本页渲染，不再跳转
+     * - 支持 ?force=wx 强制进入微信模式，方便调试
+     * ========================================================= */
+    (function detectEnv(){
+      var ua=(navigator.userAgent||"").toLowerCase();
+      var isWeixin=/micromessenger/.test(ua);
+      var isMiniProgram=/miniprogram/.test(ua)||window.__wxjs_environment==="miniprogram";
+      var params=new URLSearchParams(location.search);
+      var force=params.get("force");
+      window.__IS_WX__=isWeixin||isMiniProgram||force==="wx";
+      window.__IS_MINI__=isMiniProgram;
+      // 若是"强制 wx"在浏览器调试，显示提示条
+      if(!isWeixin && force==="wx"){
+        var h=document.getElementById("wxHint");
+        if(h)h.classList.add("show");
+      }
+    })();
+
+    function handleBackToHome(){
+      // 微信内：提示右上角关闭；否则回到首页
+      if(window.__IS_WX__ && !window.__IS_MINI__){
+        toast("点击右上角「···」可关闭页面");
+      }else{
+        location.href="index.html";
+      }
+    }
+    function showShareMask(){var m=document.getElementById("shareMask");if(m)m.classList.add("show");}
+    function hideShareMask(){var m=document.getElementById("shareMask");if(m)m.classList.remove("show");}
+  </script>
+
+  <script>
+    let S=0,T=8;const A={};
+    let latestResult={id:"",name:""};
+    let latestSurveyIndex=-1;
+    const QUIZ_CFG_KEY="ardot_quiz_config_v2";
+    const BTN_FOR_SCALE={q4:"b4",q5:"b5",q6:"b6",q7:"b7"};
+    function safePositiveInt(v,fallback){
+      const n=Math.round(Number(v));
+      return Number.isFinite(n)&&n>0?n:fallback;
+    }
+    /** 题库默认与 admin.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema，避免旧 localStorage 里的题库盖住新版本。 */
+    function defaultConfig(){
+      return {
+        meta:{
+          badge:"AI Design Survival Quiz",
+          mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",
+          subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",
+          note:"9 题 · 约 6 分钟",
+          feedbackEnabled:true,
+          questionSchema:"prompt_refactor_v12",
+          roleSetVersion:5
+        },
+        roles:[
+          {id:"pica",name:"毕加班索",real:"创意焦虑型生存状态",img:"img/picasso.png",desc:"你脑子里永远有想法，但时间从来不够用。你在追求突破和赶工交付之间反复横跳，最怕灵感来得太快、产能跟不上。"},
+          {id:"mona",name:"莫奈何",real:"审美细节型生存状态",img:"img/hara.png",desc:"你对质感和审美有天然敏感度，但最痛苦的是 AI 每次都差那口气。你不是不会做，而是不能接受“差不多”。"},
+          {id:"dali",name:"达利谱",real:"探索实验型生存状态",img:"img/dali.png",desc:"你喜欢试新工具、尝新玩法，灵感爆发力很强，但方向也容易过载。你不是没方向，是方向太多。"},
+          {id:"slow",name:"唐纳德诺慢",real:"流程效率型生存状态",img:"img/beethoven.png",desc:"你最关注效率和稳定性，核心诉求是“别崩、别慢、别绕”。你希望 AI 真正进入工作流，而不是演示功能。"}
+        ],
+        questions:{
+          q1:{type:"rank",title:"在你的设计流程里，希望 AI 更像哪种角色（排序）--需求优先级？",desc:"请排序（从最希望到最不希望）",options:[{key:"A",label:"A. 会脑暴的灵感搭子"},{key:"B",label:"B. 能出稿的执行工具"},{key:"C",label:"C. 懂上下文的长期助手"},{key:"D",label:"D. 串流程的工作流中枢"}]},
+          q2:{type:"single",title:"方案脑暴时，最让你抓狂的是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. AI 给的建议是平庸套路，毫无新意"},{key:"B",label:"B. 它的响应速度影响工作"},{key:"C",label:"C. 它根本理解不了我们项目核心，总在跑题"},{key:"D",label:"D. 方案光有视觉噱头，完全没考虑落地执行"}]},
+          q3:{type:"single",title:"出稿子时，最想把 AI 哪方面的短板补齐？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 把模糊想法继续发散开"},{key:"B",label:"B. 元素图层散乱，我只能从头画起"},{key:"C",label:"C. 给了参考图和规范，却不按我的要求来"},{key:"D",label:"D. 图是出了，但扩图、补图的质量没跟上"}]},
+          q4:{type:"single",title:"改界面改烦了，AI 最让你崩溃的是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 方案不新或者太新，并没有在优化"},{key:"B",label:"B. 反复出现的组件、色彩偏差，还是得我调整"},{key:"C",label:"C. 我得再告诉 AI 之前的设计逻辑，不如自己改"},{key:"D",label:"D. 改完一处稿子，没帮我同步到其他稿子"}]},
+          q5:{type:"single",title:"做原型、串页面时，你最想让 AI 先解决什么？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 帮我生成交互动效"},{key:"B",label:"B. 减少重复搭建、复制、调整这些机械劳动"},{key:"C",label:"C. 理解和填充我稿子里的图片、占位符素材"},{key:"D",label:"D. 帮我在原型与设计稿之间做同步修改"}]},
+          q6:{type:"single",title:"当你想让 AI 生一张图时，你会怎么和 AI 对话？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 直接描述想要的画面"},{key:"B",label:"B. 结合参考图说明想要的效果"},{key:"C",label:"C. 带着更具体的参数和参考去生成"},{key:"D",label:"D. 先让其他 AI 帮我整理 Prompt，再去生成"}]},
+          q7:{type:"single",title:"当你想让 AI 改一张已经生成好的图时，你更接近下面哪种写法？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 直接说这张图哪里要改"},{key:"B",label:"B. 截图局部，描述想调整成什么方向"},{key:"C",label:"C. 在修改要求里，会明确哪些地方要改、哪些地方不要动，标注参数"},{key:"D",label:"D. 先让其他 AI 帮我整理修改思路，再交给改图 AI"}]},
+          q8:{type:"single",title:"设计师工作类型（单选）",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 图形 / Logo"},{key:"B",label:"B. 界面体验"},{key:"C",label:"C. 角色人设"},{key:"D",label:"D. 流程原型"}]},
+          q9:{type:"multi",maxSelect:3,title:"常用 AI 工具（最多选 3 个）",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Figma"},{key:"B",label:"B. Sketch"},{key:"C",label:"C. Axure"},{key:"D",label:"D. MasterGo"},{key:"E",label:"E. PhotoShop"},{key:"F",label:"F. Pixso"},{key:"G",label:"G. Motiff"},{key:"H",label:"H. Penpot"},{key:"I",label:"I. Adobe XD"}]},
+          q10:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
+        },
+        mappings:{
+          single:{
+            q2:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q3:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q4:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q5:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q6:{A:{pica:1,dali:1},B:{mona:2},C:{dali:2,slow:1},D:{slow:2,mona:1}},
+            q7:{A:{pica:2},B:{mona:2},C:{mona:2,slow:1},D:{slow:2,dali:1}},
+            q8:{A:{pica:2,dali:1},B:{mona:2,slow:1},C:{dali:2,pica:1},D:{slow:3}}
+          },
+          rank:{
+            q1:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}}
+          },
+          multi:{
+            q9:{A:{slow:3},B:{mona:1,slow:1},C:{slow:3},D:{slow:3},E:{pica:2,mona:1},F:{slow:3},G:{slow:3},H:{slow:3},I:{mona:2,slow:1},J:{dali:2,pica:1}}
+          },
+          score:{},
+          scale:{}
+        }
+      };
+    }
+    function safeClone(v){return JSON.parse(JSON.stringify(v))}
+    function mergeQuestionsDeep(baseQ,parsedQ){
+      const out={...baseQ};
+      Object.keys(parsedQ||{}).forEach((id)=>{
+        out[id]={...(baseQ&&baseQ[id]||{}),...(parsedQ[id]||{})};
+      });
+      return out;
+    }
+    function migrateQuestionFlags(questions){
+      Object.keys(questions||{}).forEach((id)=>{
+        const qq=questions[id];
+        if(!qq||typeof qq!=="object")return;
+        if(qq.usePriorityWeight!==undefined){
+          if(qq.mapsToRoles===undefined)qq.mapsToRoles=!!qq.usePriorityWeight;
+          delete qq.usePriorityWeight;
+        }
+      });
+      return questions;
+    }
+    function loadConfig(){
+      const base=defaultConfig();
+      try{
+        const raw=localStorage.getItem(QUIZ_CFG_KEY);
+        if(!raw)return base;
+        const parsed=JSON.parse(raw);
+        const parsedRoleSet=Number((parsed.meta&&parsed.meta.roleSetVersion)||0);
+        const baseRoleSet=Number((base.meta&&base.meta.roleSetVersion)||0);
+        const allowedRoleIds=new Set((base.roles||[]).map((r)=>r.id));
+        const parsedRolesFiltered=(Array.isArray(parsed.roles)?parsed.roles:[]).filter((r)=>r&&allowedRoleIds.has(r.id));
+        const useParsedRoles=parsedRolesFiltered.length>0&&parsedRoleSet===baseRoleSet;
+        const pm={...(parsed.meta||{})};
+        delete pm.priorityWeightEnabled;
+        const schemaOutdated=((parsed.meta&&parsed.meta.questionSchema)||"")!==base.meta.questionSchema;
+        const mergedQuestions=migrateQuestionFlags(
+          schemaOutdated
+            ? JSON.parse(JSON.stringify(base.questions))
+            : mergeQuestionsDeep(base.questions, parsed.questions||{})
+        );
+        const mergedMappings=schemaOutdated
+          ? JSON.parse(JSON.stringify(base.mappings))
+          :{
+              single:Object.assign({}, base.mappings.single, (parsed.mappings&&parsed.mappings.single)||{}),
+              rank:Object.assign({}, base.mappings.rank, (parsed.mappings&&parsed.mappings.rank)||{}),
+              multi:Object.assign({}, base.mappings.multi, (parsed.mappings&&parsed.mappings.multi)||{}),
+              score:Object.assign({}, base.mappings.score, (parsed.mappings&&parsed.mappings.score)||{}),
+              scale:Object.assign({}, base.mappings.scale, (parsed.mappings&&parsed.mappings.scale)||{})
+            };
+        return Object.assign(base, parsed, {
+          meta:Object.assign({}, base.meta, pm,useParsedRoles?{}:{roleSetVersion:base.meta.roleSetVersion},{questionSchema:base.meta.questionSchema}),
+          roles:useParsedRoles?parsedRolesFiltered:base.roles,
+          questions:mergedQuestions,
+          mappings:mergedMappings
+        });
+      }catch(e){return base}
+    }
+    const CFG=loadConfig();
+    const FEEDBACK_ENABLED=!CFG.meta || CFG.meta.feedbackEnabled!==false;
+    const DEFAULT_ORDER=["q1","q2","q3","q4","q5","q6","q7","q8","q9"];
+    function normalizeQuestionOrder(){
+      const ids=Object.keys(CFG.questions||{}).filter((id)=>!(CFG.questions[id]&&CFG.questions[id].resultOnly));
+      const custom=Array.isArray(CFG.meta&&CFG.meta.questionOrder)?CFG.meta.questionOrder:[];
+      const ordered=custom.filter((id)=>ids.includes(id));
+      DEFAULT_ORDER.forEach((id)=>{if(ids.includes(id)&&!ordered.includes(id))ordered.push(id)});
+      ids.forEach((id)=>{if(!ordered.includes(id))ordered.push(id)});
+      return ordered;
+    }
+    const QUESTION_ORDER=normalizeQuestionOrder();
+    T=QUESTION_ORDER.length;
+    const QID_TO_SCENE={};
+    QUESTION_ORDER.forEach((qid,idx)=>{QID_TO_SCENE[qid]=idx+1;});
+    const masters=safeClone(CFG.roles);
+    const SINGLE_MAP=safeClone(CFG.mappings.single);
+    const RANK_MAP=safeClone(CFG.mappings.rank||{});
+    const MULTI_MAP=safeClone(CFG.mappings.multi||{});
+    const SCORE_MAP=safeClone(CFG.mappings.score||{});
+    const SCALE_MAP=safeClone(CFG.mappings.scale);
+    function ensureScene(index){
+      const id="s"+index;
+      let scene=document.getElementById(id);
+      if(scene)return scene;
+      scene=document.createElement("div");
+      scene.className="scene";
+      scene.id=id;
+      scene.innerHTML=`<div class="qh"><div class="q-num"></div><h2 class="q-title"></h2><p class="q-desc"></p></div>
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b${index}" disabled onclick="nx()">继续</button></div>`;
+      const wrap=document.querySelector(".wrap");
+      const loader=document.getElementById("ld");
+      if(wrap&&loader)wrap.insertBefore(scene,loader);
+      return scene;
+    }
+
+    function applyConfigToPage(){
+      const welcome=document.getElementById("s0");
+      if(welcome){
+        const sub=welcome.querySelector(".welcome-sub");if(sub)sub.textContent=CFG.meta.badge||"AI Design Survival Quiz";
+        const h1=welcome.querySelector("h1");if(h1)h1.innerHTML=CFG.meta.mainTitle||"";
+        const p=welcome.querySelector("p");if(p)p.textContent=CFG.meta.subtitle||"";
+        const note=welcome.querySelector(".welcome-note");if(note)note.textContent=CFG.meta.note||"8 题 · 约 4 分钟";
+        const chips=welcome.querySelector(".master-preview");
+        if(chips)chips.innerHTML=masters.map(m=>`<span class="chip">${m.name}</span>`).join("");
+      }
+      QUESTION_ORDER.forEach((qid,idx)=>{
+        const scene=ensureScene(idx+1);if(!scene)return;
+        scene.style.display="";
+        const qh=scene.querySelector(".qh");if(!qh)return;
+        const n=qh.querySelector(".q-num"),t=qh.querySelector(".q-title"),d=qh.querySelector(".q-desc");
+        const qDef=CFG.questions[qid]||{};
+        if(n)n.textContent=`${String(idx+1).padStart(2,"0")} / ${String(T).padStart(2,"0")}`;
+        if(t)t.textContent=qDef.title||"";
+        if(d){
+          const desc=(qDef.desc||"");
+          d.textContent=qDef.type==="scale"
+            ? desc.replace(/1-5/g,"1-7").replace(/1\s*=\s*完全不像/g,"1 = 完全同意").replace(/5\s*=\s*就是我/g,"7 = 完全不同意")
+            : desc;
+        }
+        const nextBtn=document.getElementById("b"+(idx+1));
+        if(nextBtn){
+          nextBtn.onclick=idx===T-1?gen:nx;
+          nextBtn.textContent=idx===T-1?"看我的生存角色":"继续";
+          nextBtn.disabled=true;
+        }
+        renderSceneQuestion(scene,qid);
+      });
+      const maxSceneCount=document.querySelectorAll(".scene[id^='s']").length-1;
+      for(let i=QUESTION_ORDER.length+1;i<=maxSceneCount;i++){
+        const scene=document.getElementById("s"+i);
+        if(scene)scene.style.display="none";
+      }
+    }
+
+    function renderSceneQuestion(scene,qid){
+      const q=CFG.questions[qid]||{};
+      const qa=scene.querySelector(".qa");
+      scene.querySelectorAll(".opts,.scale-help,.scale-list,.text-wrap,.rank-wrap").forEach((el)=>el.remove());
+      if(!qa)return;
+      if(q.type==="single"){
+        const opts=document.createElement("div");
+        opts.className="opts";
+        opts.dataset.q=qid;
+        opts.dataset.t="s";
+        opts.innerHTML=(q.options||[]).map(opt=>`<div class="opt" data-v="${opt.key}" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">${opt.label}</span></div>`).join("");
+        scene.insertBefore(opts,qa);
+        const selected=A[qid];
+        if(selected){
+          const cur=opts.querySelector(`.opt[data-v="${selected}"]`);
+          if(cur){cur.classList.add("sel");}
+          const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+          if(btn)btn.disabled=false;
+        }
+        return;
+      }
+      if(q.type==="multi"){
+        const maxSelect=safePositiveInt(q.maxSelect,3);
+        const selected=Array.isArray(A[qid])?A[qid]:[];
+        /* 外层 wrap：计数器 + chip 网格 */
+        const wrap=document.createElement("div");
+        wrap.className="chip-wrap";
+        wrap.dataset.q=qid;
+        wrap.dataset.t="m";
+        wrap.dataset.max=String(maxSelect);
+        const counter=document.createElement("div");
+        counter.className="chip-counter";
+        counter.innerHTML=`<span class="chip-counter-txt">已选 <b class="chip-cur">${selected.length}</b> / ${maxSelect}</span>`;
+        if(selected.length>=maxSelect)counter.classList.add("full");
+        wrap.appendChild(counter);
+        const grid=document.createElement("div");
+        grid.className="chip-grid";
+        grid.innerHTML=(q.options||[]).map((opt)=>{
+          const active=selected.includes(opt.key)?" sel":"";
+          /* 把 "A. Figma" 这种前缀去掉，只留工具名 */
+          const name=String(opt.label||"").replace(/^[A-Za-z]\.\s*/,"");
+          return `<div class="chip${active}" data-v="${opt.key}" onclick="pkMulti(this)"><span class="chip-name">${name}</span><span class="chip-check" aria-hidden="true">✓</span></div>`;
+        }).join("");
+        wrap.appendChild(grid);
+        scene.insertBefore(wrap,qa);
+        const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+        if(btn)btn.disabled=selected.length===0;
+        return;
+      }
+      if(q.type==="rank"){
+        const rankWrap=document.createElement("div");
+        rankWrap.className="rank-wrap";
+        const rankState=Array.isArray(A[qid])&&A[qid].length ? A[qid].slice() : (q.options||[]).map((o)=>o.key);
+        if(!Array.isArray(A[qid])||!A[qid].length)A[qid]=rankState.slice();
+        const rankHelp=q.topN?`长按拖动排序（按前 ${q.topN} 名统计）`:"长按拖动排序（最希望 → 最不希望）";
+        rankWrap.innerHTML=`<div class="rank-help">${rankHelp}</div>
+          <div class="rank-list" data-q="${qid}">
+            ${rankState.map((key,idx)=>{
+              const opt=(q.options||[]).find((o)=>o.key===key)||{key,label:key};
+              return `<div class="rank-item" data-key="${opt.key}">
+                <div class="rank-index">${idx+1}</div>
+                <div class="rank-label">${opt.label}</div>
+                <div class="rank-handle">⋮⋮</div>
+              </div>`;
+            }).join("")}
+          </div>`;
+        scene.insertBefore(rankWrap,qa);
+        /* 绑定长按拖拽（触屏 + 鼠标统一处理） */
+        bindRankDrag(rankWrap.querySelector(".rank-list"),qid);
+        const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+        if(btn)btn.disabled=false;
+        return;
+      }
+      if(q.type==="text"){
+        const wrap=document.createElement("div");
+        wrap.className="text-wrap";
+        wrap.innerHTML=`<textarea id="text-${qid}" placeholder="${q.placeholder||"请输入"}" style="min-height:120px"></textarea>`;
+        scene.insertBefore(wrap,qa);
+        const input=wrap.querySelector("textarea");
+        input.value=String(A[qid]||"");
+        input.oninput=()=>{
+          A[qid]=input.value;
+        };
+        const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+        if(btn)btn.disabled=false;
+        return;
+      }
+      if(q.type==="score"){
+        const min=Math.max(1,Number(q.min||1));
+        const max=Math.max(min,Number(q.max||7));
+        const opts=document.createElement("div");
+        opts.className="opts";
+        opts.dataset.q=qid;
+        opts.dataset.t="score";
+        opts.innerHTML=new Array(max-min+1).fill(0).map((_,i)=>{
+          const v=min+i;
+          return `<div class="opt" data-v="${v}" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">${v} 分</span></div>`;
+        }).join("");
+        scene.insertBefore(opts,qa);
+        const selected=Number(A[qid]);
+        if(Number.isFinite(selected)){
+          const cur=opts.querySelector(`.opt[data-v="${selected}"]`);
+          if(cur){cur.classList.add("sel");}
+          const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+          if(btn)btn.disabled=false;
+        }
+        return;
+      }
+      const help=document.createElement("div");
+      help.className="scale-help";
+      help.textContent="每次先回答当前一条，系统会自动展开下一条。";
+      const list=document.createElement("div");
+      list.className="scale-list";
+      list.dataset.qid=qid;
+      const stems=q.stems||[];
+      const DOT_SIZE=[44,36,28,22,28,36,44];
+      const DOT_COLOR=["#d5a56d","#cc975e","#c18850","#b6aea2","#a28f78","#957f67","#896f58"];
+      list.innerHTML=stems.map((txt,idx)=>(
+        `<div class="scale-item" data-q="${qid}" data-i="${idx}">
+          <div class="scale-no">第 ${idx+1} / ${stems.length} 条</div>
+          <div class="scale-st">${txt}</div>
+          <div class="scale-likert">
+            <span class="scale-side disagree">Disagree</span>
+            <div class="scale-dots">
+              ${[1,2,3,4,5,6,7].map((step,i)=>`<button class="scale-dot" type="button" style="--sz:${DOT_SIZE[i]}px;--dot:${DOT_COLOR[i]}" data-step="${step}" onclick="setScale('${qid}',${idx},${step})"></button>`).join("")}
+            </div>
+            <span class="scale-side agree">Agree</span>
+          </div>
+        </div>`
+      )).join("");
+      scene.insertBefore(list,qa);
+      scene.insertBefore(help,list);
+      stems.forEach((_,idx)=>{
+        const v=(A[qid]||{})[idx];
+        if(!isScaleAnswered(v))return;
+        const step=scaleValueToStep(v);
+        const row=list.querySelector(`.scale-item[data-q="${qid}"][data-i="${idx}"]`);
+        if(row)row.querySelectorAll(".scale-dot").forEach((b)=>b.classList.toggle("sel",Number(b.dataset.step)===step));
+      });
+      refreshScaleUIState(qid,false);
+    }
+
+    function scaleStepToValue(step){ return Math.max(1,Math.min(7,Number(step))); }
+    function scaleValueToStep(value){
+      return Math.max(1,Math.min(7,Math.round(Number(value||4))));
+    }
+    function isScaleAnswered(v){
+      return Number.isFinite(Number(v))&&Number(v)>=1&&Number(v)<=7;
+    }
+    function refreshScaleUIState(q,scrollNext){
+      const stems=(CFG.questions[q]&&CFG.questions[q].stems)||[];
+      const ans=A[q]||{};
+      let answeredPrefix=0;
+      for(let i=0;i<stems.length;i++){
+        if(isScaleAnswered(ans[i]))answeredPrefix++;
+        else break;
+      }
+      const activeIndex=answeredPrefix<stems.length ? answeredPrefix : Math.max(stems.length-1,0);
+      stems.forEach((_,idx)=>{
+        const row=document.querySelector(`.scale-item[data-q="${q}"][data-i="${idx}"]`);
+        if(!row)return;
+        row.classList.toggle("active-step",idx===activeIndex);
+        row.classList.toggle("muted-step",idx!==activeIndex);
+      });
+      if(scrollNext&&answeredPrefix<stems.length){
+        const nextRow=document.querySelector(`.scale-item[data-q="${q}"][data-i="${answeredPrefix}"]`);
+        if(nextRow)nextRow.scrollIntoView({behavior:"smooth",block:"center"});
+      }
+      const done=stems.length>0&&stems.every((_,idx)=>isScaleAnswered(ans[idx]));
+      const btn=document.getElementById("b"+QID_TO_SCENE[q]);
+      if(btn)btn.disabled=!done;
+    }
+
+    function setScale(q,idx,step){
+      if(!A[q])A[q]={};
+      A[q][idx]=scaleStepToValue(step);
+      const row=document.querySelector(`.scale-item[data-q="${q}"][data-i="${idx}"]`);
+      if(row){
+        row.querySelectorAll(".scale-dot").forEach((b)=>b.classList.toggle("sel",Number(b.dataset.step)===step));
+      }
+      refreshScaleUIState(q,true);
+    }
+
+    function upBar(){document.getElementById("bar").style.width=S===0?"0%":(S/T*100)+"%"}
+    function show(id){
+      document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+      const e=document.getElementById(id);
+      if(!e)return;
+      void e.offsetWidth;
+      e.classList.add("active");
+      const idx=Number((id||"").replace("s",""));
+      document.body.classList.toggle("quiz-on-q",Number.isFinite(idx)&&idx>=1&&idx<=T);
+      const qid=QUESTION_ORDER[idx-1];
+      if(qid&&CFG.questions[qid]&&CFG.questions[qid].type==="scale")refreshScaleUIState(qid,false);
+    }
+    function start(){
+      const s0=document.getElementById("s0");
+      s0.classList.add("quiz-started");
+      s0.classList.remove("active");
+      S=1;
+      show("s1");
+      upBar();
+      snapToScene();
+    }
+    function pk(el){
+      const g=el.parentElement;
+      g.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel"));
+      el.classList.add("sel");
+      const qid=g.dataset.q;
+      const isScore=g.dataset.t==="score";
+      A[qid]=isScore?Number(el.dataset.v):el.dataset.v;
+      const b=document.getElementById("b"+S);
+      if(b)b.disabled=false;
+    }
+    function pkMulti(el){
+      /* 找到包含 data-q 的容器：新版 .chip-wrap 或旧版 .opts */
+      const g=el.closest("[data-q]")||el.parentElement;
+      const qid=g.dataset.q;
+      const maxSelect=safePositiveInt(g.dataset.max,3);
+      const key=el.dataset.v;
+      const selected=Array.isArray(A[qid])?A[qid].slice():[];
+      const idx=selected.indexOf(key);
+      if(idx!==-1){
+        selected.splice(idx,1);
+        el.classList.remove("sel");
+      }else{
+        if(selected.length>=maxSelect){
+          /* 满员态：抖动一下当前被点项 + 轻震 */
+          el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");
+          try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
+          return;
+        }
+        selected.push(key);
+        el.classList.add("sel");
+      }
+      A[qid]=selected;
+      /* 同步计数器 UI（如果是新版 chip-wrap） */
+      const counter=g.querySelector(".chip-counter");
+      if(counter){
+        const cur=counter.querySelector(".chip-cur");
+        if(cur)cur.textContent=String(selected.length);
+        counter.classList.toggle("full",selected.length>=maxSelect);
+      }
+      const b=document.getElementById("b"+S);
+      if(b)b.disabled=selected.length===0;
+    }
+    /* ===== 排序题：长按拖拽（触屏 + 鼠标统一） =====
+       交互：按住 120ms 或手指纵向滑动超阈值立即激活 → 短震动 + 浮起 → 跟手移动 → 实时换位（其它项平滑让位） → 松手落位 */
+    const RANK_HOLD_MS=120;     // 长按触发时间（轻按即抓）
+    const RANK_MOVE_TOL=14;     // 激活前横向偏移容忍（超出视为横滑/滚动，取消长按）
+    const RANK_DRAG_TRIGGER=6;  // 纵向滑动超此值即刻激活，无需等计时器
+    function bindRankDrag(listEl,qid){
+      if(!listEl)return;
+      listEl.querySelectorAll(".rank-item").forEach((item)=>{
+        attachRankPointer(item,listEl,qid);
+      });
+    }
+    function attachRankPointer(item,listEl,qid){
+      let holdTimer=null;
+      let active=false;           // 是否已激活拖拽
+      let startX=0,startY=0;      // 按下坐标
+      let fingerToCenter=0;       // 按下时 "手指Y - 项中心Y" 的偏移，用于跟手期间反推中心位置
+      let itemH=0;                // 被拖项高度（用于算邻项位移）
+      let gap=10;                 // 项间距（rank-list gap）
+      let homeIndex=0;            // 被拖项原始 DOM 索引（对应 items 里的下标）
+      let items=[];               // 激活瞬间列表内所有项快照（DOM 顺序）
+      let order=[];               // 当前顺序的 key 数组（初始 = items 的 key 顺序）
+      let touchActive=false;      // iOS 触屏后模拟 mouse 的防抖开关
+
+      const onDown=(clientX,clientY,isTouch)=>{
+        clearTimeout(holdTimer);
+        startX=clientX;startY=clientY;
+        item.classList.add("press");
+        holdTimer=setTimeout(()=>activate(isTouch),RANK_HOLD_MS);
+      };
+      const onMove=(clientX,clientY,ev)=>{
+        if(!active){
+          const dx=Math.abs(clientX-startX),dy=Math.abs(clientY-startY);
+          /* 横向偏移过大 → 当作横滑/滚动，取消长按 */
+          if(dx>RANK_MOVE_TOL&&dx>dy){
+            clearTimeout(holdTimer);
+            item.classList.remove("press");
+            return;
+          }
+          /* 纵向滑动超阈值 → 立刻激活（不用死等计时器） */
+          if(dy>RANK_DRAG_TRIGGER){
+            clearTimeout(holdTimer);
+            activate(ev&&ev.type&&ev.type.indexOf("touch")===0);
+          }else{
+            return;
+          }
+        }
+        /* 已激活：阻止页面滚动，跟手 */
+        if(ev&&ev.cancelable)ev.preventDefault();
+        /* 被拖项的跟随：用相对"按下位置"的位移 */
+        const offsetY=clientY-startY;
+        item.style.transform=`translateY(${offsetY}px) scale(1.04)`;
+        /* 用"手指当前 Y - 手指到项中心的偏移" 反推被拖项此刻的中心 Y（不受 DOM 顺序影响） */
+        const centerY=clientY-fingerToCenter;
+        /* 根据 centerY 判断应该落在哪个目标下标 targetIdx */
+        let targetIdx=homeIndex;
+        for(let i=0;i<items.length;i++){
+          if(i===homeIndex)continue;
+          /* 用每个"其它项"的原始中心位置（不含任何 transform）做比较 */
+          const origCenter=items[i]._origTop+itemH/2;
+          if(i<homeIndex&&centerY<origCenter){targetIdx=i;break;}
+          if(i>homeIndex&&centerY>origCenter)targetIdx=i;  // 注意不 break，继续找更大的 i
+        }
+        applyLayout(targetIdx);
+      };
+      const onUp=()=>{
+        clearTimeout(holdTimer);
+        item.classList.remove("press");
+        if(!active)return;
+        /* 落位：解除浮起、清所有 transform、提交数据、重渲染序号 */
+        active=false;
+        item.style.transform="";
+        item.classList.remove("lift");
+        items.forEach((el)=>{el.style.transition="";el.style.transform="";});
+        A[qid]=order.slice();
+        const scene=document.getElementById("s"+QID_TO_SCENE[qid]);
+        if(scene)renderSceneQuestion(scene,qid);
+      };
+      const activate=(isTouch)=>{
+        active=true;
+        item.classList.remove("press");
+        item.classList.add("lift");
+        try{if(navigator.vibrate)navigator.vibrate(15);}catch(e){}
+        /* 快照当前列表的原始位置（DOM 不会变，只靠 transform 做视觉让位） */
+        items=Array.from(listEl.querySelectorAll(".rank-item"));
+        order=items.map((el)=>el.dataset.key);
+        items.forEach((el)=>{
+          const r=el.getBoundingClientRect();
+          el._origTop=r.top;  // 原始 top（viewport 坐标）
+        });
+        itemH=item.offsetHeight;
+        homeIndex=items.indexOf(item);
+        const itemRect=item.getBoundingClientRect();
+        fingerToCenter=startY-(itemRect.top+itemH/2);
+        /* gap 取 CSS 里的 rank-list gap；两相邻项的原始 top 差 = itemH + gap */
+        if(items.length>=2)gap=items[1]._origTop-items[0]._origTop-itemH;
+      };
+      /* 根据 "被拖项应该落在第 targetIdx 位" 重新排 order 和给其它项加让位 transform */
+      const applyLayout=(targetIdx)=>{
+        /* 用 homeIndex 和 targetIdx 算 order：从原始数组 items 出发，删掉 homeIndex 位置，插入到 targetIdx */
+        const newOrder=items.map((el)=>el.dataset.key);
+        const dragged=newOrder.splice(homeIndex,1)[0];
+        newOrder.splice(targetIdx,0,dragged);
+        order=newOrder;
+        /* 给每个"其它项"施加 translateY：如果它的新位置 ≠ 旧位置，就滑过去 */
+        const step=itemH+gap;
+        items.forEach((el,i)=>{
+          if(el===item)return;
+          const newIdx=order.indexOf(el.dataset.key);
+          const delta=(newIdx-i)*step;
+          el.style.transform=delta?`translateY(${delta}px)`:"";
+        });
+      };
+
+      /* 触屏事件 */
+      item.addEventListener("touchstart",(ev)=>{
+        touchActive=true;
+        const t=ev.touches[0];onDown(t.clientX,t.clientY,true);
+      },{passive:true});
+      item.addEventListener("touchmove",(ev)=>{
+        const t=ev.touches[0];onMove(t.clientX,t.clientY,ev);
+      },{passive:false});
+      item.addEventListener("touchend",()=>{
+        onUp();
+        /* 触屏结束后 400ms 内忽略模拟鼠标事件 */
+        setTimeout(()=>{touchActive=false;},400);
+      });
+      item.addEventListener("touchcancel",()=>{onUp();touchActive=false;});
+      /* 桌面鼠标事件 */
+      item.addEventListener("mousedown",(ev)=>{
+        if(ev.button!==0||touchActive)return;
+        onDown(ev.clientX,ev.clientY,false);
+        const mm=(e)=>onMove(e.clientX,e.clientY,e);
+        const mu=()=>{document.removeEventListener("mousemove",mm);document.removeEventListener("mouseup",mu);onUp();};
+        document.addEventListener("mousemove",mm);
+        document.addEventListener("mouseup",mu);
+      });
+    }
+    /* 切题：瞬时对齐，让新题号出现在顶栏正下方，无动画无滑行 */
+    function snapToScene(){
+      const el=document.querySelector(".scene.active");
+      if(!el)return;
+      const HEADER=58; // 顶栏 56 + 进度条 2
+      const y=el.getBoundingClientRect().top+window.pageYOffset-HEADER;
+      /* 瞬时对齐（auto 无动画）；只有视口位置和目标相差超过 2px 才滚，避免抖动 */
+      if(Math.abs(window.pageYOffset-Math.max(0,y))>2){
+        window.scrollTo({top:Math.max(0,y),behavior:"auto"});
+      }
+    }
+    function nx(){if(S<T){S++;show("s"+S);upBar();snapToScene()}}
+    function bk(){
+      if(S>1){S--;show("s"+S);upBar();snapToScene()}
+      else if(S===1){
+        const s0=document.getElementById("s0");
+        if(s0.classList.contains("quiz-started")){
+          document.body.classList.remove("quiz-on-q");
+          window.location.href="index.html";
+          return;
+        }
+        S=0;
+        document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+        s0.classList.add("active");
+        document.body.classList.remove("quiz-on-q");
+        upBar();
+        window.scrollTo(0,0);
+      }
+    }
+
+    function buildQ1PriorityMultipliers(){
+      const order=A.q1;
+      if(!Array.isArray(order)||!order.length)return null;
+      const factors=[1,0.75,0.5,0.25];
+      const agg={};
+      masters.forEach((m)=>{agg[m.id]=0;});
+      order.forEach((key,idx)=>{
+        const map=RANK_MAP.q1&&RANK_MAP.q1[key];
+        if(!map)return;
+        const factor=factors[idx]!==undefined?factors[idx]:0;
+        Object.keys(map).forEach((rid)=>{agg[rid]+=(Number(map[rid])||0)*factor;});
+      });
+      const ids=masters.map((m)=>m.id);
+      const mx=Math.max(...ids.map((id)=>agg[id]||0),1e-9);
+      const out={};
+      ids.forEach((id)=>{
+        const raw=(agg[id]||0)/mx;
+        out[id]=raw>1e-6?raw:0.2;
+      });
+      return out;
+    }
+    function questionMapsToRoles(qid){
+      if(qid==="q1")return false;
+      const q=CFG.questions&&CFG.questions[qid];
+      if(!q)return false;
+      if(q.type==="text"||q.resultOnly)return false;
+      if(q.mapsToRoles===false)return false;
+      if(q.mapsToRoles===true)return true;
+      return q.type==="single"||q.type==="multi"||q.type==="rank"||q.type==="score"||q.type==="scale";
+    }
+    function rolePriorityMultiplier(rid,priorityMult){
+      if(!priorityMult||priorityMult[rid]===undefined)return 1;
+      return Number(priorityMult[rid])||1;
+    }
+    function applySingle(score,q,v,priorityMult){
+      const map=SINGLE_MAP[q]&&SINGLE_MAP[q][v];
+      if(!map)return;
+      Object.keys(map).forEach((rid)=>{
+        const base=Number(map[rid])||0;
+        const m=rolePriorityMultiplier(rid,priorityMult);
+        score[rid]+=base*m;
+      });
+    }
+    function applyRank(score,q,order,priorityMult){
+      if(!Array.isArray(order)||!order.length)return;
+      const factors=[1,0.75,0.5,0.25];
+      const topN=Math.max(1,Number((CFG.questions[q]&&CFG.questions[q].topN)||order.length));
+      order.slice(0,topN).forEach((key,idx)=>{
+        const map=RANK_MAP[q]&&RANK_MAP[q][key];
+        if(!map)return;
+        const factor=factors[idx]!==undefined?factors[idx]:0;
+        Object.keys(map).forEach((rid)=>{
+          const base=(Number(map[rid])||0)*factor;
+          const m=rolePriorityMultiplier(rid,priorityMult);
+          score[rid]+=base*m;
+        });
+      });
+    }
+    function applyMulti(score,q,arr,priorityMult){
+      if(!Array.isArray(arr)||!arr.length)return;
+      const topN=safePositiveInt((CFG.questions[q]&&CFG.questions[q].maxSelect),arr.length);
+      arr.slice(0,topN).forEach((key)=>{
+        const map=MULTI_MAP[q]&&MULTI_MAP[q][key];
+        if(!map)return;
+        Object.keys(map).forEach((rid)=>{
+          const base=Number(map[rid])||0;
+          const m=rolePriorityMultiplier(rid,priorityMult);
+          score[rid]+=base*m;
+        });
+      });
+    }
+    function applyScore(score,q,val,priorityMult){
+      const scoreMap=SCORE_MAP[q]||{};
+      const map=scoreMap[String(val)]||scoreMap[val];
+      if(!map)return;
+      Object.keys(map).forEach((rid)=>{
+        const base=Number(map[rid])||0;
+        const m=rolePriorityMultiplier(rid,priorityMult);
+        score[rid]+=base*m;
+      });
+    }
+    function applyScale(score,q,priorityMult){
+      const ans=A[q]||{};
+      const rows=SCALE_MAP[q]||[];
+      rows.forEach((weights,idx)=>{
+        const v=Number(ans[idx]||0);
+        Object.keys(weights).forEach((rid)=>{
+          const base=v*(Number(weights[rid])||0);
+          const m=rolePriorityMultiplier(rid,priorityMult);
+          score[rid]+=base*m;
+        });
+      });
+    }
+
+    function calcScores(){
+      const score={};
+      masters.forEach(m=>score[m.id]=30);
+      const needPriority=QUESTION_ORDER.some((qid)=>questionMapsToRoles(qid));
+      const priorityMult=needPriority?buildQ1PriorityMultipliers():null;
+      QUESTION_ORDER.forEach((qid)=>{
+        const q=CFG.questions[qid]||{};
+        if(!questionMapsToRoles(qid))return;
+        if(q.type==="single")applySingle(score,qid,A[qid],priorityMult);
+        if(q.type==="multi")applyMulti(score,qid,A[qid],priorityMult);
+        if(q.type==="rank"&&qid!=="q1")applyRank(score,qid,A[qid],priorityMult);
+        if(q.type==="score")applyScore(score,qid,Number(A[qid]),priorityMult);
+        if(q.type==="scale")applyScale(score,qid,priorityMult);
+      });
+      const vals=Object.values(score),mn=Math.min(...vals),mx=Math.max(...vals);
+      Object.keys(score).forEach(k=>score[k]=Math.round(60+((score[k]-mn)/(mx-mn||1))*37));
+      return score;
+    }
+
+    function submit(result){
+      const answers={};
+      QUESTION_ORDER.forEach((qid)=>{answers[qid]=A[qid]===undefined?"":A[qid];});
+      const q1Value=Array.isArray(A.q1)?(A.q1[0]||""):(A.q1||"");
+      const q9Top3=Array.isArray(A.q9)?A.q9.slice(0,3):[];
+      const d={
+        answers,
+        q1_task_focus:q1Value,
+        q8_designer_type:A.q8||"",
+        q9_ai_tools_top3:q9Top3,
+        q10_ai_wish:String(A.q10||""),
+        result_role_id:result&&result.id?result.id:"",
+        result_role_name:result&&result.name?result.name:"",
+        timestamp:new Date().toISOString()
+      };
+      d.answers.q10=String(A.q10||"");
+      const arr=JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+      arr.push(d);
+      latestSurveyIndex=arr.length-1;
+      localStorage.setItem("ardot_survey",JSON.stringify(arr));
+      try{fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).catch(()=>{})}catch(e){}
+    }
+
+    function renderResult(){
+      const sc=calcScores();
+      const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+      const topId=sorted[0][0];
+      const m=masters.find(x=>x.id===topId);
+      document.getElementById("rImg").style.display="";
+      document.getElementById("wishBox").style.display="";
+      document.getElementById("othersTitle").style.display="";
+      document.getElementById("othersRow").style.display="";
+      document.getElementById("rImg").src=m.img;
+      document.getElementById("rName").textContent=m.name;
+      document.getElementById("rReal").textContent=m.real;
+      document.getElementById("rDesc").textContent=m.desc;
+      const wishTitle=document.getElementById("wishTitle");
+      if(wishTitle)wishTitle.textContent=`从「${m.name}」到「${roleIdealName(m)}」`;
+      const wishDesc=document.getElementById("wishDesc");
+      const hasWish=String(A.q10||"").trim().length>0;
+      if(wishDesc)wishDesc.textContent=hasWish?"你已填写需要的 AI 功能，可点击按钮参与抽奖":"请填写你需要的 AI 功能，提交后可参与抽奖";
+      const wishInput=document.getElementById("wishInput");
+      if(wishInput){
+        wishInput.style.display="";
+        wishInput.value=String(A.q10||"");
+        wishInput.oninput=()=>{A.q10=wishInput.value;};
+      }
+      const others=sorted.slice(1,4);
+      document.getElementById("othersRow").innerHTML=others.map(([id,val])=>{
+        const mm=masters.find(x=>x.id===id);
+        return `<div class="other-card"><img src="${mm.img}" alt><div class="oc-name">${mm.name}</div><div class="oc-pct">${val}%</div></div>`;
+      }).join("");
+      latestResult={id:topId,name:m&&m.name?m.name:""};
+      const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
+      document.getElementById("res").classList.add("active");
+      window.scrollTo({top:0,behavior:"smooth"});
+      return {id:topId,name:m&&m.name?m.name:""};
+    }
+
+    function renderSurveyOnlyResult(){
+      document.getElementById("rImg").style.display="none";
+      document.getElementById("wishBox").style.display="none";
+      document.getElementById("othersTitle").style.display="none";
+      document.getElementById("othersRow").style.display="none";
+      document.getElementById("rName").textContent="问卷已提交";
+      document.getElementById("rReal").textContent="感谢你的参与";
+      document.getElementById("rDesc").textContent="当前为普通问卷收集模式，本次不展示测试结果反馈。";
+      latestResult={id:"",name:"问卷用户"};
+      const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
+      document.getElementById("res").classList.add("active");
+      window.scrollTo({top:0,behavior:"smooth"});
+      return {id:"",name:""};
+    }
+
+    function roleIdealName(role){
+      const byId={
+        pica:"毕加索",
+        mona:"莫奈",
+        dali:"达利",
+        slow:"唐纳德"
+      };
+      const byName={
+        "毕加班索":"毕加索",
+        "莫奈何":"莫奈",
+        "达利谱":"达利",
+        "唐纳德诺慢":"唐纳德"
+      };
+      if(role&&role.id&&byId[role.id])return byId[role.id];
+      const raw=role&&role.name?String(role.name):"";
+      if(raw&&byName[raw])return byName[raw];
+      return raw||"理想状态";
+    }
+
+    function submitWishAndDraw(){
+      const resultEl=document.getElementById("wishResult");
+      const text=String(A.q10||"").trim();
+      if(!text){
+        toast("请先填写你需要的 AI 功能");
+        return;
+      }
+      const pool=["设计效率工具包","高质量提示词模板包","AI 协作流程清单","视觉灵感补给包"];
+      const reward=pool[Math.floor(Math.random()*pool.length)];
+      const role=masters.find((r)=>r.id===latestResult.id) || null;
+      const rec={
+        wish:text,
+        role_id:latestResult.id||"",
+        role_name:latestResult.name||"",
+        ideal_name:roleIdealName(role||{name:latestResult.name||""}),
+        timestamp:new Date().toISOString()
+      };
+      const arr=JSON.parse(localStorage.getItem("ardot_wish_lottery_v1")||"[]");
+      arr.push(rec);
+      localStorage.setItem("ardot_wish_lottery_v1",JSON.stringify(arr));
+      const surveyArr=JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+      const idx=(latestSurveyIndex>=0&&latestSurveyIndex<surveyArr.length)?latestSurveyIndex:(surveyArr.length-1);
+      if(idx>=0&&surveyArr[idx]){
+        if(!surveyArr[idx].answers||typeof surveyArr[idx].answers!=="object")surveyArr[idx].answers={};
+        surveyArr[idx].answers.q10=text;
+        surveyArr[idx].q10_ai_wish=text;
+        localStorage.setItem("ardot_survey",JSON.stringify(surveyArr));
+      }
+      if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
+      const input=document.getElementById("wishInput");
+      if(input)input.style.display="none";
+      toast("心愿提交成功，已完成抽奖");
+    }
+
+    function gen(){
+      document.body.classList.remove("quiz-on-q");
+      document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+      document.getElementById("ld").classList.add("active");
+      setTimeout(()=>{
+        document.getElementById("ld").classList.remove("active");
+        const result=FEEDBACK_ENABLED ? renderResult() : renderSurveyOnlyResult();
+        submit(result);
+        document.getElementById("bar").style.width="100%";
+      },2200);
+    }
+
+    function share(){
+      var n=document.getElementById("rName").textContent;
+      var roleId=(latestResult&&latestResult.id)||"";
+      var txt="我在 AI 时代的设计生存状态是「"+n+"」，你也来测测看。";
+      // 构造带角色参数的分享链接，朋友打开时可展示"TA 的结果是 XXX"
+      var shareLink=location.origin+location.pathname.replace(/[^\/]*$/,"")+"quiz-h5.html"+(roleId?("?from="+encodeURIComponent(roleId)):"");
+      var shareImg=document.getElementById("rImg").src||"https://ardot-quiz.edgeone.dev/img/picasso.png";
+      // 更新分享卡片 meta（部分社交平台会重读）
+      updateShareMeta({title:"我是「"+n+"」型设计师",desc:txt,img:shareImg,link:shareLink});
+      // 微信环境：尝试通过 JSSDK 更新分享内容（需后端签名）；未签名或失败 → 弹出引导遮罩
+      if(window.__IS_WX__){
+        var ok=tryUpdateWxShare({title:"我是「"+n+"」型设计师 — AI时代设计生存状态",desc:txt,link:shareLink,imgUrl:shareImg});
+        showShareMask();
+        if(!ok){/* 未接入 JSSDK 签名时，用户手动点右上角，分享出去的标题/图会由微信读取当前页 meta */}
+        return;
+      }
+      // 非微信：复制链接到剪贴板
+      var fallback=txt+" "+shareLink;
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(fallback).then(function(){toast("已复制分享链接")},function(){toast("复制失败，请长按链接复制")});
+      }else{
+        toast("请长按页面分享");
+      }
+    }
+
+    function updateShareMeta(opts){
+      opts=opts||{};
+      function set(selector,attr,val){
+        var el=document.querySelector(selector);
+        if(el&&val)el.setAttribute(attr,val);
+      }
+      if(opts.title){document.title=opts.title;}
+      set('meta[property="og:title"]',"content",opts.title);
+      set('meta[name="twitter:title"]',"content",opts.title);
+      set('meta[itemprop="name"]',"content",opts.title);
+      set('meta[property="og:description"]',"content",opts.desc);
+      set('meta[name="twitter:description"]',"content",opts.desc);
+      set('meta[itemprop="description"]',"content",opts.desc);
+      set('meta[name="description"]',"content",opts.desc);
+      set('meta[property="og:image"]',"content",opts.img);
+      set('meta[name="twitter:image"]',"content",opts.img);
+      set('meta[itemprop="image"]',"content",opts.img);
+      if(opts.link){set('meta[property="og:url"]',"content",opts.link);}
+    }
+
+    /** 尝试调用微信 JSSDK 设置分享（需要后端 /api/wx-signature 返回签名）。
+     *  未接入签名接口时会静默失败，不影响页面。接入步骤：
+     *  1. 后端通过 jsapi_ticket 对 (noncestr,jsapi_ticket,timestamp,url) 做 sha1，返回 signature
+     *  2. 前端把 appId/timestamp/nonceStr/signature 喂给 wx.config
+     *  3. wx.ready 后调 updateAppMessageShareData / updateTimelineShareData
+     */
+    function tryUpdateWxShare(share){
+      if(typeof wx==="undefined"||!wx||window.__wxSDKFailed)return false;
+      // 如果还没做过 wx.config，尝试拉一次签名（接口不存在会直接失败，页面不受影响）
+      if(!window.__wxConfigured){
+        fetch("/api/wx-signature?url="+encodeURIComponent(location.href.split("#")[0]))
+          .then(function(r){return r.ok?r.json():Promise.reject()})
+          .then(function(cfg){
+            if(!cfg||!cfg.appId)return;
+            wx.config({
+              debug:false,
+              appId:cfg.appId,
+              timestamp:cfg.timestamp,
+              nonceStr:cfg.nonceStr,
+              signature:cfg.signature,
+              jsApiList:["updateAppMessageShareData","updateTimelineShareData","onMenuShareAppMessage","onMenuShareTimeline"]
+            });
+            window.__wxConfigured=true;
+            wx.ready(function(){applyWxShare(share);});
+            wx.error(function(){/* 签名失败：忽略，用户仍可用默认分享 */});
+          })
+          .catch(function(){/* 没有签名接口：忽略 */});
+        return false;
+      }
+      applyWxShare(share);
+      return true;
+    }
+    function applyWxShare(share){
+      try{
+        if(wx.updateAppMessageShareData){
+          wx.updateAppMessageShareData({title:share.title,desc:share.desc,link:share.link,imgUrl:share.imgUrl});
+        }
+        if(wx.updateTimelineShareData){
+          wx.updateTimelineShareData({title:share.title,link:share.link,imgUrl:share.imgUrl});
+        }
+        // 老接口兜底
+        if(wx.onMenuShareAppMessage){
+          wx.onMenuShareAppMessage({title:share.title,desc:share.desc,link:share.link,imgUrl:share.imgUrl});
+        }
+        if(wx.onMenuShareTimeline){
+          wx.onMenuShareTimeline({title:share.title,link:share.link,imgUrl:share.imgUrl});
+        }
+      }catch(e){}
+    }
+
+    function toast(msg){const e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
+
+    applyConfigToPage();
+
+    /* 入口：如果是朋友分享进来的（URL 带 ?from=xxx），在欢迎页加一条"你朋友测得的是 XX"提示 */
+    (function showFromHint(){
+      try{
+        var from=new URLSearchParams(location.search).get("from");
+        if(!from)return;
+        var role=(CFG.roles||[]).find(function(r){return r.id===from;});
+        if(!role)return;
+        var welcome=document.getElementById("s0");
+        if(!welcome)return;
+        var p=welcome.querySelector("p");
+        if(p){
+          p.innerHTML='你的朋友测得的是「<strong style="color:#c46a1a">'+role.name+'</strong>」，来看看你是哪种？';
+        }
+      }catch(e){}
+    })();
+
+    /* 默认（进入即可分享）微信分享配置：首次加载时就让用户点右上角能分享出"邀请测试"的卡片 */
+    (function defaultWxShare(){
+      if(!window.__IS_WX__)return;
+      var defaultShare={
+        title:"AI时代，你活成了哪种大师？",
+        desc:"9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。",
+        link:location.href.split("#")[0],
+        imgUrl:location.origin+location.pathname.replace(/[^\/]*$/,"")+"img/picasso.png"
+      };
+      tryUpdateWxShare(defaultShare);
+    })();
+  </script>
+</body>
+</html>
