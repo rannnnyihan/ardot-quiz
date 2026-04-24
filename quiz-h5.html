@@ -488,7 +488,7 @@
           subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",
           note:"9 题 · 约 6 分钟",
           feedbackEnabled:true,
-          questionSchema:"prompt_refactor_v13",
+          questionSchema:"prompt_refactor_v14",
           roleSetVersion:5
         },
         roles:[
@@ -507,7 +507,9 @@
           q7:{type:"single",title:"改稿时，AI 哪种操作最容易让你当场沉默？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 我只是扩个图，它把主角也扩没了"},{key:"B",label:"B. 上一版为什么那样做，它已经失忆"},{key:"C",label:"C. 我说动一根头发，它换了整颗头"},{key:"D",label:"D. 改了 A，B/C/D 还在原地等我手动同步"}]},
           q8:{type:"single",title:"到交付这一步，AI 哪种“不靠谱”最让你不敢放手？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 交互逻辑、页面状态一点不给研发标记"},{key:"B",label:"B. 之前做的交互逻辑还要和他再说一遍"},{key:"C",label:"C. 间距、状态、边界、响应式、动效全要重新调"},{key:"D",label:"D. 原型是原型，代码是代码，谁也不认识谁"}]},
           q9:{type:"single",title:"项目收尾做沉淀时，AI 哪种表现最容易让资产库继续“长草”？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 它不问我要沉淀什么，就什么都沉淀不出来"},{key:"B",label:"B. 关键背景埋在长聊天里，谁找谁痛苦"},{key:"C",label:"C. 存进去了，但下次用还得先验货"},{key:"D",label:"D. 资产库的尽头，是另一个杂物间"}]},
-          q10:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
+          q10:{type:"single",title:"设计师工作类型（单选）",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 图形 / Logo"},{key:"B",label:"B. 界面体验"},{key:"C",label:"C. 角色人设"},{key:"D",label:"D. 流程原型"}]},
+          q11:{type:"multi",maxSelect:3,title:"常用 AI 工具（最多选 3 个）",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Figma"},{key:"B",label:"B. Sketch"},{key:"C",label:"C. Axure"},{key:"D",label:"D. MasterGo"},{key:"E",label:"E. PhotoShop"},{key:"F",label:"F. Pixso"},{key:"G",label:"G. Motiff"},{key:"H",label:"H. Penpot"},{key:"I",label:"I. Adobe XD"}]},
+          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
         },
         mappings:{
           single:{
@@ -518,12 +520,15 @@
             q6:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
             q7:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
             q8:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q9:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}}
+            q9:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
+            q10:{A:{pica:2,dali:1},B:{mona:2,slow:1},C:{dali:2,pica:1},D:{slow:3}}
           },
           rank:{
             q1:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1},E:{mona:1},F:{slow:1}}
           },
-          multi:{},
+          multi:{
+            q11:{A:{slow:3},B:{mona:1,slow:1},C:{slow:3},D:{slow:3},E:{pica:2,mona:1},F:{slow:3},G:{slow:3},H:{slow:3},I:{mona:2,slow:1},J:{dali:2,pica:1}}
+          },
           score:{},
           scale:{}
         }
@@ -586,7 +591,7 @@
     }
     const CFG=loadConfig();
     const FEEDBACK_ENABLED=!CFG.meta || CFG.meta.feedbackEnabled!==false;
-    const DEFAULT_ORDER=["q1","q2","q3","q4","q5","q6","q7","q8","q9"];
+    const DEFAULT_ORDER=["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10","q11"];
     function normalizeQuestionOrder(){
       const ids=Object.keys(CFG.questions||{}).filter((id)=>!(CFG.questions[id]&&CFG.questions[id].resultOnly));
       const custom=Array.isArray(CFG.meta&&CFG.meta.questionOrder)?CFG.meta.questionOrder:[];
@@ -1189,18 +1194,18 @@
       const answers={};
       QUESTION_ORDER.forEach((qid)=>{answers[qid]=A[qid]===undefined?"":A[qid];});
       const q1Value=Array.isArray(A.q1)?(A.q1[0]||""):(A.q1||"");
-      const q9Value=Array.isArray(A.q9)?(A.q9[0]||""):(A.q9||"");
+      const q11Arr=Array.isArray(A.q11)?A.q11.slice(0,3):[];
       const d={
         answers,
         q1_task_focus:q1Value,
-        q8_designer_type:A.q8||"",
-        q9_ai_tools_top3:q9Value?[q9Value]:[],
-        q10_ai_wish:String(A.q10||""),
+        q10_designer_type:A.q10||"",
+        q11_ai_tools_top3:q11Arr,
+        q12_ai_wish:String(A.q12||""),
         result_role_id:result&&result.id?result.id:"",
         result_role_name:result&&result.name?result.name:"",
         timestamp:new Date().toISOString()
       };
-      d.answers.q10=String(A.q10||"");
+      d.answers.q12=String(A.q12||"");
       const arr=JSON.parse(localStorage.getItem("ardot_survey")||"[]");
       arr.push(d);
       latestSurveyIndex=arr.length-1;
@@ -1224,13 +1229,13 @@
       const wishTitle=document.getElementById("wishTitle");
       if(wishTitle)wishTitle.textContent=`从「${m.name}」到「${roleIdealName(m)}」`;
       const wishDesc=document.getElementById("wishDesc");
-      const hasWish=String(A.q10||"").trim().length>0;
+      const hasWish=String(A.q12||"").trim().length>0;
       if(wishDesc)wishDesc.textContent=hasWish?"你已填写需要的 AI 功能，可点击按钮参与抽奖":"请填写你需要的 AI 功能，提交后可参与抽奖";
       const wishInput=document.getElementById("wishInput");
       if(wishInput){
         wishInput.style.display="";
-        wishInput.value=String(A.q10||"");
-        wishInput.oninput=()=>{A.q10=wishInput.value;};
+        wishInput.value=String(A.q12||"");
+        wishInput.oninput=()=>{A.q12=wishInput.value;};
       }
       const others=sorted.slice(1,4);
       document.getElementById("othersRow").innerHTML=others.map(([id,val])=>{
@@ -1280,7 +1285,7 @@
 
     function submitWishAndDraw(){
       const resultEl=document.getElementById("wishResult");
-      const text=String(A.q10||"").trim();
+      const text=String(A.q12||"").trim();
       if(!text){
         toast("请先填写你需要的 AI 功能");
         return;
@@ -1302,8 +1307,8 @@
       const idx=(latestSurveyIndex>=0&&latestSurveyIndex<surveyArr.length)?latestSurveyIndex:(surveyArr.length-1);
       if(idx>=0&&surveyArr[idx]){
         if(!surveyArr[idx].answers||typeof surveyArr[idx].answers!=="object")surveyArr[idx].answers={};
-        surveyArr[idx].answers.q10=text;
-        surveyArr[idx].q10_ai_wish=text;
+        surveyArr[idx].answers.q12=text;
+        surveyArr[idx].q12_ai_wish=text;
         localStorage.setItem("ardot_survey",JSON.stringify(surveyArr));
       }
       if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
