@@ -321,51 +321,104 @@
     let statsChart=null;
     let activeTab="manage";
     let activeManageSubTab="question";
-    /** 题库默认与 quiz-h5.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema；Admin 内编辑会写入 localStorage（ardot_quiz_config_v2）。 */
+    /** 题库默认与 quiz-h5.html 同步：6 维 × 6 角色（D1..D6）。仓库或对话里改题时两边一起改，并递增 meta.questionSchema / roleSetVersion。 */
     function defaultConfig(){
       return {
-        meta:{badge:"AI Design Survival Quiz",mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",note:"11 题 · 约 6 分钟",feedbackEnabled:true,questionSchema:"prompt_refactor_v15",roleSetVersion:5},
+        meta:{badge:"AI Designer Personality Test",mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",subtitle:"11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。",note:"11 题 · 约 6 分钟",feedbackEnabled:true,questionSchema:"designer_personality_v2",roleSetVersion:7},
         roles:[
-          {id:"pica",name:"毕加班索",real:"创意焦虑型生存状态",img:"img/picasso.png",desc:"你脑子里永远有想法，但时间从来不够用。你在追求突破和赶工交付之间反复横跳，最怕灵感来得太快、产能跟不上。"},
-          {id:"mona",name:"莫奈何",real:"审美细节型生存状态",img:"img/hara.png",desc:"你对质感和审美有天然敏感度，但最痛苦的是 AI 每次都差那口气。你不是不会做，而是不能接受“差不多”。"},
-          {id:"dali",name:"达利谱",real:"探索实验型生存状态",img:"img/dali.png",desc:"你喜欢试新工具、尝新玩法，灵感爆发力很强，但方向也容易过载。你不是没方向，是方向太多。"},
-          {id:"slow",name:"唐纳德诺慢",real:"流程效率型生存状态",img:"img/beethoven.png",desc:"你最关注效率和稳定性，核心诉求是“别崩、别慢、别绕”。你希望 AI 真正进入工作流，而不是演示功能。"}
+          {id:"d1",name:"草稿太多的毕加班索",real:"D1 · 灵感发散与筛选",img:"img/picasso.png",desc:"你脑子里永远有想法，AI 一问还能再炸出一百种方向。问题不是没灵感，而是筛不动、收不住——画到最后连自己都忘了最开始想画什么。"},
+          {id:"d2",name:"还在抠图的原研灾",real:"D2 · 图像与素材处理",img:"img/hara.png",desc:"你对质感和细节极度敏感，AI 抠图、去背、修边、放大总是差那一口气。不是做不到，是不能接受“差不多”——宁可自己再抠一次。"},
+          {id:"d3",name:"对不齐的蒙得里不安",real:"D3 · 版式与结构处理",img:"img/mondrian.png",desc:"你对结构、栅格、规范有近乎强迫症的追求。AI 出的布局总是“像那么回事但就是不对齐”，你不得不亲手一格一格把它掰正。"},
+          {id:"d4",name:"复制到崩溃的草间弥死",real:"D4 · 重复执行与批量操作",img:"img/kusama.png",desc:"你最怕的不是创意，而是“把同一个改动复制 83 次”。AI 批量处理要么配置半天、要么改得不一致，最后还是要逐个检查到崩溃。"},
+          {id:"d5",name:"风格断片的梵稿",real:"D5 · 项目上下文管理",img:"img/gogh.png",desc:"你希望 AI 真正记得你之前的风格、规范、历史方案。但它每次开新对话都像失忆——你一边讲设计，一边像在写回忆录。"},
+          {id:"d6",name:"睡莲迁移失败的莫奈何",real:"D6 · 工作流衔接",img:"img/monet.png",desc:"你最关注的是“稿子能不能顺利交出去”：一键原型、标注、跨软件同步。AI 能做一半，另一半永远要你在不同工具之间来回搬运。"}
         ],
         questions:{
-          q1:{type:"single",title:"老板甩来一个需求，说「做几个方向看看」，我会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 用多个 AI 工具生成、筛选并落地方向，但工具切换多，流程不够连贯"},{key:"B",label:"B. 用 AI 生成参考或概念，但还需要自己大量筛选、重组和修改"},{key:"C",label:"C. 聊了半天都不对味，最后还是去翻参考"},{key:"D",label:"D. 不折腾 AI，直接开网站找案例"}]},
-          q2:{type:"single",title:"手里这张素材，主体要抠出来、还要放大、修边并合成到新背景里。你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 抠图、放大、合成分给几个 AI 做"},{key:"B",label:"B. 让 AI 先抠个大概，毛边我自己收拾"},{key:"C",label:"C. 试几次不是糊就是假，最后返工"},{key:"D",label:"D. 钢笔、蒙版、修边，一步步手动来"}]},
-          q3:{type:"single",title:"打开空白画板，要做一个新的页面设计，我准备：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用 AI 按规范生成初版结构，再在对话中让它修改"},{key:"B",label:"B. 让 AI 给个布局骨架，我再调间距和组件"},{key:"C",label:"C. AI 画出来像“差不多”，但规范全得重做"},{key:"D",label:"D. 基本不用 AI，因为 AI 很难理解我的规范"}]},
-          q4:{type:"single",title:"老板说「改掉这个按钮的样式」——你看了眼 83 张稿子：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用脚本、插件或 AI 批量处理，但配置复杂、检查成本高"},{key:"B",label:"B. 用 AI 或插件处理一部分，但仍要逐张检查和手动补漏"},{key:"C",label:"C. 尝试过自动化工具，但修改不一致或容易出错，最后返工更多"},{key:"D",label:"D. 基本手动逐个修改，因为现有工具很难可靠地批量处理设计稿"}]},
-          q5:{type:"single",title:"新方案需要复用过去项目的设计逻辑，你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 让 AI 找到之前的上下文，直接接进新方案"},{key:"B",label:"B. 把旧稿和说明丢给 AI，让它先帮我捋"},{key:"C",label:"C. 尝试过让 AI 理解历史项目，但它经常抓不到关键逻辑或风格原则"},{key:"D",label:"D. 自己翻聊天、翻文件、靠记忆把逻辑拼回来"}]},
-          q6:{type:"single",title:"开发发来消息：「稿子定了吗？标注和原型今天能给我吗？」",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 先用工具一键转原型，再补命名和标注细节"},{key:"B",label:"B. 自动生成一部分，再人工补一部分"},{key:"C",label:"C. 在不同工具之间来回导出和调整格式"},{key:"D",label:"D. 从设计稿开始，手动做原型和标注"}]},
-          q7:{type:"rank",topN:3,title:"下班前跟电脑说一声「晚安」，早上醒来想看到它已经替你整理好了什么？",desc:"长按拖动排序（前 3 名计分）",options:[{key:"A",label:"1. 一组概念图和 moodboard"},{key:"B",label:"2. 按我要求该抠的抠、该修的修的图片"},{key:"C",label:"3. 按我的要求和规范的组件生成的界面"},{key:"D",label:"4. 在我要求的范围里替换了我新修改的设计"},{key:"E",label:"5. 梳理了过去项目的设计逻辑和复用建议"},{key:"F",label:"6. 把设计稿同步在其他软件中的形式"}]},
-          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. 我的设计风格"},{key:"B",label:"B. 我的组件规范"},{key:"C",label:"C. 我的项目上下文"},{key:"D",label:"D. 我的操作习惯"},{key:"E",label:"E. 我的素材库"},{key:"F",label:"F. 我的历史方案逻辑"}]},
-          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 结果不稳定，需要反复调整"},{key:"B",label:"B. 工具太分散，流程不连贯"},{key:"C",label:"C. 不理解我的设计规范和项目背景"},{key:"D",label:"D. 很难直接生成可用的设计稿"},{key:"E",label:"E. 不适合处理批量修改和重复执行"},{key:"F",label:"F. 学习成本高，不知道怎么用"}]},
-          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. UI / 产品设计"},{key:"B",label:"B. 视觉 / 品牌设计"},{key:"C",label:"C. 电商 / 运营设计"},{key:"D",label:"D. 平面 / 包装设计"},{key:"E",label:"E. 动效 / 视频设计"}]},
-          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Midjourney"},{key:"B",label:"B. 即梦（Dreamina）"},{key:"C",label:"C. Stable Diffusion / ComfyUI"},{key:"D",label:"D. Ideogram"},{key:"E",label:"E. Recraft"},{key:"F",label:"F. ChatGPT / Claude（文字发散）"},{key:"G",label:"G. Figma Make"},{key:"H",label:"H. Galileo AI"},{key:"I",label:"I. Uizard"},{key:"J",label:"J. v0（Vercel）"},{key:"K",label:"K. Framer AI"},{key:"L",label:"L. MasterGo AI"},{key:"M",label:"M. Pixso AI"}]},
-          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
+          q1:{type:"single",title:"D1 · 老板甩来「多做几个方向看看」，你最常卡在哪一步？",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 我能很快收敛方向，AI 对我来说主要是提速工具"},
+            {key:"B",label:"B. AI 给灵感很顺，但筛选和收口还需要我花不少时间"},
+            {key:"C",label:"C. AI 一发散就停不下来，我经常被淹没在备选里"},
+            {key:"D",label:"D. 每次都是草稿一堆、方向越聊越多，最后不知道选哪个"}
+          ]},
+          q2:{type:"single",title:"D2 · 一张素材要抠图、放大、修边、合成，你通常是：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 大部分交给 AI，结果基本够用，我只做最后把关"},
+            {key:"B",label:"B. AI 先做一轮，毛边、瑕疵我再手动收拾一下"},
+            {key:"C",label:"C. 出来的图总是差那口气，我经常要返工重做"},
+            {key:"D",label:"D. 不敢让 AI 碰精修，最后还是钢笔、蒙版、一点点手动来"}
+          ]},
+          q3:{type:"single",title:"D3 · 让 AI 生成一个有规范的页面/版式，结果常常是：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 按我的规范生成的结构基本能用，我只调一点细节"},
+            {key:"B",label:"B. 骨架 OK，但间距、对齐、组件我需要自己再调一轮"},
+            {key:"C",label:"C. 看起来像那么回事，但规范全乱，对不齐是常态"},
+            {key:"D",label:"D. AI 根本接不住我的设计规范，基本重做"}
+          ]},
+          q4:{type:"single",title:"D4 · 需要把一个改动批量应用到一堆稿子/页面上，你：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 用脚本/插件/AI 批处理一把搞定，几乎不用手改"},
+            {key:"B",label:"B. 一部分自动、一部分补刀，整体还能接受"},
+            {key:"C",label:"C. 自动化总是改得不一致，最后返工反而更多"},
+            {key:"D",label:"D. 不敢用批量工具，老老实实一个一个手改到怀疑人生"}
+          ]},
+          q5:{type:"single",title:"D5 · 新项目想复用过去的设计风格/逻辑，你通常：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. AI 能把之前的上下文接过来，我几乎不用重讲"},
+            {key:"B",label:"B. 把旧稿和说明丢给 AI，它能帮我捋出大半"},
+            {key:"C",label:"C. AI 抓不到关键风格和约束，我要反复纠正"},
+            {key:"D",label:"D. 每次都像从零开始，只能靠自己翻聊天、翻文件、靠脑子"}
+          ]},
+          q6:{type:"single",title:"D6 · 稿子定了，需要同步原型/标注/跨软件交付，你：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 一键转原型+自动标注，基本顺滑交出"},
+            {key:"B",label:"B. 自动能做一部分，剩下的我再补一补"},
+            {key:"C",label:"C. 在不同软件之间反复导入导出，光格式就磨半天"},
+            {key:"D",label:"D. 从设计稿到原型/标注几乎全手动，心里有一百个问号"}
+          ]},
+          q7:{type:"rank",title:"Q7 · 下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"长按拖动排序（全部 6 项都计入权重）",options:[
+            {key:"A",label:"1. 一组概念图和 moodboard（灵感发散与筛选）"},
+            {key:"B",label:"2. 该抠的抠、该修的修的图片素材（图像与素材处理）"},
+            {key:"C",label:"3. 符合我规范、对得齐的界面版式（版式与结构处理）"},
+            {key:"D",label:"4. 在一批稿子里替我批量改好（重复执行与批量操作）"},
+            {key:"E",label:"5. 梳理过去项目的风格与复用建议（项目上下文管理）"},
+            {key:"F",label:"6. 同步到原型/标注/其他软件里的交付物（工作流衔接）"}
+          ]},
+          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项，此题不计入角色分，仅用于了解你的偏好）",mapsToRoles:false,options:[
+            {key:"A",label:"A. 我的设计风格"},
+            {key:"B",label:"B. 我的组件规范"},
+            {key:"C",label:"C. 我的项目上下文"},
+            {key:"D",label:"D. 我的操作习惯"},
+            {key:"E",label:"E. 我的素材库"},
+            {key:"F",label:"F. 我的历史方案逻辑"}
+          ]},
+          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选（此题不计入角色分，仅用于了解你的痛点）",mapsToRoles:false,options:[
+            {key:"A",label:"A. 结果不稳定，需要反复调整"},
+            {key:"B",label:"B. 工具太分散，流程不连贯"},
+            {key:"C",label:"C. 不理解我的设计规范和项目背景"},
+            {key:"D",label:"D. 很难直接生成可用的设计稿"},
+            {key:"E",label:"E. 不适合处理批量修改和重复执行"},
+            {key:"F",label:"F. 学习成本高，不知道怎么用"}
+          ]},
+          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选（此题用于了解你的职业背景）",mapsToRoles:false,options:[
+            {key:"A",label:"A. UI / 产品设计"},
+            {key:"B",label:"B. 视觉 / 品牌设计"},
+            {key:"C",label:"C. 电商 / 运营设计"},
+            {key:"D",label:"D. 平面 / 包装设计"},
+            {key:"E",label:"E. 动效 / 视频设计"}
+          ]},
+          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项，此题用于了解你的工具链）",mapsToRoles:false,options:[
+            {key:"A",label:"A. Midjourney"},
+            {key:"B",label:"B. 即梦（Dreamina）"},
+            {key:"C",label:"C. Stable Diffusion / ComfyUI"},
+            {key:"D",label:"D. Ideogram"},
+            {key:"E",label:"E. Recraft"},
+            {key:"F",label:"F. ChatGPT / Claude（文字发散）"},
+            {key:"G",label:"G. Figma Make"},
+            {key:"H",label:"H. Galileo AI"},
+            {key:"I",label:"I. Uizard"},
+            {key:"J",label:"J. v0（Vercel）"},
+            {key:"K",label:"K. Framer AI"},
+            {key:"L",label:"L. MasterGo AI"},
+            {key:"M",label:"M. Pixso AI"}
+          ]},
+          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"}
         },
-        mappings:{
-          single:{
-            q1:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q2:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q3:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q4:{A:{dali:2,slow:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q5:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q6:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q9:{A:{mona:3},B:{slow:3},C:{slow:2,mona:1},D:{pica:3},E:{slow:2,dali:1},F:{dali:2,pica:1}},
-            q10:{A:{slow:2,pica:1},B:{mona:2,dali:1},C:{pica:2,dali:1},D:{mona:2,dali:1},E:{dali:2,pica:1}}
-          },
-          rank:{
-            q7:{A:{dali:3,pica:2,mona:1},B:{pica:3,mona:2,dali:1},C:{slow:3,mona:2,pica:1},D:{mona:3,pica:2,slow:1},E:{slow:3,pica:2,mona:1},F:{slow:3,dali:2,pica:1}}
-          },
-          multi:{
-            q8:{A:{mona:3},B:{slow:3},C:{slow:2,pica:1},D:{slow:2,mona:1},E:{dali:2,pica:1},F:{pica:2,slow:1}},
-            q11:{A:{dali:2,pica:1},B:{dali:2,pica:1},C:{dali:3},D:{dali:2,mona:1},E:{dali:2,mona:1},F:{pica:2,slow:1},G:{slow:3},H:{slow:2,pica:1},I:{slow:2,pica:1},J:{slow:3},K:{slow:2,pica:1},L:{slow:2,mona:1},M:{slow:2,mona:1}}
-          },
-          score:{},
-          scale:{}
-        }
+        mappings:{single:{},rank:{},multi:{},score:{},scale:{}}
       };
     }
 

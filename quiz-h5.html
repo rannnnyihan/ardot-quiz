@@ -6,42 +6,41 @@
   <meta name="format-detection" content="telephone=no,email=no,address=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>AI时代，你活成了哪种大师 — Ardot</title>
-  <link rel="icon" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <title>好险，差点就做完了</title>
+  <link rel="icon" href="https://ardot-quiz.edgeone.dev/img/poster.png?v=3">
 
-  <!-- 分享卡片元数据（统一：同一张 400×400 正方形缩略图，兼容微信聊天/朋友圈/电脑微信/老版客户端） -->
-  <meta name="description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态，看看你是毕加班索、莫奈何，还是达利谱、唐纳德诺慢。">
-  <meta name="keywords" content="AI设计,艺术家测试,创意人格测试,Ardot">
+  <!-- 分享卡片元数据（统一：首页海报 poster.png，兼容微信聊天/朋友圈/电脑微信/老版客户端） -->
+  <meta name="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta name="keywords" content="AI设计,设计师人格测试,还没下班的大师,Ardot">
   <!-- Open Graph（微信 / Facebook / 大部分社交平台主抓） -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Ardot">
-  <meta property="og:title" content="AI时代，你活成了哪种大师？">
-  <meta property="og:description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
+  <meta property="og:title" content="好险，差点就做完了">
+  <meta property="og:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
   <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
-  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
-  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="400">
-  <meta property="og:image:height" content="400">
-  <meta property="og:image:alt" content="AI时代，你活成了哪种大师 — Ardot">
+  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:alt" content="好险，差点就做完了 — 你是哪位还没下班的设计大师">
   <!-- Twitter Card（部分抓取引擎 fallback） -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AI时代，你活成了哪种大师？">
-  <meta name="twitter:description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
-  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <meta name="twitter:title" content="好险，差点就做完了">
+  <meta name="twitter:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
   <!-- Schema.org（部分场景 fallback） -->
-  <meta itemprop="name" content="AI时代，你活成了哪种大师？">
-  <meta itemprop="description" content="9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。">
-  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <meta itemprop="name" content="好险，差点就做完了">
+  <meta itemprop="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
   <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
-  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
   <!-- 微信 / QQ 专属 thumbnail 提示（非官方但部分版本有效） -->
-  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/picasso.png">
+  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
   <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
   <meta name="application-name" content="Ardot · 艺术家测试">
 
   <!-- 微信 JSSDK（需要后端签名才能真正调用 wx.config；未签名时仅作占位，不影响页面可用性） -->
   <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" onerror="window.__wxSDKFailed=true"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" onerror="window.__h2cFailed=true"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -51,33 +50,61 @@
     .nav-logo-icon svg{width:12px;height:12px}
     .nav-back{display:flex;align-items:center;gap:4px;color:#999;text-decoration:none;font-size:13px;transition:color .2s}
     .nav-back:hover{color:#333}
-    .bar{position:fixed;top:56px;left:0;right:0;height:2px;background:#e8e5e0;z-index:999}
+    .bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e8e5e0;z-index:999}
     .bar-fill{height:100%;width:0;background:#c46a1a;transition:width .5s cubic-bezier(.4,0,.2,1)}
-    .wrap{max-width:720px;margin:0 auto;padding:96px 20px 80px}
+    .wrap{max-width:720px;margin:0 auto;padding:32px 20px 80px}
     .scene{display:none;animation:fadeUp .45s ease}
     .scene.active{display:block}
     .welcome.scene.active{display:flex}
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    .welcome{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:70vh;justify-content:center}
-    .welcome-cover{width:120px;height:120px;border-radius:24px;margin-bottom:20px;box-shadow:0 10px 30px rgba(196,106,26,.18);object-fit:cover;display:block}
-    .welcome-sub{font-size:12px;color:#b0a898;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:20px}
-    .welcome h1{font-size:34px;font-weight:800;line-height:1.25;margin-bottom:16px}
-    .welcome h1 em{font-style:normal;color:#c46a1a}
-    .welcome>p{font-size:15px;color:#888;line-height:1.6;max-width:520px;margin-bottom:34px}
-    .welcome-cta{display:flex;flex-direction:column;align-items:center;width:100%;max-width:560px;margin:0 auto;gap:22px}
-    .master-preview{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;margin:0}
+    /* ===== 首页：整张海报完整显示（不裁切）+ 底部固定按钮 ===== */
+    .welcome{position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+      min-height:calc(100vh - 120px);
+      padding:0 0 28px;margin:-20px -4px 0;
+      border-radius:22px;overflow:hidden;
+      background:#0b0c0b;                          /* 海报 contain 后四周的留白使用页面黑色 */
+      box-shadow:0 18px 42px rgba(0,0,0,.32)}
+    /* 海报本体：真正的 <img>，object-fit:contain → 完整显示，不裁切 */
+    .welcome-poster{position:absolute;inset:0;width:100%;height:100%;
+      object-fit:contain;object-position:center center;
+      user-select:none;-webkit-user-drag:none;pointer-events:none;z-index:0}
+    /* 底部加一层柔和渐变，让按钮更清晰 */
+    .welcome::after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;
+      background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));pointer-events:none;z-index:1}
+    /* 原来的结构全部隐藏，只保留按钮 */
+    .welcome-cover,
+    .welcome-sub,
+    .welcome h1,
+    .welcome>p,
+    .master-preview,
+    .welcome-note{display:none!important}
+    /* 按钮：绝对定位锁在容器底部中央 → 图怎么缩放按钮都不动 */
+    .welcome-cta{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);
+      z-index:2;display:flex;flex-direction:column;align-items:center;
+      width:100%;max-width:420px;padding:0 20px;box-sizing:border-box}
     .welcome.quiz-started .welcome-cta{display:none}
-    .welcome.quiz-started .welcome-note{display:none}
-    .welcome.quiz-started .welcome-cover{display:none}
+    .btn-go{position:relative;display:flex;align-items:center;justify-content:space-between;
+      width:100%;height:64px;padding:0 10px 0 34px;border-radius:999px;
+      border:2px solid #f6f1e5;background:#f6f1e5;color:#0f1110;
+      font-size:19px;font-weight:800;letter-spacing:.04em;cursor:pointer;
+      transition:transform .15s ease,box-shadow .2s ease;
+      box-shadow:0 6px 0 #0f1110,0 12px 26px rgba(0,0,0,.4);
+      -webkit-tap-highlight-color:transparent}
+    .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
+      box-shadow:0 8px 0 #0f1110,0 16px 30px rgba(0,0,0,.45);outline:none}
+    .btn-go:active{transform:translateY(2px);box-shadow:0 2px 0 #0f1110,0 6px 14px rgba(0,0,0,.3)}
+    .btn-go>span:first-child{flex:1;text-align:center;padding-right:12px}
+    .btn-go .arr{flex-shrink:0;display:inline-flex;width:46px;height:46px;border-radius:50%;
+      background:#2ea24a;color:#fff;align-items:center;justify-content:center;
+      box-shadow:inset 0 -2px 0 rgba(0,0,0,.2)}
+    .btn-go .arr svg{width:22px;height:22px;display:block}
+    /* 兼容旧 class，不破坏其他页面 */
     .chip{padding:8px 12px;border:1px solid #e8e5e0;border-radius:999px;background:#fff;font-size:12px;color:#555}
-    .btn-go{height:50px;padding:0 36px;border-radius:10px;border:none;background:#1a1a2e;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
-    .btn-go:hover{background:#2d2d4a;transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,26,46,.15)}
-    .welcome-note{margin-top:14px;font-size:12px;color:#ccc}
     .qh{margin-bottom:24px}
     .q-num{font-size:12px;color:#c46a1a;font-weight:600;letter-spacing:.04em;margin-bottom:10px}
     .q-title{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:8px}
     .q-desc{font-size:14px;color:#999;line-height:1.5}
-    body.quiz-on-q .wrap{padding-top:58px;padding-bottom:56px}
+    body.quiz-on-q .wrap{padding-top:18px;padding-bottom:56px}
     body.quiz-on-q .qh{margin-bottom:12px}
     body.quiz-on-q .q-num{font-size:11px;margin-bottom:4px;letter-spacing:.06em;color:#b89572}
     body.quiz-on-q .q-title{font-size:17px;font-weight:600;line-height:1.32;margin-bottom:4px;color:#3d3d4a}
@@ -166,13 +193,17 @@
     .ld-s{font-size:13px;color:#bbb}
     .ld-dots::after{content:'';animation:dots 1.5s infinite}
     @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
-    .res{display:none;animation:fadeUp .6s ease}
+    .res{display:none;animation:fadeUp .6s ease both}
     .res.active{display:block}
-    .res-card{border-radius:20px;border:1px solid #e8e5e0;background:#fff;overflow:hidden;margin-bottom:24px}
-    .res-top{padding:36px 32px 0;text-align:center}
-    .res-avatar{width:128px;height:128px;border-radius:50%;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:0 8px 32px rgba(0,0,0,.1);border:4px solid #fff}
-    .res-name{font-size:34px;font-weight:900;color:#1a1a2e;margin-bottom:4px;letter-spacing:.02em}
-    .res-real{font-size:14px;color:#b0a898;margin-bottom:14px;font-weight:500}
+    /* 截图瞬时类：强制结果区处于"完成态"，避免 html2canvas 拍到动画中态（全局发灰） */
+    #res.capturing,#res.capturing *{animation:none!important;transition:none!important;opacity:1!important;filter:none!important}
+    .res-card{border-radius:0;border:0;background:transparent;overflow:visible;margin-bottom:0;box-shadow:none}
+    .res-top{padding:28px 24px 12px;text-align:center}
+    /* 头像外框（参考图：细边框圆角相框） */
+    .res-avatar-frame{width:100%;aspect-ratio:1/1;margin:0 0 18px;border:1px solid #d9cdb3;border-radius:18px;background:#fff;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 0 #fff inset;overflow:hidden}
+    .res-avatar{width:100%;height:100%;border-radius:18px;object-fit:cover;display:block;background:#f2ece0}
+    .res-name{font-size:44px;font-weight:900;color:#1a1a2e;margin-bottom:6px;letter-spacing:.04em;font-family:Georgia,"Times New Roman",serif}
+    .res-real{font-size:13px;color:#8a7658;margin-bottom:0;font-weight:500;letter-spacing:.04em}
     .res-desc{font-size:14px;color:#888;line-height:1.7;max-width:460px;margin:0 auto;padding-bottom:24px}
     .match-bar{margin-bottom:12px}
     .match-bar:last-child{margin-bottom:0}
@@ -218,19 +249,15 @@
     .wx-hint{position:fixed;top:0;left:0;right:0;background:#fff8ee;border-bottom:1px solid #f0e6d4;color:#8f5d24;font-size:12px;padding:8px 16px;text-align:center;z-index:1001;display:none}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
-    @media(max-width:640px){.wrap{padding:80px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:20px;padding-right:20px}.res-name{font-size:28px}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:52px}body.quiz-on-q .q-title{font-size:16px}}
+    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:20px;padding-right:20px}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
     /* ====== 桌面/平板响应式增强（≥768px 启用桌面布局） ====== */
     @media(min-width:768px){
-      .wrap{max-width:780px;padding:110px 32px 96px}
+      .wrap{max-width:780px;padding:40px 32px 96px}
       .wx-hint{display:none !important} /* 桌面端隐藏"请在微信打开"提示条 */
-      .nav{padding:0 48px}
-      .welcome{min-height:calc(100vh - 180px)}
-      .welcome-cover{width:160px;height:160px;border-radius:28px;margin-bottom:28px}
-      .welcome h1{font-size:44px;line-height:1.2}
-      .welcome>p{font-size:16px;max-width:560px;margin-bottom:40px}
-      .welcome-note{font-size:13px}
-      .chip{padding:10px 16px;font-size:13px}
-      .btn-go{height:54px;padding:0 42px;font-size:16px}
+      .welcome{min-height:calc(100vh - 140px);padding-bottom:36px}
+      .welcome-cta{max-width:460px;padding:0 24px}
+      .btn-go{height:68px;font-size:21px}
+      .btn-go .arr{width:52px;height:52px}
       .q-title{font-size:26px;line-height:1.3}
       .q-desc{font-size:15px}
       .opts{gap:14px}
@@ -241,7 +268,7 @@
       .chip-grid{grid-template-columns:repeat(4,1fr);gap:12px}
       .chip{min-height:66px;padding:12px 14px;border-radius:14px}
       .chip-name{font-size:15px}
-      body.quiz-on-q .wrap{padding-top:96px;padding-bottom:80px}
+      body.quiz-on-q .wrap{padding-top:32px;padding-bottom:80px}
       body.quiz-on-q .q-title{font-size:22px}
       body.quiz-on-q .opt{padding:18px 22px}
       body.quiz-on-q .opt-t{font-size:15px}
@@ -255,10 +282,8 @@
       .btn-b,.btn-n{height:46px;font-size:14px}
       .btn-b{padding:0 22px}
       .btn-n{padding:0 28px}
-      .res-card{border-radius:24px}
-      .res-top{padding:48px 40px 0}
-      .res-avatar{width:148px;height:148px}
-      .res-name{font-size:40px}
+      .res-card{border-radius:0}
+      .res-top{padding:36px 40px 16px}
       .res-desc{font-size:15px;max-width:520px}
       .wish-box{margin:0 40px 28px;padding:20px}
       .others-title{padding:0 40px}
@@ -269,6 +294,586 @@
       .wrap{max-width:860px}
       .welcome h1{font-size:50px}
     }
+    /* ====== 新结果页模板样式（参考 IMG_2616 版式） ====== */
+    .res-section{padding:0 20px 22px}
+    .res-section-title{font-size:12px;font-weight:700;color:#3a3428;letter-spacing:.04em;margin-bottom:10px}
+    /* 一句话诊断：米白圆角块 + 左上金色引号 */
+    .res-tagline-wrap{padding:0 20px;margin-bottom:22px}
+    .res-tagline{position:relative;padding:14px 16px 14px 34px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:13px;line-height:1.75;color:#5a5245}
+    .res-tagline::before{content:"\201C";position:absolute;top:6px;left:12px;font-size:24px;line-height:1;color:#c89a4a;font-family:Georgia,serif;font-weight:700}
+    /* 性格标签（2×2 胶囊） */
+    .tag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .tag-pill{padding:12px 14px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:13px;color:#3a3428;text-align:center;font-weight:500;line-height:1.4}
+    /* 暗格解读/精华解读：米橘填充块 + 引号 */
+    .insight-box{position:relative;padding:16px 18px 16px 38px;border-radius:12px;background:#f3d9a8;border:1px solid #e4c380;color:#5a3d12;font-size:13px;line-height:1.8;font-weight:500}
+    .insight-box::before{content:"\201C";position:absolute;top:6px;left:14px;font-size:32px;color:#8f5d24;font-family:Georgia,serif;line-height:1;font-weight:700}
+    /* 选择解读：白底长段落 */
+    .reading-box{padding:16px 18px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:13px;line-height:1.85;color:#5a5245}
+    .reading-box p{margin:0 0 10px}
+    .reading-box p:last-child{margin-bottom:0}
+    /* 副属性：两张并列大数字卡 */
+    .substat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .substat-card{padding:14px 12px;border-radius:12px;background:#fff;border:1px solid #ece4d2;text-align:center}
+    .substat-label{font-size:11px;color:#8a7658;font-weight:600;margin-bottom:6px;letter-spacing:.02em}
+    .substat-val{font-size:36px;font-weight:900;color:#1a1a2e;line-height:1.1;font-family:Georgia,"Times New Roman",serif;margin-bottom:4px;letter-spacing:-.02em}
+    .substat-state{font-size:14px;font-weight:700;color:#1a1a2e;line-height:1.55;letter-spacing:.01em}
+    .substat-desc{font-size:11px;color:#8a7658;line-height:1.5}
+    /* 雷达图：黑色线框六边形 */
+    .radar-wrap{display:flex;justify-content:center;padding:8px 0 4px;background:#fff;border-radius:12px;border:1px solid #ece4d2}
+    .radar-svg{width:100%;max-width:320px;height:auto;display:block}
+    .radar-svg .r-grid{fill:none;stroke:#cdc5b5;stroke-width:.8}
+    .radar-svg .r-axis{stroke:#cdc5b5;stroke-width:.8;stroke-dasharray:2 2}
+    .radar-svg .r-area{fill:rgba(200,154,74,.18);stroke:#1a1a2e;stroke-width:1.3;stroke-linejoin:round}
+    .radar-svg .r-point{fill:#1a1a2e;stroke:#fff;stroke-width:1.5}
+    .radar-svg .r-label{font-size:10.5px;fill:#3a3428;font-weight:600}
+    .radar-svg .r-label-pct{font-size:10px;fill:#8a7658;font-weight:500}
+    /* 口头禅（2×2 胶囊 + 前置小引号） */
+    .mantra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .mantra-pill{position:relative;padding:12px 14px 12px 28px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#5a5245;line-height:1.5}
+    .mantra-pill::before{content:"\201C";position:absolute;top:6px;left:10px;font-size:18px;color:#c89a4a;font-family:Georgia,serif;font-weight:700;line-height:1}
+    /* 底部保存图片引导 */
+    .save-card{padding:14px;border-radius:14px;background:#fff;border:1px solid #ece4d2}
+    .save-card-inner{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .save-card-icon{width:40px;height:40px;border-radius:10px;background:#faecd0;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .save-card-meta{flex:1;min-width:0}
+    .save-card-title{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:3px}
+    .save-card-sub{font-size:11px;color:#8a7658;line-height:1.5}
+    .save-card-preview{display:block;width:100%;margin:0;border-radius:10px;border:1px solid #ece4d2;background:#faf4e7;-webkit-touch-callout:default;user-select:none}
+    .save-card-preview:not([src]),.save-card-preview[src=""]{min-height:180px}
+    .save-card-hint{margin-top:10px;text-align:center;font-size:11.5px;color:#8f5d24;font-weight:600;letter-spacing:.02em}
+    /* 右下角悬浮"保存图片"按钮（仅结果页显示；放在 body 根节点，常驻不消失） */
+    .save-fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#f6a85e 0%,#c46a1a 100%);color:#fff;font-size:14px;font-weight:700;letter-spacing:.02em;border:0;cursor:pointer;box-shadow:0 10px 28px rgba(196,106,26,.38),0 2px 6px rgba(196,106,26,.24);z-index:9998;animation:saveTipIn .4s ease both;-webkit-tap-highlight-color:transparent;will-change:transform}
+    body.show-save-fab .save-fab{display:inline-flex}
+    .save-fab:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(196,106,26,.42),0 2px 6px rgba(196,106,26,.26)}
+    .save-fab:active{transform:translateY(0);box-shadow:0 6px 18px rgba(196,106,26,.3)}
+    .save-fab.loading{pointer-events:none;opacity:.85}
+    .save-fab-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center}
+    .save-fab-ico svg{width:18px;height:18px;display:block}
+    @keyframes saveTipIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:640px){
+      .save-fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:11px 16px;font-size:13px}
+    }
+    /* 长按截图预览层 */
+    .save-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .save-overlay[hidden]{display:none!important}
+    /* overlay 打开时，右下角 FAB 与任何比 overlay 高的浮层一律隐藏，保证画面干净 */
+    body.save-overlay-open .save-fab{display:none!important}
+    body.save-overlay-open .wx-hint{display:none!important}
+    .save-overlay-mask{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+    .save-overlay-inner{position:relative;max-width:94vw;width:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 18px 20px;border-radius:18px;background:#111;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.55);margin:auto}
+    .save-overlay-title{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em;opacity:.92}
+    .save-overlay-img{display:block;max-width:100%;max-height:76vh;width:auto;height:auto;border-radius:12px;background:#fff;-webkit-touch-callout:default;user-select:none;object-fit:contain;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+    .save-overlay-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .save-overlay-btn{appearance:none;border:0;padding:10px 20px;border-radius:999px;background:#2ea24a;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+    .save-overlay-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.32);color:#fff}
+    /* 维度表格（保留但弱化） */
+    .dim-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #ece4d2;margin-top:12px}
+    .dim-table th,.dim-table td{padding:9px 12px;text-align:left;border-bottom:1px solid #f3ecde}
+    .dim-table tr:last-child td{border-bottom:none}
+    .dim-table th{font-weight:600;color:#8a7658;font-size:11px;background:#faf4e7}
+    .dim-table td:last-child,.dim-table th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+    .dim-table tr.top td{background:#faecd0;color:#5a3d12;font-weight:700}
+    /* 为什么会是这个结果 */
+    .why-box{padding:14px 16px;border-radius:10px;background:#fff;border:1px solid #ece4d2}
+    .why-top{font-size:13px;color:#3a3428;margin-bottom:8px;font-weight:500}
+    .why-top b{color:#8f5d24;font-weight:700}
+    .why-list{list-style:none;display:grid;gap:5px;padding:0;margin:0}
+    .why-list li{font-size:12.5px;color:#6b6252;line-height:1.6;padding-left:14px;position:relative}
+    .why-list li::before{content:"";position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:#c89a4a}
+    /* 大师差距（两张并列） */
+    .gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .gap-item{padding:12px 14px;border-radius:10px;background:#fff;border:1px solid #ece4d2}
+    .gap-item.master{background:#faecd0;border-color:#e4c380}
+    .gap-label{font-size:10.5px;color:#8a7658;font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+    .gap-item.master .gap-label{color:#8f5d24}
+    .gap-val{font-size:12.5px;color:#1a1a2e;line-height:1.55;font-weight:500}
+    /* 解锁建议 */
+    .advice-intro{font-size:13px;color:#5a5245;line-height:1.7;margin-bottom:10px}
+    .advice-intro em{font-style:normal;color:#8f5d24;font-weight:700}
+    .advice-list{list-style:none;display:grid;gap:8px;padding:0;margin:0 0 10px}
+    .advice-list li{padding:10px 14px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#3a3428;line-height:1.5;font-weight:500;display:flex;align-items:center;gap:10px}
+    .advice-list li::before{content:"\2713";display:inline-flex;width:18px;height:18px;border-radius:50%;background:#c89a4a;color:#fff;font-size:11px;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+    .advice-outro{font-size:12.5px;color:#8a7658;line-height:1.7}
+    @media(max-width:640px){
+      .res-name{font-size:36px}
+      .res-avatar-frame{width:100%;aspect-ratio:1/1}
+      .substat-val{font-size:30px}
+      .radar-svg{max-width:280px}
+    }
+    @media(min-width:768px){
+      .res-section{padding:0 32px 24px}
+      .res-tagline-wrap{padding:0 32px;margin-bottom:24px}
+      .res-avatar-frame{width:100%;aspect-ratio:1/1}
+      .res-name{font-size:52px}
+    }
+
+    /* ============================================================ */
+    /* ========  黑 / 白 / 绿 三色主题覆盖（全局最高优先级） ======== */
+    /* ============================================================ */
+    :root{
+      --bk:#0b0c0b;         /* 主黑（页面底） */
+      --bk-2:#141614;       /* 次黑（卡片底） */
+      --bk-3:#1d201d;       /* 三黑（选项底） */
+      --gn:#2ea24a;         /* 主绿 */
+      --gn-2:#49c466;       /* 亮绿 hover */
+      --gn-3:#1d7a36;       /* 深绿 */
+      --gn-soft:rgba(46,162,74,.14); /* 绿色透明背景 */
+      --wh:#ffffff;         /* 主白 */
+      --wh-2:#f6f7f6;       /* 次白 */
+      --ln:#26292a;         /* 暗分割线 */
+      --tx:#f2f3f2;         /* 主文字（白） */
+      --tx-2:#b6bab7;       /* 次文字 */
+      --tx-3:#7a7f7c;       /* 弱文字 */
+    }
+    body{background:#0b0c0b;color:var(--tx)}
+
+    /* ===== 顶部导航 ===== */
+    .nav{background:rgba(11,12,11,.88);border-bottom:1px solid var(--ln);backdrop-filter:blur(10px)}
+    .nav-logo{color:var(--tx)}
+    .nav-logo-icon{background:var(--gn)}
+    .nav-logo-icon svg path{fill:#fff}
+    .nav-back{color:var(--tx-2)}
+    .nav-back:hover{color:var(--gn-2)}
+
+    /* ===== 进度条 ===== */
+    .bar{background:#1f221f}
+    .bar-fill{background:var(--gn)}
+
+    /* ===== 首页按钮（黑底胶囊 + 绿色圆形箭头） ===== */
+    .btn-go{background:var(--bk-2);color:var(--wh);border-color:var(--bk-2);
+      box-shadow:0 6px 0 var(--gn-3),0 12px 26px rgba(0,0,0,.5)}
+    .btn-go:hover,.btn-go:focus-visible{background:#1d201d;border-color:#1d201d;
+      box-shadow:0 8px 0 var(--gn-3),0 16px 30px rgba(0,0,0,.55)}
+    .btn-go:active{box-shadow:0 2px 0 var(--gn-3),0 6px 14px rgba(0,0,0,.4)}
+    .btn-go .arr{background:var(--gn);color:#fff;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
+
+    /* ===== 题目页：题号/题干/描述 ===== */
+    .q-num{color:var(--gn-2);font-weight:700}
+    .q-title{color:var(--tx)}
+    .q-desc{color:var(--tx-3)}
+    body.quiz-on-q .q-num{color:var(--gn-2)!important}
+    body.quiz-on-q .q-title{color:var(--tx)!important}
+    body.quiz-on-q .q-desc{color:var(--tx-3)!important}
+
+    /* ===== 单选/多选 opt（暗底 → hover/选中亮绿） ===== */
+    .opt{border:1px solid var(--ln);background:var(--bk-3);color:var(--tx)}
+    .opt:hover{border-color:var(--gn);background:#1a2a1f}
+    .opt:hover .opt-r{border-color:var(--gn)}
+    .opt:hover .opt-t{color:#fff}
+    .opt.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 6px 18px rgba(46,162,74,.25)}
+    .opt.sel .opt-t{color:#fff}
+    .opt-r{border-color:#4a4f4a;background:transparent}
+    .opt.sel .opt-r{border-color:var(--gn);background:var(--gn)}
+    .opt-t{color:var(--tx)}
+
+    /* ===== chip 网格（q9 常用工具） ===== */
+    .chip{border:1.5px solid var(--ln);background:var(--bk-3);color:var(--tx)}
+    .chip:hover{border-color:var(--gn);background:#1a2a1f}
+    .chip:hover .chip-name{color:#fff}
+    .chip-name{color:var(--tx)}
+    .chip.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 4px 12px rgba(46,162,74,.25)}
+    .chip.sel .chip-name{color:#fff}
+    .chip-check{background:var(--gn);color:#fff}
+    .chip-counter{background:var(--bk-2);border-color:var(--ln)}
+    .chip-counter-txt{color:var(--tx)}
+    .chip-counter-txt b{color:var(--gn-2)}
+    .chip-counter-hint{color:var(--tx-3)}
+    .chip-counter.full{background:var(--gn-soft);border-color:var(--gn)}
+    .chip-counter.full .chip-counter-txt b{color:var(--gn-2)}
+    .chip-counter.full .chip-counter-hint{color:var(--gn-2)}
+
+    /* ===== 排序题 rank ===== */
+    .rank-item{border:1px solid var(--ln);background:var(--bk-3);color:var(--tx)}
+    .rank-item:hover{border-color:var(--gn);background:#1a2a1f}
+    .rank-item:hover .rank-handle{color:var(--gn-2)}
+    .rank-item.press{background:#1a2a1f}
+    .rank-item.press .rank-handle{color:var(--gn-2)}
+    .rank-item.lift{border-color:var(--gn);box-shadow:0 14px 28px rgba(0,0,0,.5),0 0 0 1px var(--gn)}
+    .rank-item.lift .rank-handle{color:var(--gn-2)}
+    .rank-index{background:var(--gn-soft);color:var(--gn-2)}
+    .rank-label{color:var(--tx)}
+    .rank-handle{color:var(--tx-3)}
+    .btn-rank{background:var(--gn-soft);border:1px solid var(--gn);color:var(--gn-2)}
+    .btn-rank:hover{background:rgba(46,162,74,.22)}
+
+    /* ===== 量表 scale ===== */
+    .scale-item{background:var(--bk-3);border:1px solid var(--ln);color:var(--tx)}
+    .scale-item:hover{border-color:var(--gn)}
+    .scale-item.active-step{background:#1a2a1f;border-color:var(--gn);box-shadow:0 0 0 1px var(--gn)}
+    .scale-st{color:var(--tx)}
+    .scale-no{color:var(--gn-2);font-weight:700}
+    .scale-side.agree{color:var(--gn-2)}
+    .scale-side.disagree{color:var(--tx-2)}
+    .scale-help{color:var(--tx-3)}
+
+    /* ===== 题目页底部按钮 ===== */
+    .qa .btn-b{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx-2)}
+    .qa .btn-b:hover{border-color:var(--gn);color:var(--gn-2)}
+    .qa .btn-n{background:var(--gn);color:#fff;border:none}
+    .qa .btn-n:hover{background:var(--gn-2)}
+    .qa .btn-n:disabled{opacity:.35;background:#2a2d2a;color:var(--tx-3)}
+
+    /* ===== loading 转圈 ===== */
+    .spinner{border-color:var(--ln);border-top-color:var(--gn)}
+
+    /* ===== 结果页（暗色卡片 + 绿色强调） ===== */
+    .res-card{background:var(--bk-2);border:1px solid var(--ln);box-shadow:0 2px 12px rgba(0,0,0,.3)}
+    .res-avatar-frame{border-color:var(--ln);background:var(--bk-3)}
+    .res-avatar{background:var(--bk-3)}
+    .res-name{color:var(--tx)}
+    .res-real{color:var(--tx-2)}
+    .res-desc{color:var(--tx-2)}
+    .match-name{color:var(--tx)}
+    .match-val{color:var(--gn-2);font-weight:700}
+    .match-track{background:#24272a}
+    .match-fill{background:linear-gradient(90deg,var(--gn),var(--gn-2))}
+    .wish-box{background:var(--gn-soft);border:1px solid var(--gn)}
+    .wish-title{color:var(--gn-2)}
+    .wish-desc{color:var(--tx-2)}
+    .wish-box textarea{border:1px solid var(--ln);background:var(--bk-3);color:var(--tx)}
+    .wish-btn{background:var(--gn);color:#fff}
+    .wish-btn:hover{background:var(--gn-2)}
+    .wish-result{color:var(--gn-2)}
+    .others-title{color:var(--tx-3)}
+    .other-card img{border-color:var(--ln)}
+    .other-card .oc-name{color:var(--tx-2)}
+    .other-card .oc-pct{color:var(--tx-3)}
+    .btn-share{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx)}
+    .btn-share:hover{border-color:var(--gn);color:var(--gn-2)}
+    .btn-redo{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx-2)}
+    .btn-redo:hover{border-color:var(--gn);color:var(--gn-2)}
+    .btn-explore{background:var(--gn);color:#fff;box-shadow:0 4px 12px rgba(46,162,74,.35)}
+    .btn-explore:hover{background:var(--gn-2);box-shadow:0 6px 16px rgba(46,162,74,.45)}
+    .toast{background:#f2f3f2;color:var(--bk)}
+    .wx-hint{background:var(--gn-soft);border-bottom:1px solid var(--gn);color:var(--gn-2)}
+    .wx-hint a{color:var(--gn-2)}
+
+    /* 结果页"为什么/差距/建议"等区块 */
+    .why-box,.dim-table,.gap-item{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx)}
+    .why-top,.why-top b,.advice-intro em,.gap-val,.dim-table th,.dim-table td{color:var(--tx)}
+    .why-list li{color:var(--tx-2)}
+    .why-list li::before{background:var(--gn)}
+    .advice-intro,.advice-outro{color:var(--tx-2)}
+    .dim-table th{background:var(--bk-3);border-bottom:1px solid var(--ln);color:var(--tx-2)}
+    .dim-table td{border-bottom:1px solid var(--ln)}
+    .dim-table tr.top td{background:var(--gn-soft);color:var(--gn-2)}
+    .gap-item.master{background:var(--gn-soft);border-color:var(--gn)}
+    .gap-label{color:var(--tx-3)}
+    .gap-item.master .gap-label{color:var(--gn-2)}
+    .advice-list li{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx)}
+    .advice-list li::before{background:var(--gn)}
+
+    /* ============================================================ */
+    /* ==========  只有首屏才显示 .welcome 海报（做题 / 结果页都隐藏） ========== */
+    /* ============================================================ */
+    #s0.welcome:not(.active){display:none!important}       /* 关键：不是首屏就不显示海报 */
+    body.quiz-on-q .nav-logo{visibility:hidden}             /* 做题时只保留返回按钮 */
+    body.quiz-on-q .welcome-cover,
+    body.quiz-on-q .welcome-sub,
+    body.quiz-on-q .welcome h1,
+    body.quiz-on-q .welcome>p,
+    body.quiz-on-q .master-preview,
+    body.quiz-on-q .welcome-note{display:none!important}
+
+    /* ============================================================ */
+    /* ==========  结果页：把米白色卡片全部改成暗底 + 绿色强调 ========== */
+    /* ============================================================ */
+    /* 区块小标题 */
+    .res-section-title{color:var(--tx-2)!important}
+
+    /* 顶部一句话 tagline（"你不是不会设计，而是还没走到设计本身"） */
+    .res-tagline{background:var(--bk-2)!important;border:1px solid var(--ln)!important;color:var(--tx)!important}
+    .res-tagline::before{color:var(--gn-2)!important}
+
+    /* 性格标签 2×2 胶囊 */
+    .tag-pill{background:var(--bk-3)!important;border:1px solid var(--ln)!important;color:var(--tx)!important}
+
+    /* 暗格解读（原米橘引言块） → 暗底 + 绿色强调 */
+    .insight-box{background:var(--bk-2)!important;border:1px solid var(--gn)!important;color:var(--tx)!important}
+    .insight-box::before{color:var(--gn-2)!important}
+
+    /* 选择解读长段落 */
+    .reading-box{background:var(--bk-2)!important;border:1px solid var(--ln)!important;color:var(--tx-2)!important}
+    .reading-box b,.reading-box strong{color:var(--gn-2)!important}
+
+    /* 副属性卡片 */
+    .substat-card{background:var(--bk-2)!important;border:1px solid var(--ln)!important}
+    .substat-label{color:var(--tx-3)!important}
+    .substat-val{color:var(--gn-2)!important}
+    .substat-desc{color:var(--tx-2)!important}
+
+    /* ============================================================ */
+    /* ==========  做题态：题目整体垂直居中在视口中央 ========== */
+    /* ============================================================ */
+    body.quiz-on-q .wrap{
+      min-height:100vh;                 /* 回退：老浏览器用 100vh */
+      min-height:100dvh;                /* 动态视口：地址栏显隐时居中更稳 */
+      display:flex;flex-direction:column;justify-content:center;
+      padding-top:80px;padding-bottom:80px;   /* 顶/底各留 80px 避开 nav、按钮 */
+      box-sizing:border-box;
+    }
+    body.quiz-on-q .scene.active{width:100%}  /* 场景铺满 wrap 宽度 */
+    @media(max-width:640px){
+      body.quiz-on-q .wrap{padding-top:18px;padding-bottom:72px}
+    }
+
+    /* ============================================================ */
+    /* ==========  首屏：海报按内容宽度显示 + 按钮固定视口底部 ========== */
+    /* ============================================================ */
+    /* 首屏 wrap 保持正常内容宽度（不再解除 max-width），给底部按钮留出空间避免遮挡 */
+    body:has(#s0.welcome.active) .wrap{
+      padding-top:16px;
+      padding-bottom:120px;               /* 给底部 fixed 按钮留出安全间距 */
+    }
+    /* 首屏海报容器：普通块级容器 → 高度由图自然撑开 */
+    body:has(#s0.welcome.active) .welcome{
+      display:block;                     /* 覆盖原 flex 布局 */
+      margin:0;
+      min-height:0;                      /* 覆盖原 min-height:calc(100vh-120px) */
+      width:100%;
+      padding:0;
+      border-radius:16px;
+      background:transparent;
+    }
+    /* 海报本体：宽度跟随内容宽度（≤560px），居中，不再被视口拉伸 */
+    body:has(#s0.welcome.active) .welcome-poster{
+      position:static;                   /* 从 absolute 改为 static */
+      display:block;
+      width:100%;height:auto;
+      max-width:560px;                   /* 关键：限制最大宽度，避免宽屏下被拉得过长 */
+      margin:0 auto;
+      inset:auto;
+      border-radius:16px;
+    }
+    /* 底部渐变遮罩关掉，按钮自己有背景 */
+    body:has(#s0.welcome.active) .welcome::after{display:none}
+    /* 按钮：fixed 固定在视口底部，永不随页面滚动 */
+    body:has(#s0.welcome.active) .welcome-cta{
+      position:fixed;
+      left:50%;
+      bottom:calc(24px + env(safe-area-inset-bottom,0px));
+      transform:translateX(-50%);
+      margin:0;
+      width:calc(100% - 32px);
+      max-width:560px;
+      padding:0;
+      z-index:50;
+    }
+
+    /* ============================================================ */
+    /* ==========  做题态皮肤：白底 + 选中黑框 + 绿色点缀 ========== */
+    /* ============================================================ */
+    /* 调色板：白 #ffffff / 选中黑框 #111 / 次灰 #f5f6f5 / 边框灰 #e5e7e5
+              文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 绿点缀 #2ea24a */
+
+    /* 页面底色与进度条 */
+    body.quiz-on-q{background:#ffffff!important;color:#1a1d1a!important}
+    body.quiz-on-q .bar{background:#eef0ee!important}
+    body.quiz-on-q .bar-fill{background:#2ea24a!important}
+
+    /* 顶部 nav 保持白底 */
+    body.quiz-on-q .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
+    body.quiz-on-q .nav-logo{color:#1a1d1a!important}
+    body.quiz-on-q .nav-logo-icon{background:#111!important}
+    body.quiz-on-q .nav-logo-icon svg path{fill:#fff!important}
+    body.quiz-on-q .nav-back{color:#6b7280!important}
+    body.quiz-on-q .nav-back:hover{color:#2ea24a!important}
+
+    /* 题目文字 */
+    body.quiz-on-q .q-title{color:#1a1d1a!important}
+    body.quiz-on-q .q-desc{color:#6b7280!important}
+    body.quiz-on-q .q-num{color:#2ea24a!important}         /* 题号用绿点缀 */
+
+    /* 单选选项：白底 → hover 浅灰 → 选中黑框 + 微黑底 */
+    body.quiz-on-q .opt{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
+    body.quiz-on-q .opt:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
+    body.quiz-on-q .opt:hover .opt-r{border-color:#9aa0a6!important}
+    body.quiz-on-q .opt:hover .opt-t{color:#111!important}
+    body.quiz-on-q .opt.sel{
+      border-color:#111!important;background:#111!important;
+      box-shadow:0 6px 18px rgba(0,0,0,.18)!important;
+    }
+    body.quiz-on-q .opt.sel .opt-t{color:#ffffff!important;font-weight:600}
+    body.quiz-on-q .opt-r{border-color:#c9ccc9!important;background:transparent!important}
+    body.quiz-on-q .opt.sel .opt-r{border-color:#ffffff!important;background:#ffffff!important}
+    body.quiz-on-q .opt.sel .opt-r::after{background:#111!important}
+    body.quiz-on-q .opt-t{color:#1a1d1a!important}
+
+    /* 多选芯片 */
+    body.quiz-on-q .chip{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
+    body.quiz-on-q .chip:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
+    body.quiz-on-q .chip.sel{
+      border-color:#111!important;background:#111!important;color:#ffffff!important;font-weight:600;
+      box-shadow:0 4px 12px rgba(0,0,0,.18)!important;
+    }
+    body.quiz-on-q .chip .chip-name{color:#1a1d1a!important}
+    body.quiz-on-q .chip.sel .chip-name{color:#ffffff!important;font-weight:600}
+    /* 右上角对勾徽章：静默绿色→选中时换白底黑勾，与黑底搭配 */
+    body.quiz-on-q .chip .chip-check{background:#2ea24a!important;color:#ffffff!important}
+    body.quiz-on-q .chip.sel .chip-check{background:#ffffff!important;color:#111!important}
+    body.quiz-on-q .chip-counter{background:#f5f6f5!important;border-color:#e5e7e5!important}
+    body.quiz-on-q .chip-counter-txt{color:#1a1d1a!important}
+    body.quiz-on-q .chip-counter-txt b{color:#2ea24a!important}          /* 计数数字绿色点缀 */
+    body.quiz-on-q .chip-counter-hint{color:#6b7280!important}
+    body.quiz-on-q .chip-counter.full{background:#eaf7ed!important;border-color:#2ea24a!important}
+    body.quiz-on-q .chip-counter.full .chip-counter-txt b{color:#2ea24a!important}
+    body.quiz-on-q .chip-counter.full .chip-counter-hint{color:#2ea24a!important}
+
+    /* 排序题 rank */
+    body.quiz-on-q .rank-item{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
+    body.quiz-on-q .rank-item:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
+    body.quiz-on-q .rank-item:hover .rank-handle{color:#2ea24a!important}
+    body.quiz-on-q .rank-item.press{background:#f0f2f0!important}
+    body.quiz-on-q .rank-item.lift{
+      border-color:#111!important;background:#111!important;color:#ffffff!important;
+      box-shadow:0 14px 28px rgba(0,0,0,.22)!important;
+    }
+    body.quiz-on-q .rank-item.lift .rank-label{color:#ffffff!important}
+    body.quiz-on-q .rank-item.lift .rank-handle{color:#ffffff!important}
+    body.quiz-on-q .rank-index{background:#eaf7ed!important;color:#2ea24a!important}  /* 序号徽章绿色 */
+    body.quiz-on-q .rank-label{color:#1a1d1a!important}
+    body.quiz-on-q .rank-handle{color:#9aa0a6!important}
+    body.quiz-on-q .btn-rank{background:#eaf7ed!important;border:1px solid #2ea24a!important;color:#2ea24a!important}
+    body.quiz-on-q .btn-rank:hover{background:#dcf1e1!important}
+
+    /* 量表 scale */
+    body.quiz-on-q .scale-item{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
+    body.quiz-on-q .scale-item:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
+    body.quiz-on-q .scale-item.sel{
+      border-color:#111!important;background:#111!important;color:#ffffff!important;
+      box-shadow:0 6px 18px rgba(0,0,0,.18)!important;
+    }
+    body.quiz-on-q .scale-item.sel .scale-no{color:#ffffff!important}
+    body.quiz-on-q .scale-no{color:#2ea24a!important}       /* 编号绿点缀 */
+    body.quiz-on-q .scale-side.agree{color:#2ea24a!important}
+    body.quiz-on-q .scale-side.disagree{color:#6b7280!important}
+    body.quiz-on-q .scale-help{color:#9aa0a6!important}
+
+    /* 底部按钮 */
+    body.quiz-on-q .qa .btn-b{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
+    body.quiz-on-q .qa .btn-b:hover{border-color:#111!important;color:#111!important}
+    body.quiz-on-q .qa .btn-n{background:#2ea24a!important;color:#fff!important;border:none!important}
+    body.quiz-on-q .qa .btn-n:hover{background:#26893d!important}
+    body.quiz-on-q .qa .btn-n:disabled{opacity:.35!important;background:#d4d7d4!important;color:#9aa0a6!important}
+
+    /* Loading 旋转器 */
+    body.quiz-on-q .spinner{border-color:#e5e7e5!important;border-top-color:#2ea24a!important}
+
+    /* ============================================================ */
+    /* ==========  Loading 态皮肤：白底 + 绿色转圈 + 黑字 ========== */
+    /* ============================================================ */
+    body:has(#ld.active){background:#ffffff!important;color:#1a1d1a!important}
+    body:has(#ld.active) .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
+    body:has(#ld.active) .nav-logo{color:#1a1d1a!important}
+    body:has(#ld.active) .nav-logo-icon{background:#111!important}
+    body:has(#ld.active) .nav-logo-icon svg path{fill:#fff!important}
+    body:has(#ld.active) .nav-back{color:#6b7280!important}
+    body:has(#ld.active) .nav-back:hover{color:#2ea24a!important}
+    body:has(#ld.active) .spinner{border-color:#e5e7e5!important;border-top-color:#2ea24a!important}
+    body:has(#ld.active) .ld-t{color:#111!important}
+    body:has(#ld.active) .ld-s{color:#6b7280!important}
+
+    /* ============================================================ */
+    /* ==========  结果态皮肤：白底 + 黑色高亮 + 绿色点缀 ========== */
+    /* ============================================================ */
+    /* 用 :has 锁定"结果场景激活"时的 body。
+       调色板同做题态：白 #ffffff / 主黑 #111 / 文字 #1a1d1a /
+       次灰 #6b7280 / 弱灰 #9aa0a6 / 边框 #e5e7e5 / 次底 #f7f8f7 /
+       绿点缀 #2ea24a / 浅绿底 #eaf7ed */
+    body:has(#res.active){background:#ffffff!important;color:#1a1d1a!important}
+    body:has(#res.active) .bar{background:#eef0ee!important}
+    body:has(#res.active) .bar-fill{background:#2ea24a!important}
+    body:has(#res.active) .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
+    body:has(#res.active) .nav-logo{color:#1a1d1a!important}
+    body:has(#res.active) .nav-logo-icon{background:#111!important}
+    body:has(#res.active) .nav-logo-icon svg path{fill:#fff!important}
+    body:has(#res.active) .nav-back{color:#6b7280!important}
+    body:has(#res.active) .nav-back:hover{color:#2ea24a!important}
+
+    /* 主卡 & 头部 */
+    #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+    #res .res-avatar-frame{border-color:#e5e7e5!important;background:#ffffff!important;box-shadow:0 1px 0 #fff inset!important}
+    #res .res-avatar{background:#f7f8f7!important}
+    #res .res-name{color:#111!important}                   /* 角色名：主黑 */
+    #res .res-real{color:#6b7280!important}                /* 副标题：次灰 */
+    #res .res-desc{color:#6b7280!important}
+
+    /* 金句 tagline */
+    #res .res-tagline{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .res-tagline::before{color:#2ea24a!important}     /* 引号绿点缀 */
+
+    /* section 小标题 */
+    #res .res-section-title{color:#6b7280!important}
+
+    /* 性格标签 */
+    #res .tag-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+
+    /* 暗格解读 insight-box：黑底白字 + 绿引号 */
+    #res .insight-box{background:#111!important;border:1px solid #111!important;color:#ffffff!important}
+    #res .insight-box::before{color:#2ea24a!important}
+
+    /* 选择解读 reading-box */
+    #res .reading-box{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .reading-box b,#res .reading-box strong{color:#2ea24a!important}
+
+    /* 副属性 */
+    #res .substat-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
+    #res .substat-label{color:#6b7280!important}
+    #res .substat-val{color:#111!important}                /* 大数字：主黑 */
+    #res .substat-state{color:#1a1d1a!important}           /* 状态句：主黑 */
+    #res .substat-desc{color:#6b7280!important}
+
+    /* 魅力雷达 */
+    #res .radar-wrap{background:#ffffff!important;border:1px solid #e5e7e5!important}
+    #res .radar-svg .r-grid{stroke:#e5e7e5!important}
+    #res .radar-svg .r-axis{stroke:#d4d7d4!important}
+    #res .radar-svg .r-area{fill:rgba(46,162,74,.15)!important;stroke:#111!important}  /* 区域线：黑 / 填充：绿半透 */
+    #res .radar-svg .r-point{fill:#111!important;stroke:#ffffff!important}
+    #res .radar-svg .r-label{fill:#1a1d1a!important}
+    #res .radar-svg .r-label-pct{fill:#6b7280!important}
+
+    /* 你缺的工具 */
+    #res .advice-intro{color:#1a1d1a!important}
+    #res .advice-intro em{color:#2ea24a!important;font-weight:700}
+    #res .advice-outro{color:#6b7280!important}
+    #res .advice-list li{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .advice-list li::before{background:#2ea24a!important;color:#ffffff!important}  /* 勾选圆点：绿 */
+
+    /* 口头禅 */
+    #res .mantra-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .mantra-pill::before{color:#2ea24a!important}
+
+    /* 保存卡片 */
+    #res .save-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
+    #res .save-card-icon{background:#eaf7ed!important}
+    #res .save-card-title{color:#111!important}
+    #res .save-card-sub{color:#6b7280!important}
+    #res .save-card-preview{border:1px solid #e5e7e5!important;background:#f7f8f7!important}
+    #res .save-card-hint{color:#2ea24a!important}
+
+    /* 心愿抽奖卡 */
+    #res .wish-box{background:#eaf7ed!important;border:1px solid #2ea24a!important}
+    #res .wish-title{color:#1a1d1a!important}
+    #res .wish-desc{color:#6b7280!important}
+    #res .wish-box textarea{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .wish-btn{background:#111!important;color:#ffffff!important}
+    #res .wish-btn:hover{background:#2ea24a!important}
+    #res .wish-result{color:#2ea24a!important}
+
+    /* 相关角色列表 */
+    #res .others-title{color:#6b7280!important}
+    #res .other-card img{border-color:#e5e7e5!important}
+    #res .other-card .oc-name{color:#1a1d1a!important}
+    #res .other-card .oc-pct{color:#9aa0a6!important}
+
+    /* 底部操作按钮 */
+    #res .btn-explore{background:#2ea24a!important;color:#ffffff!important;box-shadow:0 4px 12px rgba(46,162,74,.25)!important}
+    #res .btn-explore:hover{background:#26893d!important;box-shadow:0 6px 16px rgba(46,162,74,.35)!important}
+    #res .btn-share{background:#111!important;border:none!important;color:#ffffff!important}
+    #res .btn-share:hover{background:#2ea24a!important}
+    #res .btn-redo{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
+    #res .btn-redo:hover{border-color:#111!important;color:#111!important}
+
   </style>
 </head>
 <body>
@@ -277,153 +882,126 @@
     当前为微信调试模式，请在微信内打开以体验完整分享功能。
   </div>
 
-  <nav class="nav">
-    <a href="index.html" class="nav-logo">
-      <div class="nav-logo-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L6 2.5L9.5 9.5H2.5Z" fill="white"/></svg></div>
-      Ardot
-    </a>
-    <a href="javascript:;" class="nav-back" onclick="handleBackToHome()">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      返回
-    </a>
-  </nav>
-
   <div class="bar"><div class="bar-fill" id="bar"></div></div>
 
   <div class="wrap">
     <div class="welcome scene active" id="s0">
-      <img class="welcome-cover"
-           src="https://ardot-quiz.edgeone.dev/img/picasso.png"
-           alt="AI时代，你活成了哪种大师"
-           width="400" height="400">
-      <div class="welcome-sub">AI Design Survival Quiz</div>
-      <h1>《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》</h1>
-      <p>来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。</p>
+      <img class="welcome-poster" src="img/poster.png" alt="好险，差点就做完了" />
       <div class="welcome-cta">
-        <div class="master-preview">
-          <span class="chip">毕加班索</span>
-          <span class="chip">莫奈何</span>
-          <span class="chip">达利谱</span>
-          <span class="chip">唐纳德诺慢</span>
-        </div>
-        <button type="button" class="btn-go" id="welcomeStart" onclick="start()">开始测测看 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L8 4m3 3L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
+          <span>开始测试</span>
+          <span class="arr" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13m0 0l-5-5m5 5l-5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </button>
       </div>
-      <div class="welcome-note">9 题 · 约 6 分钟</div>
     </div>
 
-    <div class="scene" id="s1">
-      <div class="qh"><div class="q-num">01 / 08</div><h2 class="q-title">你最近最常被哪种活拴住？</h2><p class="q-desc">单选</p></div>
-      <div class="opts c2" data-q="q1" data-t="s">
-        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 想图形，磨 Logo</span></div>
-        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 调界面，盯感觉</span></div>
-        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 画角色，保人设</span></div>
-        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 搭流程，做原型</span></div>
-      </div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b1" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s2">
-      <div class="qh"><div class="q-num">02 / 08</div><h2 class="q-title">你现在把 AI 当什么使？</h2><p class="q-desc">单选</p></div>
-      <div class="opts c2" data-q="q2" data-t="s">
-        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 炸灵感</span></div>
-        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 补细节</span></div>
-        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 想让它干活</span></div>
-        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 想接工作流</span></div>
-      </div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b2" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s3">
-      <div class="qh"><div class="q-num">03 / 08</div><h2 class="q-title">你最近最常用的是哪一路？</h2><p class="q-desc">单选</p></div>
-      <div class="opts c2" data-q="q3" data-t="s">
-        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. Midjourney / DALL·E</span></div>
-        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. SD / ComfyUI</span></div>
-        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. Firefly / Figma AI / Copilot</span></div>
-        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 通义 / 文心 / 其他</span></div>
-      </div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b3" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s4">
-      <div class="qh"><div class="q-num">04 / 08</div><h2 class="q-title">下面这些破防时刻，像不像你？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
-      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
-      <div class="scale-list" id="q4Scale"></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b4" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s5">
-      <div class="qh"><div class="q-num">05 / 08</div><h2 class="q-title">真让 AI 争口气，你最希望它先补哪块？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
-      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
-      <div class="scale-list" id="q5Scale"></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b5" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s6">
-      <div class="qh"><div class="q-num">06 / 08</div><h2 class="q-title">你现在和 Prompt 的关系，更像哪种？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
-      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
-      <div class="scale-list" id="q6Scale"></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b6" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s7">
-      <div class="qh"><div class="q-num">07 / 08</div><h2 class="q-title">说真的，你更信哪句？</h2><p class="q-desc">请按 1-7 分打分（1 = 完全同意，7 = 完全不同意）</p></div>
-      <div class="scale-help">每次先回答当前一条，系统会自动展开下一条。</div>
-      <div class="scale-list" id="q7Scale"></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b7" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s8">
-      <div class="qh"><div class="q-num">08 / 08</div><h2 class="q-title">下面哪句最像你现在的状态？</h2><p class="q-desc">单选</p></div>
-      <div class="opts" data-q="q8" data-t="s">
-        <div class="opt" data-v="A" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">A. 我不是没想法，我是没下班</span></div>
-        <div class="opt" data-v="B" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">B. 我不是没审美，是它不争气</span></div>
-        <div class="opt" data-v="C" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">C. 我不是没流程，是流程太慢</span></div>
-        <div class="opt" data-v="D" onclick="pk(this)"><div class="opt-r"></div><span class="opt-t">D. 我不是没方向，是方向太多</span></div>
-      </div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b8" disabled onclick="nx()">继续</button></div>
-    </div>
-
-    <div class="scene" id="s9">
-      <div class="qh"><div class="q-num">09 / 09</div><h2 class="q-title">常用 AI 工具（最多选 3 个）</h2><p class="q-desc">多选（最多 3 项）</p></div>
-      <div class="opts" data-q="q9" data-t="s"></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b9" disabled onclick="nx()">继续</button></div>
-    </div>
+    <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
 
     <div class="ld" id="ld">
       <div class="spinner"></div>
-      <div class="ld-t">正在匹配你的生存角色<span class="ld-dots"></span></div>
-      <p class="ld-s">从四种 AI 时代设计生存状态中匹配你</p>
+      <div class="ld-t">正在匹配你的艺术大师人格<span class="ld-dots"></span></div>
+      <p class="ld-s">从 6 维设计痛点里找出最像你的那一位</p>
     </div>
 
     <div class="res" id="res">
       <div class="res-card">
         <div class="res-top">
-          <img class="res-avatar" id="rImg" src="" alt>
-          <div class="res-name" id="rName">毕加班索</div>
-          <div class="res-real" id="rReal">创意焦虑型生存状态</div>
-          <p class="res-desc" id="rDesc">描述</p>
+          <div class="res-avatar-frame"><img class="res-avatar" id="rImg" src="" alt></div>
+          <div class="res-name" id="rName">草稿太多的毕加班索</div>
+          <div class="res-real" id="rReal" style="display:none">D1 · 灵感发散与筛选</div>
         </div>
-        <div class="wish-box" id="wishBox">
-          <div class="wish-title" id="wishTitle">从「毕加班索」到「毕加索」</div>
-          <div class="wish-desc" id="wishDesc">请填写你需要的 AI 功能，提交后可参与抽奖</div>
-          <textarea id="wishInput" placeholder="我希望 AI 有这样的能力..."></textarea>
-          <div class="wish-actions">
-            <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿并抽奖</button>
-            <span class="wish-result" id="wishResult"></span>
+
+        <!-- 暗格解读（大师点评） -->
+        <div class="res-section">
+          <div class="res-section-title">暗格解读</div>
+          <div class="insight-box" id="rComment"></div>
+        </div>
+
+        <!-- 性格标签（2×2 胶囊） -->
+        <div class="res-section">
+          <div class="res-section-title">性格标签</div>
+          <div class="tag-grid" id="rTags"></div>
+        </div>
+
+        <!-- 选择解读（why + 差距合成段落） -->
+        <div class="res-section">
+          <div class="res-section-title">选择解读</div>
+          <div class="reading-box" id="rReading"></div>
+        </div>
+
+        <!-- 你的两个副属性 -->
+        <div class="res-section">
+          <div class="res-section-title">你的两个副属性</div>
+          <div class="substat-grid" id="rSubStats"></div>
+        </div>
+
+        <!-- 魅力雷达 -->
+        <div class="res-section">
+          <div class="res-section-title">魅力雷达</div>
+          <div class="radar-wrap" id="rRadar"></div>
+        </div>
+
+        <!-- 你缺的工具（解锁建议） -->
+        <div class="res-section">
+          <div class="res-section-title">你缺的工具</div>
+          <div class="advice-intro">你最需要的不是<em>"更努力"</em>，而是一个能帮你：</div>
+          <ul class="advice-list" id="rAdvice"></ul>
+          <div class="advice-outro">的 AI 设计工具。</div>
+        </div>
+
+        <!-- 口头禅（2×2 胶囊） -->
+        <div class="res-section">
+          <div class="res-section-title">口头禅</div>
+          <div class="mantra-grid" id="rMantras"></div>
+        </div>
+
+        <!-- 底部心愿抽奖 -->
+        <div class="res-section">
+          <div class="wish-box" id="wishBox" style="margin:0">
+            <div class="wish-title" id="wishTitle">从「草稿太多的毕加班索」到「毕加索」</div>
+            <div class="wish-desc" id="wishDesc">请填写你需要的 AI 功能，提交后可参与抽奖</div>
+            <textarea id="wishInput" placeholder="我希望 AI 有这样的能力..."></textarea>
+            <div class="wish-actions">
+              <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿并抽奖</button>
+              <span class="wish-result" id="wishResult"></span>
+            </div>
           </div>
         </div>
-        <div class="others-title" id="othersTitle">其他可能接近的状态</div>
-        <div class="others" id="othersRow"></div>
+
       </div>
       <div class="res-actions">
         <a class="btn-explore" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer">探索 AI 设计<span class="arr" aria-hidden="true">↗</span></a>
-        <button class="btn-share" onclick="share()">分享结果</button>
+        <button class="btn-share" onclick="share()">分享测试</button>
         <button class="btn-redo" onclick="location.reload()">再测一次</button>
       </div>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- 右下角常驻"保存图片"按钮（结果页可见；脱离 #res，避免父节点动画影响） -->
+  <button type="button" class="save-fab" id="saveFab" aria-label="保存页面为图片" onclick="saveToAlbum()">
+    <span class="save-fab-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </span>
+    <span class="save-fab-txt">保存图片</span>
+  </button>
+
+  <!-- 截图预览层：放在 body 根节点，彻底脱离 #res 的 transform/动画影响，保证 position:fixed 相对视口定位 -->
+  <div class="save-overlay" id="saveOverlay" hidden>
+    <div class="save-overlay-mask" onclick="closeSaveOverlay()"></div>
+    <div class="save-overlay-inner">
+      <div class="save-overlay-title">长按图片可转发给朋友 / 存入相册</div>
+      <img class="save-overlay-img" id="saveOverlayImg" alt="我的大师人格 - 分享海报">
+      <div class="save-overlay-actions">
+        <button type="button" class="save-overlay-btn" onclick="shareSaveImage()">分享</button>
+        <button type="button" class="save-overlay-btn ghost" onclick="downloadSaveImage()">下载</button>
+        <button type="button" class="save-overlay-btn ghost" onclick="closeSaveOverlay()">关闭</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 微信分享引导遮罩：点击"分享结果"按钮后提示用户点击右上角 -->
   <div class="share-mask" id="shareMask" onclick="hideShareMask()">
@@ -479,59 +1057,305 @@
       const n=Math.round(Number(v));
       return Number.isFinite(n)&&n>0?n:fallback;
     }
-    /** 题库默认与 admin.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema，避免旧 localStorage 里的题库盖住新版本。 */
+    /** 题库默认与 admin.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema / meta.roleSetVersion，
+        避免旧 localStorage 里的题库盖住新版本。
+        6 维 × 6 角色：
+          D1 草稿太多的毕加班索 / D2 还在抠图的原研灾 / D3 对不齐的蒙得里不安
+          D4 复制到崩溃的草间弥死 / D5 风格断片的梵稿 / D6 睡莲迁移失败的莫奈何
+        Q1–Q6 每题 4 个选项 ABCD → 痛点强度 1/2/3/4（Qn 对应 Dn）；Q7 六维完整排序给权重 6/21…1/21。
+        计算由全局 window.computeDesignerPersonality(answers) 驱动，不再使用 mappings 映射表。 */
     function defaultConfig(){
       return {
         meta:{
-          badge:"AI Design Survival Quiz",
+          badge:"AI Designer Personality Test",
           mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",
-          subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",
-          note:"9 题 · 约 6 分钟",
+          subtitle:"11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。",
+          note:"11 题 · 约 6 分钟",
           feedbackEnabled:true,
-          questionSchema:"prompt_refactor_v15",
-          roleSetVersion:5
+          questionSchema:"designer_personality_v2",
+          roleSetVersion:7
         },
         roles:[
-          {id:"pica",name:"毕加班索",real:"创意焦虑型生存状态",img:"img/picasso.png",desc:"你脑子里永远有想法，但时间从来不够用。你在追求突破和赶工交付之间反复横跳，最怕灵感来得太快、产能跟不上。"},
-          {id:"mona",name:"莫奈何",real:"审美细节型生存状态",img:"img/hara.png",desc:"你对质感和审美有天然敏感度，但最痛苦的是 AI 每次都差那口气。你不是不会做，而是不能接受“差不多”。"},
-          {id:"dali",name:"达利谱",real:"探索实验型生存状态",img:"img/dali.png",desc:"你喜欢试新工具、尝新玩法，灵感爆发力很强，但方向也容易过载。你不是没方向，是方向太多。"},
-          {id:"slow",name:"唐纳德诺慢",real:"流程效率型生存状态",img:"img/beethoven.png",desc:"你最关注效率和稳定性，核心诉求是“别崩、别慢、别绕”。你希望 AI 真正进入工作流，而不是演示功能。"}
+          {
+            id:"d1",name:"草稿太多的毕加班索",real:"D1 · 灵感发散与筛选",img:"img/picasso.png?v=2",
+            desc:"你不是没灵感，而是灵感太多，每一张草稿都像有点道理。",
+            resultContent:{
+              tagline:"你不是没灵感，而是灵感太多，每一张草稿都像有点道理。",
+              archetype:"毕加索",
+              stuck:"灵感发散与方案筛选",
+              tool:"一个能帮你筛选、组合、收敛方向的 AI 设计助手",
+              dimension:"灵感发散与筛选",
+              whyLines:[
+                "你对概念图、moodboard 和多方向探索有较高需求，但当前 AI 给你的结果可能还不够稳定。",
+                "它能给你很多图，却不一定能帮你判断哪一个更值得继续。"
+              ],
+              masterComment:"你的脑子里有很多视角。问题不是没有想法，而是每个想法都在喊\u201c选我\u201d。",
+              masterState:"把混乱视角变成结构。",
+              userState:"让草稿越堆越多，方向越来越难选。",
+              advice:[
+                "快速生成多个设计方向",
+                "自动整理 moodboard",
+                "对方向进行比较和筛选",
+                "把概念方向落成初稿"
+              ],
+              mantras:[
+                "\u201c这个方向也不是不行。\u201d",
+                "\u201c我再找几张参考。\u201d",
+                "\u201c先别删，万一后面用得上。\u201d"
+              ],
+              tags:["灵感爆发 MAX","方向选择困难","参考永远不够","草稿删不动"],
+              subStats:[{val:"42%",label:"灵感留存率",desc:"100 个想法里能真正推下去的比例"},{val:"3.7",label:"同时在跑的方向",desc:"一张稿子平均并行的探索条数"}],
+              shareLine:"我不是没灵感，我只是需要一个筛选器。"
+            }
+          },
+          {
+            id:"d2",name:"还在抠图的原研灾",real:"D2 · 图像与素材处理",img:"img/hara.png?v=2",
+            desc:"你不是不会设计，而是还没走到设计本身。",
+            resultContent:{
+              tagline:"你不是不会设计，而是还没走到设计本身。",
+              archetype:"原研哉",
+              stuck:"图像与素材处理",
+              tool:"一个能自动抠图、修图、放大和合成的 AI 图片助手",
+              dimension:"图像与素材处理",
+              whyLines:[
+                "你希望 AI 帮你处理图片素材，但当前很多素材还需要你手动修边、修细节、调合成。",
+                "设计还没开始，时间已经被素材消耗掉了。"
+              ],
+              masterComment:"你追求干净、克制和质感。可惜最消耗你的，往往是那一圈永远修不干净的毛边。",
+              masterState:"用留白制造秩序。",
+              userState:"还在和毛边、糊图、假合成拉扯。",
+              advice:[
+                "自动抠图和修边",
+                "自动放大并补足细节",
+                "自动换背景和合成",
+                "清理素材瑕疵"
+              ],
+              mantras:[
+                "\u201c这个边缘有点脏。\u201d",
+                "\u201c放大以后糊了。\u201d",
+                "\u201c我先处理一下素材。\u201d"
+              ],
+              tags:["像素级强迫症","毛边雷达常开","合成不接受将就","细节死磕派"],
+              subStats:[{val:"28%",label:"素材返工率",desc:"一张图平均要重修的像素比例"},{val:"1.8h",label:"每天耗在素材上",desc:"真正落在设计上之前的时间"}],
+              shareLine:"我不是不会设计，我只是被毛边拦住了。"
+            }
+          },
+          {
+            id:"d3",name:"对不齐的蒙得里不安",real:"D3 · 版式与结构处理",img:"img/mondrian.png",
+            desc:"你不是没有结构感，而是总被规范、组件和间距拖住。",
+            resultContent:{
+              tagline:"你不是没有结构感，而是总被规范、组件和间距拖住。",
+              archetype:"蒙德里安",
+              stuck:"版式与结构处理",
+              tool:"一个能理解组件规范和页面结构的 AI 版式助手",
+              dimension:"版式与结构处理",
+              whyLines:[
+                "你希望 AI 按规范生成页面或组件结构，但它经常只能给出\u201c看起来差不多\u201d的结果。",
+                "真正接进设计规范后，你还是要重画、重调、重对齐。"
+              ],
+              masterComment:"你心里有秩序，但画板上总有几块东西不听话。",
+              masterState:"把网格变成语言。",
+              userState:"还在把网格一格一格手动摆正。",
+              advice:[
+                "理解设计规范",
+                "调用组件库",
+                "自动生成页面结构",
+                "检查间距、对齐和层级"
+              ],
+              mantras:[
+                "\u201c这个间距不对。\u201d",
+                "\u201c组件不能这么用。\u201d",
+                "\u201c先拉一下网格。\u201d"
+              ],
+              tags:["网格信徒","对齐偏执狂","规范第一位","间距检察官"],
+              subStats:[{val:"51%",label:"返工对齐率",desc:"AI 出稿后仍需手动微调的比例"},{val:"6px",label:"可容忍误差",desc:"你对像素级偏移的最大忍让值"}],
+              shareLine:"我不是没有秩序感，我只是需要一个懂规范的助手。"
+            }
+          },
+          {
+            id:"d4",name:"复制到崩溃的草间弥死",real:"D4 · 重复执行与批量操作",img:"img/kusama.png",
+            desc:"你不是效率低，而是被重复劳动吞掉了。",
+            resultContent:{
+              tagline:"你不是效率低，而是被重复劳动吞掉了。",
+              archetype:"草间弥生",
+              stuck:"重复执行与批量操作",
+              tool:"一个能批量修改、同步更新和自动检查的 AI 自动化助手",
+              dimension:"重复执行与批量操作",
+              whyLines:[
+                "你希望 AI 帮你替换、同步和批量修改设计稿，但当前工具常常不够可靠。",
+                "改一个按钮，要检查几十张稿子；自动化跑完，还要担心漏掉哪一页。"
+              ],
+              masterComment:"重复本可以成为风格。但在你的画板里，重复更像工伤。",
+              masterState:"把重复变成系统。",
+              userState:"把重复变成加班。",
+              advice:[
+                "批量替换设计元素",
+                "多稿同步更新",
+                "自动识别相似组件",
+                "自动检查遗漏页面"
+              ],
+              mantras:[
+                "\u201c怎么还有 83 张？\u201d",
+                "\u201c这个也要改？\u201d",
+                "\u201c检查比修改还累。\u201d"
+              ],
+              tags:["Ctrl+D 常驻","多稿同步焦虑","检查比改还累","批量心态濒临崩溃"],
+              subStats:[{val:"83",label:"单次平均稿数",desc:"一次小改动要检查的稿子数"},{val:"2.5x",label:"重复耗时倍数",desc:"你比批处理工具慢的倍数"}],
+              shareLine:"我不是不够快，我只是被复制粘贴绑架了。"
+            }
+          },
+          {
+            id:"d5",name:"风格断片的梵稿",real:"D5 · 项目上下文管理",img:"img/gogh.png",
+            desc:"你不是没有风格，而是每次都要重新找回它。",
+            resultContent:{
+              tagline:"你不是没有风格，而是每次都要重新找回它。",
+              archetype:"梵高",
+              stuck:"项目上下文管理",
+              tool:"一个能记住项目背景、提取设计逻辑的 AI 项目记忆助手",
+              dimension:"项目上下文管理",
+              whyLines:[
+                "你希望 AI 帮你梳理旧项目逻辑和复用建议，但历史方案往往散落在文件、截图、聊天记录里。",
+                "AI 能总结表面内容，却不一定抓得住真正的设计判断。"
+              ],
+              masterComment:"你的笔触很强，但上下文总是断。真正麻烦的不是做新方案，而是重新找回旧方案为什么成立。",
+              masterState:"让风格持续生长。",
+              userState:"每个新项目都像重新开始。",
+              advice:[
+                "记住项目背景",
+                "提取历史方案逻辑",
+                "识别风格原则",
+                "帮新方案接上旧项目上下文"
+              ],
+              mantras:[
+                "\u201c这个项目之前是不是做过类似的？\u201d",
+                "\u201c让我翻一下旧文件。\u201d",
+                "\u201cAI 总结得像，但没抓到重点。\u201d"
+              ],
+              tags:["记忆断片","翻旧文件大师","风格不稳定","上下文失踪人口"],
+              subStats:[{val:"35%",label:"历史复用率",desc:"旧方案能被新项目顺利复用的比例"},{val:"4.2h",label:"每周翻旧稿时间",desc:"找回上次设计决策耗掉的时间"}],
+              shareLine:"我不是没有风格，我只是缺一个项目记忆体。"
+            }
+          },
+          {
+            id:"d6",name:"睡莲迁移失败的莫奈何",real:"D6 · 工作流衔接",img:"img/monet.png?v=2",
+            desc:"你不是不会交付，而是被工具之间的缝隙卡住了。",
+            resultContent:{
+              tagline:"你不是不会交付，而是被工具之间的缝隙卡住了。",
+              archetype:"莫奈",
+              stuck:"工作流衔接",
+              tool:"一个能自动生成原型、标注、命名和交付文件的 AI 工作流助手",
+              dimension:"工作流衔接",
+              whyLines:[
+                "你希望 AI 帮你把设计稿同步到其他软件和交付形式中，但现在经常还要导出、补命名、写标注、调整格式。",
+                "设计完成之后，流程还没有结束。"
+              ],
+              masterComment:"你的画面已经完成了，但它总是在去往原型、标注和交付的路上迷路。",
+              masterState:"让水面自然流动。",
+              userState:"让文件在工具之间反复漂流。",
+              advice:[
+                "自动生成原型",
+                "自动生成标注",
+                "自动补全命名",
+                "整理交付说明",
+                "跨工具同步设计稿"
+              ],
+              mantras:[
+                "\u201c原型我马上补。\u201d",
+                "\u201c这个格式怎么又乱了？\u201d",
+                "\u201c我再导一版给你。\u201d"
+              ],
+              tags:["交付流浪汉","导出格式焦虑","原型最后一公里","标注补丁工"],
+              subStats:[{val:"5",label:"经手工具数",desc:"单个项目交付涉及的软件数量"},{val:"31%",label:"交付耗时占比",desc:"设计完成后仍要处理的时间比例"}],
+              shareLine:"我不是不会交付，我只是卡在工具缝隙里。"
+            }
+          }
         ],
         questions:{
-          q1:{type:"single",title:"老板甩来一个需求，说「做几个方向看看」，我会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 用多个 AI 工具生成、筛选并落地方向，但工具切换多，流程不够连贯"},{key:"B",label:"B. 用 AI 生成参考或概念，但还需要自己大量筛选、重组和修改"},{key:"C",label:"C. 聊了半天都不对味，最后还是去翻参考"},{key:"D",label:"D. 不折腾 AI，直接开网站找案例"}]},
-          q2:{type:"single",title:"手里这张素材，主体要抠出来、还要放大、修边并合成到新背景里。你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 抠图、放大、合成分给几个 AI 做"},{key:"B",label:"B. 让 AI 先抠个大概，毛边我自己收拾"},{key:"C",label:"C. 试几次不是糊就是假，最后返工"},{key:"D",label:"D. 钢笔、蒙版、修边，一步步手动来"}]},
-          q3:{type:"single",title:"打开空白画板，要做一个新的页面设计，我准备：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用 AI 按规范生成初版结构，再在对话中让它修改"},{key:"B",label:"B. 让 AI 给个布局骨架，我再调间距和组件"},{key:"C",label:"C. AI 画出来像“差不多”，但规范全得重做"},{key:"D",label:"D. 基本不用 AI，因为 AI 很难理解我的规范"}]},
-          q4:{type:"single",title:"老板说「改掉这个按钮的样式」——你看了眼 83 张稿子：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用脚本、插件或 AI 批量处理，但配置复杂、检查成本高"},{key:"B",label:"B. 用 AI 或插件处理一部分，但仍要逐张检查和手动补漏"},{key:"C",label:"C. 尝试过自动化工具，但修改不一致或容易出错，最后返工更多"},{key:"D",label:"D. 基本手动逐个修改，因为现有工具很难可靠地批量处理设计稿"}]},
-          q5:{type:"single",title:"新方案需要复用过去项目的设计逻辑，你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 让 AI 找到之前的上下文，直接接进新方案"},{key:"B",label:"B. 把旧稿和说明丢给 AI，让它先帮我捋"},{key:"C",label:"C. 尝试过让 AI 理解历史项目，但它经常抓不到关键逻辑或风格原则"},{key:"D",label:"D. 自己翻聊天、翻文件、靠记忆把逻辑拼回来"}]},
-          q6:{type:"single",title:"开发发来消息：「稿子定了吗？标注和原型今天能给我吗？」",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 先用工具一键转原型，再补命名和标注细节"},{key:"B",label:"B. 自动生成一部分，再人工补一部分"},{key:"C",label:"C. 在不同工具之间来回导出和调整格式"},{key:"D",label:"D. 从设计稿开始，手动做原型和标注"}]},
-          q7:{type:"rank",topN:3,title:"下班前跟电脑说一声「晚安」，早上醒来想看到它已经替你整理好了什么？",desc:"长按拖动排序（前 3 名计分）",options:[{key:"A",label:"1. 一组概念图和 moodboard"},{key:"B",label:"2. 按我要求该抠的抠、该修的修的图片"},{key:"C",label:"3. 按我的要求和规范的组件生成的界面"},{key:"D",label:"4. 在我要求的范围里替换了我新修改的设计"},{key:"E",label:"5. 梳理了过去项目的设计逻辑和复用建议"},{key:"F",label:"6. 把设计稿同步在其他软件中的形式"}]},
-          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. 我的设计风格"},{key:"B",label:"B. 我的组件规范"},{key:"C",label:"C. 我的项目上下文"},{key:"D",label:"D. 我的操作习惯"},{key:"E",label:"E. 我的素材库"},{key:"F",label:"F. 我的历史方案逻辑"}]},
-          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 结果不稳定，需要反复调整"},{key:"B",label:"B. 工具太分散，流程不连贯"},{key:"C",label:"C. 不理解我的设计规范和项目背景"},{key:"D",label:"D. 很难直接生成可用的设计稿"},{key:"E",label:"E. 不适合处理批量修改和重复执行"},{key:"F",label:"F. 学习成本高，不知道怎么用"}]},
-          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. UI / 产品设计"},{key:"B",label:"B. 视觉 / 品牌设计"},{key:"C",label:"C. 电商 / 运营设计"},{key:"D",label:"D. 平面 / 包装设计"},{key:"E",label:"E. 动效 / 视频设计"}]},
-          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Midjourney"},{key:"B",label:"B. 即梦（Dreamina）"},{key:"C",label:"C. Stable Diffusion / ComfyUI"},{key:"D",label:"D. Ideogram"},{key:"E",label:"E. Recraft"},{key:"F",label:"F. ChatGPT / Claude（文字发散）"},{key:"G",label:"G. Figma Make"},{key:"H",label:"H. Galileo AI"},{key:"I",label:"I. Uizard"},{key:"J",label:"J. v0（Vercel）"},{key:"K",label:"K. Framer AI"},{key:"L",label:"L. MasterGo AI"},{key:"M",label:"M. Pixso AI"}]},
-          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
+          q1:{type:"single",title:"D1 · 老板甩来「多做几个方向看看」，你最常卡在哪一步？",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 我能很快收敛方向，AI 对我来说主要是提速工具"},
+            {key:"B",label:"B. AI 给灵感很顺，但筛选和收口还需要我花不少时间"},
+            {key:"C",label:"C. AI 一发散就停不下来，我经常被淹没在备选里"},
+            {key:"D",label:"D. 每次都是草稿一堆、方向越聊越多，最后不知道选哪个"}
+          ]},
+          q2:{type:"single",title:"D2 · 一张素材要抠图、放大、修边、合成，你通常是：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 大部分交给 AI，结果基本够用，我只做最后把关"},
+            {key:"B",label:"B. AI 先做一轮，毛边、瑕疵我再手动收拾一下"},
+            {key:"C",label:"C. 出来的图总是差那口气，我经常要返工重做"},
+            {key:"D",label:"D. 不敢让 AI 碰精修，最后还是钢笔、蒙版、一点点手动来"}
+          ]},
+          q3:{type:"single",title:"D3 · 让 AI 生成一个有规范的页面/版式，结果常常是：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 按我的规范生成的结构基本能用，我只调一点细节"},
+            {key:"B",label:"B. 骨架 OK，但间距、对齐、组件我需要自己再调一轮"},
+            {key:"C",label:"C. 看起来像那么回事，但规范全乱，对不齐是常态"},
+            {key:"D",label:"D. AI 根本接不住我的设计规范，基本重做"}
+          ]},
+          q4:{type:"single",title:"D4 · 需要把一个改动批量应用到一堆稿子/页面上，你：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 用脚本/插件/AI 批处理一把搞定，几乎不用手改"},
+            {key:"B",label:"B. 一部分自动、一部分补刀，整体还能接受"},
+            {key:"C",label:"C. 自动化总是改得不一致，最后返工反而更多"},
+            {key:"D",label:"D. 不敢用批量工具，老老实实一个一个手改到怀疑人生"}
+          ]},
+          q5:{type:"single",title:"D5 · 新项目想复用过去的设计风格/逻辑，你通常：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. AI 能把之前的上下文接过来，我几乎不用重讲"},
+            {key:"B",label:"B. 把旧稿和说明丢给 AI，它能帮我捋出大半"},
+            {key:"C",label:"C. AI 抓不到关键风格和约束，我要反复纠正"},
+            {key:"D",label:"D. 每次都像从零开始，只能靠自己翻聊天、翻文件、靠脑子"}
+          ]},
+          q6:{type:"single",title:"D6 · 稿子定了，需要同步原型/标注/跨软件交付，你：",desc:"单选（痛感越强，选项越靠后）",mapsToRoles:true,options:[
+            {key:"A",label:"A. 一键转原型+自动标注，基本顺滑交出"},
+            {key:"B",label:"B. 自动能做一部分，剩下的我再补一补"},
+            {key:"C",label:"C. 在不同软件之间反复导入导出，光格式就磨半天"},
+            {key:"D",label:"D. 从设计稿到原型/标注几乎全手动，心里有一百个问号"}
+          ]},
+          q7:{type:"rank",title:"Q7 · 下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"长按拖动排序（全部 6 项都计入权重）",options:[
+            {key:"A",label:"1. 一组概念图和 moodboard（灵感发散与筛选）"},
+            {key:"B",label:"2. 该抠的抠、该修的修的图片素材（图像与素材处理）"},
+            {key:"C",label:"3. 符合我规范、对得齐的界面版式（版式与结构处理）"},
+            {key:"D",label:"4. 在一批稿子里替我批量改好（重复执行与批量操作）"},
+            {key:"E",label:"5. 梳理过去项目的风格与复用建议（项目上下文管理）"},
+            {key:"F",label:"6. 同步到原型/标注/其他软件里的交付物（工作流衔接）"}
+          ]},
+          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项，此题不计入角色分，仅用于了解你的偏好）",mapsToRoles:false,options:[
+            {key:"A",label:"A. 我的设计风格"},
+            {key:"B",label:"B. 我的组件规范"},
+            {key:"C",label:"C. 我的项目上下文"},
+            {key:"D",label:"D. 我的操作习惯"},
+            {key:"E",label:"E. 我的素材库"},
+            {key:"F",label:"F. 我的历史方案逻辑"}
+          ]},
+          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选（此题不计入角色分，仅用于了解你的痛点）",mapsToRoles:false,options:[
+            {key:"A",label:"A. 结果不稳定，需要反复调整"},
+            {key:"B",label:"B. 工具太分散，流程不连贯"},
+            {key:"C",label:"C. 不理解我的设计规范和项目背景"},
+            {key:"D",label:"D. 很难直接生成可用的设计稿"},
+            {key:"E",label:"E. 不适合处理批量修改和重复执行"},
+            {key:"F",label:"F. 学习成本高，不知道怎么用"}
+          ]},
+          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选（此题用于了解你的职业背景）",mapsToRoles:false,options:[
+            {key:"A",label:"A. UI / 产品设计"},
+            {key:"B",label:"B. 视觉 / 品牌设计"},
+            {key:"C",label:"C. 电商 / 运营设计"},
+            {key:"D",label:"D. 平面 / 包装设计"},
+            {key:"E",label:"E. 动效 / 视频设计"}
+          ]},
+          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项，此题用于了解你的工具链）",mapsToRoles:false,options:[
+            {key:"A",label:"A. Midjourney"},
+            {key:"B",label:"B. 即梦（Dreamina）"},
+            {key:"C",label:"C. Stable Diffusion / ComfyUI"},
+            {key:"D",label:"D. Ideogram"},
+            {key:"E",label:"E. Recraft"},
+            {key:"F",label:"F. ChatGPT / Claude（文字发散）"},
+            {key:"G",label:"G. Figma Make"},
+            {key:"H",label:"H. Galileo AI"},
+            {key:"I",label:"I. Uizard"},
+            {key:"J",label:"J. v0（Vercel）"},
+            {key:"K",label:"K. Framer AI"},
+            {key:"L",label:"L. MasterGo AI"},
+            {key:"M",label:"M. Pixso AI"}
+          ]},
+          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"}
         },
-        mappings:{
-          single:{
-            q1:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q2:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q3:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q4:{A:{dali:2,slow:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q5:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q6:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
-            q9:{A:{mona:3},B:{slow:3},C:{slow:2,mona:1},D:{pica:3},E:{slow:2,dali:1},F:{dali:2,pica:1}},
-            q10:{A:{slow:2,pica:1},B:{mona:2,dali:1},C:{pica:2,dali:1},D:{mona:2,dali:1},E:{dali:2,pica:1}}
-          },
-          rank:{
-            q7:{A:{dali:3,pica:2,mona:1},B:{pica:3,mona:2,dali:1},C:{slow:3,mona:2,pica:1},D:{mona:3,pica:2,slow:1},E:{slow:3,pica:2,mona:1},F:{slow:3,dali:2,pica:1}}
-          },
-          multi:{
-            q8:{A:{mona:3},B:{slow:3},C:{slow:2,pica:1},D:{slow:2,mona:1},E:{dali:2,pica:1},F:{pica:2,slow:1}},
-            q11:{A:{dali:2,pica:1},B:{dali:2,pica:1},C:{dali:3},D:{dali:2,mona:1},E:{dali:2,mona:1},F:{pica:2,slow:1},G:{slow:3},H:{slow:2,pica:1},I:{slow:2,pica:1},J:{slow:3},K:{slow:2,pica:1},L:{slow:2,mona:1},M:{slow:2,mona:1}}
-          },
-          score:{},
-          scale:{}
-        }
+        mappings:{single:{},rank:{},multi:{},score:{},scale:{}}
       };
     }
     function safeClone(v){return JSON.parse(JSON.stringify(v))}
@@ -581,9 +1405,21 @@
               score:Object.assign({}, base.mappings.score, (parsed.mappings&&parsed.mappings.score)||{}),
               scale:Object.assign({}, base.mappings.scale, (parsed.mappings&&parsed.mappings.scale)||{})
             };
+        /* 如果 admin 保存过 roles（parsedRolesFiltered 非空），与 base.roles 做 id 合并：
+           admin 改动的文字字段覆盖 base，但 resultContent 等结构字段若 admin 没配，保留 base 里的默认文案。 */
+        const mergedRoles=useParsedRoles?parsedRolesFiltered.map((pr)=>{
+          const br=(base.roles||[]).find((b)=>b.id===pr.id)||{};
+          const merged=Object.assign({},br,pr);
+          if(!merged.resultContent||typeof merged.resultContent!=="object"){
+            merged.resultContent=br.resultContent?JSON.parse(JSON.stringify(br.resultContent)):{};
+          }else if(br.resultContent){
+            merged.resultContent=Object.assign({},br.resultContent,merged.resultContent);
+          }
+          return merged;
+        }):base.roles;
         return Object.assign(base, parsed, {
           meta:Object.assign({}, base.meta, pm,useParsedRoles?{}:{roleSetVersion:base.meta.roleSetVersion},{questionSchema:base.meta.questionSchema}),
-          roles:useParsedRoles?parsedRolesFiltered:base.roles,
+          roles:mergedRoles,
           questions:mergedQuestions,
           mappings:mergedMappings
         });
@@ -1047,13 +1883,20 @@
         document.addEventListener("mouseup",mu);
       });
     }
-    /* 切题：瞬时对齐，让新题号出现在顶栏正下方，无动画无滑行 */
+    /* 切题：优先让题目在视口中居中展示；只有内容高度超过视口时，才对齐到顶栏下方 */
     function snapToScene(){
       const el=document.querySelector(".scene.active");
       if(!el)return;
-      const HEADER=58; // 顶栏 56 + 进度条 2
+      const HEADER=12; // 进度条 3 + 安全 buffer
+      const vh=window.innerHeight;
+      const sceneH=el.getBoundingClientRect().height;
+      /* 内容比视口短：滚到顶部，让 .wrap 的 flex 居中规则生效（题目天然居中显示） */
+      if(sceneH+HEADER<=vh){
+        if(window.pageYOffset>2)window.scrollTo({top:0,behavior:"auto"});
+        return;
+      }
+      /* 内容比视口长：把题目顶部对齐到顶栏下方，保证题号可见 */
       const y=el.getBoundingClientRect().top+window.pageYOffset-HEADER;
-      /* 瞬时对齐（auto 无动画）；只有视口位置和目标相差超过 2px 才滚，避免抖动 */
       if(Math.abs(window.pageYOffset-Math.max(0,y))>2){
         window.scrollTo({top:Math.max(0,y),behavior:"auto"});
       }
@@ -1077,135 +1920,45 @@
       }
     }
 
-    function buildQ1PriorityMultipliers(){
-      const order=A.q7;
-      if(!Array.isArray(order)||!order.length)return null;
-      const factors=[1,0.75,0.5,0.25];
-      const agg={};
-      masters.forEach((m)=>{agg[m.id]=0;});
-      order.forEach((key,idx)=>{
-        const map=RANK_MAP.q7&&RANK_MAP.q7[key];
-        if(!map)return;
-        const factor=factors[idx]!==undefined?factors[idx]:0;
-        Object.keys(map).forEach((rid)=>{agg[rid]+=(Number(map[rid])||0)*factor;});
+    /* 旧的 4 角色加权/priority 逻辑已整段移除。
+       新的 6 维 × 6 角色计分统一交给 window.computeDesignerPersonality（文件底部定义）。 */
+    function calcPersonalityResult(){
+      const answers={};
+      /* q1..q6：把选项 key 直接带上；q7：rank 顺序 */
+      ["q1","q2","q3","q4","q5","q6"].forEach((qid)=>{
+        const v=A[qid];
+        answers[qid]=Array.isArray(v)?v[0]:v;
       });
-      const ids=masters.map((m)=>m.id);
-      const mx=Math.max(...ids.map((id)=>agg[id]||0),1e-9);
-      const out={};
-      ids.forEach((id)=>{
-        const raw=(agg[id]||0)/mx;
-        out[id]=raw>1e-6?raw:0.2;
-      });
-      return out;
-    }
-    function questionMapsToRoles(qid){
-      if(qid==="q7")return false;
-      const q=CFG.questions&&CFG.questions[qid];
-      if(!q)return false;
-      if(q.type==="text"||q.resultOnly)return false;
-      if(q.mapsToRoles===false)return false;
-      if(q.mapsToRoles===true)return true;
-      return q.type==="single"||q.type==="multi"||q.type==="rank"||q.type==="score"||q.type==="scale";
-    }
-    function rolePriorityMultiplier(rid,priorityMult){
-      if(!priorityMult||priorityMult[rid]===undefined)return 1;
-      return Number(priorityMult[rid])||1;
-    }
-    function applySingle(score,q,v,priorityMult){
-      const map=SINGLE_MAP[q]&&SINGLE_MAP[q][v];
-      if(!map)return;
-      Object.keys(map).forEach((rid)=>{
-        const base=Number(map[rid])||0;
-        const m=rolePriorityMultiplier(rid,priorityMult);
-        score[rid]+=base*m;
-      });
-    }
-    function applyRank(score,q,order,priorityMult){
-      if(!Array.isArray(order)||!order.length)return;
-      const factors=[1,0.75,0.5,0.25];
-      const topN=Math.max(1,Number((CFG.questions[q]&&CFG.questions[q].topN)||order.length));
-      order.slice(0,topN).forEach((key,idx)=>{
-        const map=RANK_MAP[q]&&RANK_MAP[q][key];
-        if(!map)return;
-        const factor=factors[idx]!==undefined?factors[idx]:0;
-        Object.keys(map).forEach((rid)=>{
-          const base=(Number(map[rid])||0)*factor;
-          const m=rolePriorityMultiplier(rid,priorityMult);
-          score[rid]+=base*m;
-        });
-      });
-    }
-    function applyMulti(score,q,arr,priorityMult){
-      if(!Array.isArray(arr)||!arr.length)return;
-      const topN=safePositiveInt((CFG.questions[q]&&CFG.questions[q].maxSelect),arr.length);
-      arr.slice(0,topN).forEach((key)=>{
-        const map=MULTI_MAP[q]&&MULTI_MAP[q][key];
-        if(!map)return;
-        Object.keys(map).forEach((rid)=>{
-          const base=Number(map[rid])||0;
-          const m=rolePriorityMultiplier(rid,priorityMult);
-          score[rid]+=base*m;
-        });
-      });
-    }
-    function applyScore(score,q,val,priorityMult){
-      const scoreMap=SCORE_MAP[q]||{};
-      const map=scoreMap[String(val)]||scoreMap[val];
-      if(!map)return;
-      Object.keys(map).forEach((rid)=>{
-        const base=Number(map[rid])||0;
-        const m=rolePriorityMultiplier(rid,priorityMult);
-        score[rid]+=base*m;
-      });
-    }
-    function applyScale(score,q,priorityMult){
-      const ans=A[q]||{};
-      const rows=SCALE_MAP[q]||[];
-      rows.forEach((weights,idx)=>{
-        const v=Number(ans[idx]||0);
-        Object.keys(weights).forEach((rid)=>{
-          const base=v*(Number(weights[rid])||0);
-          const m=rolePriorityMultiplier(rid,priorityMult);
-          score[rid]+=base*m;
-        });
-      });
+      answers.q7=Array.isArray(A.q7)?A.q7.slice():[];
+      if(typeof window.computeDesignerPersonality!=="function"){
+        return {finalRole:"",finalDimension:"",scores:[],radarData:[]};
+      }
+      return window.computeDesignerPersonality(answers);
     }
 
-    function calcScores(){
-      const score={};
-      masters.forEach(m=>score[m.id]=30);
-      const needPriority=QUESTION_ORDER.some((qid)=>questionMapsToRoles(qid));
-      const priorityMult=needPriority?buildQ1PriorityMultipliers():null;
-      QUESTION_ORDER.forEach((qid)=>{
-        const q=CFG.questions[qid]||{};
-        if(!questionMapsToRoles(qid))return;
-        if(q.type==="single")applySingle(score,qid,A[qid],priorityMult);
-        if(q.type==="multi")applyMulti(score,qid,A[qid],priorityMult);
-        if(q.type==="rank"&&qid!=="q7")applyRank(score,qid,A[qid],priorityMult);
-        if(q.type==="score")applyScore(score,qid,Number(A[qid]),priorityMult);
-        if(q.type==="scale")applyScale(score,qid,priorityMult);
-      });
-      const vals=Object.values(score),mn=Math.min(...vals),mx=Math.max(...vals);
-      Object.keys(score).forEach(k=>score[k]=Math.round(60+((score[k]-mn)/(mx-mn||1))*37));
-      return score;
-    }
-
-    function submit(result){
+    function submit(result,personality){
       const answers={};
       QUESTION_ORDER.forEach((qid)=>{answers[qid]=A[qid]===undefined?"":A[qid];});
-      const q1Value=Array.isArray(A.q1)?(A.q1[0]||""):(A.q1||"");
+      /* 结果页心愿填空固定走 q12（resultOnly text），同时把补充调研题单独冗余一份方便数据分析 */
+      answers.q12=String(A.q12||"");
       const q11Arr=Array.isArray(A.q11)?A.q11.slice(0,3):[];
+      const q8Arr=Array.isArray(A.q8)?A.q8.slice(0,3):[];
       const d={
         answers,
-        q1_task_focus:q1Value,
+        q7_priority_order:Array.isArray(A.q7)?A.q7.slice():[],
+        q8_memory_top3:q8Arr,
+        q9_blocker:A.q9||"",
         q10_designer_type:A.q10||"",
         q11_ai_tools_top3:q11Arr,
         q12_ai_wish:String(A.q12||""),
         result_role_id:result&&result.id?result.id:"",
         result_role_name:result&&result.name?result.name:"",
+        result_dimension:(personality&&personality.finalDimension)||"",
+        personality_scores:(personality&&personality.scores)||[],
+        radar_data:(personality&&personality.radarData)||[],
+        wish:String(A.q12||""),
         timestamp:new Date().toISOString()
       };
-      d.answers.q12=String(A.q12||"");
       const arr=JSON.parse(localStorage.getItem("ardot_survey")||"[]");
       arr.push(d);
       latestSurveyIndex=arr.length-1;
@@ -1213,21 +1966,71 @@
       try{fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).catch(()=>{})}catch(e){}
     }
 
+    /* 通过计算模块返回的 finalRole 名匹配 CFG.roles 里的 role 对象 */
+    function roleByPersonalityName(name){
+      if(!name)return null;
+      return (CFG.roles||[]).find((r)=>r.name===name)||null;
+    }
+
     function renderResult(){
-      const sc=calcScores();
-      const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
-      const topId=sorted[0][0];
-      const m=masters.find(x=>x.id===topId);
-      document.getElementById("rImg").style.display="";
-      document.getElementById("wishBox").style.display="";
-      document.getElementById("othersTitle").style.display="";
-      document.getElementById("othersRow").style.display="";
-      document.getElementById("rImg").src=m.img;
-      document.getElementById("rName").textContent=m.name;
-      document.getElementById("rReal").textContent=m.real;
-      document.getElementById("rDesc").textContent=m.desc;
+      const personality=calcPersonalityResult();
+      const topRole=roleByPersonalityName(personality.finalRole)||(CFG.roles&&CFG.roles[0])||null;
+      if(!topRole){
+        return renderSurveyOnlyResult();
+      }
+      const rc=topRole.resultContent||{};
+      /* 顶部 */
+      const rImg=document.getElementById("rImg");if(rImg){rImg.style.display="";rImg.src=topRole.img;}
+      document.getElementById("rName").textContent=topRole.name;
+      document.getElementById("rReal").textContent=topRole.real||personality.finalDimension||"";
+
+      /* 暗格解读（大师点评） */
+      setText("rComment",rc.masterComment||"");
+
+      /* 性格标签 */
+      const tagEl=document.getElementById("rTags");
+      const tags=Array.isArray(rc.tags)&&rc.tags.length?rc.tags:[rc.archetype||"","被困："+(rc.stuck||""),rc.dimension||"","等待解锁"];
+      if(tagEl)tagEl.innerHTML=tags.slice(0,4).map(t=>`<div class="tag-pill">${t}</div>`).join("");
+
+      /* 选择解读：whyLines + 总结 */
+      const reading=document.getElementById("rReading");
+      if(reading){
+        const paras=[];
+        const why=Array.isArray(rc.whyLines)?rc.whyLines.join(""):"";
+        if(why)paras.push(`<p>${why}</p>`);
+        paras.push(`<p>这说明这个环节同时满足：你很希望 AI 介入；你当前处理起来不够顺；它最可能成为你的效率突破口。</p>`);
+        reading.innerHTML=paras.join("");
+      }
+
+      /* 副属性（两张卡片：大师的状态 / 你的状态） */
+      const subEl=document.getElementById("rSubStats");
+      const stateCards=[
+        {label:"大师的状态",val:rc.masterState||"—"},
+        {label:"你的状态",  val:rc.userState  ||"—"}
+      ];
+      if(subEl)subEl.innerHTML=stateCards.map(s=>`<div class="substat-card"><div class="substat-label">${s.label}</div><div class="substat-state">${s.val}</div></div>`).join("");
+
+      /* 魅力雷达 + 表格 */
+      renderRadarSvg("rRadar",personality);
+
+      /* 你缺的工具（解锁建议） */
+      const advEl=document.getElementById("rAdvice");
+      const advArr=Array.isArray(rc.advice)?rc.advice:[];
+      if(advEl)advEl.innerHTML=advArr.map(a=>`<li>${a}</li>`).join("");
+
+      /* 口头禅 2×2 */
+      const mtEl=document.getElementById("rMantras");
+      const mtArr=Array.isArray(rc.mantras)?rc.mantras:[];
+      if(mtEl)mtEl.innerHTML=mtArr.slice(0,4).map(m=>`<div class="mantra-pill">${(m||"").replace(/^[\u201C"]/,"").replace(/[\u201D"]$/,"")}</div>`).join("");
+
+      /* 结果页右下角"保存图片"悬浮按钮 + 绑定长按截图保存（兼容老交互） */
+      showSaveFab();
+      bindLongPressSave();
+
+      /* 心愿抽奖区 */
+      const wishBox=document.getElementById("wishBox");if(wishBox)wishBox.style.display="";
       const wishTitle=document.getElementById("wishTitle");
-      if(wishTitle)wishTitle.textContent=`从「${m.name}」到「${roleIdealName(m)}」`;
+      if(wishTitle)wishTitle.textContent=`从「${topRole.name}」到「${roleIdealName(topRole)}」`;
       const wishDesc=document.getElementById("wishDesc");
       const hasWish=String(A.q12||"").trim().length>0;
       if(wishDesc)wishDesc.textContent=hasWish?"你已填写需要的 AI 功能，可点击按钮参与抽奖":"请填写你需要的 AI 功能，提交后可参与抽奖";
@@ -1237,28 +2040,775 @@
         wishInput.value=String(A.q12||"");
         wishInput.oninput=()=>{A.q12=wishInput.value;};
       }
-      const others=sorted.slice(1,4);
-      document.getElementById("othersRow").innerHTML=others.map(([id,val])=>{
-        const mm=masters.find(x=>x.id===id);
-        return `<div class="other-card"><img src="${mm.img}" alt><div class="oc-name">${mm.name}</div><div class="oc-pct">${val}%</div></div>`;
-      }).join("");
-      latestResult={id:topId,name:m&&m.name?m.name:""};
+
+      latestResult={id:topRole.id,name:topRole.name||"",personality:personality};
       const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
       document.getElementById("res").classList.add("active");
       window.scrollTo({top:0,behavior:"smooth"});
-      return {id:topId,name:m&&m.name?m.name:""};
+      return {id:topRole.id,name:topRole.name||"",personality:personality};
+    }
+
+    /* 底部保存图：用 Canvas 生成一张含头像/名称/tagline/二维码（指向 H5 入口）的分享长图，展示给用户长按保存 */
+    /* ====== 右下角"保存图片"悬浮按钮 + 长按截图保存 ====== */
+    function showSaveFab(){
+      document.body.classList.add("show-save-fab");
+      const fab=document.getElementById("saveFab");
+      if(fab)fab.classList.add("visible"); /* 兼容旧类名 */
+    }
+    function hideSaveFab(){
+      document.body.classList.remove("show-save-fab");
+      const fab=document.getElementById("saveFab");
+      if(fab)fab.classList.remove("visible");
+    }
+    function setSaveFabLoading(on,txt){
+      const fab=document.getElementById("saveFab");
+      if(!fab)return;
+      const t=fab.querySelector(".save-fab-txt");
+      fab.classList.toggle("loading",!!on);
+      if(t)t.textContent=on?(txt||"生成中…"):"保存图片";
+    }
+
+    let __lpBound=false,__lpTimer=null,__lpStartY=0,__lpMoved=false;
+    function bindLongPressSave(){
+      if(__lpBound)return;
+      __lpBound=true;
+      const res=document.getElementById("res");
+      if(!res)return;
+      const shouldSkip=(target)=>{
+        /* 在按钮/链接/输入框/叠层上按下时不触发截图 */
+        return !!(target && target.closest && target.closest("button,a,input,textarea,select,.save-overlay,.wish-btn"));
+      };
+      /* 移动端：touchstart 长按 600ms */
+      res.addEventListener("touchstart",(e)=>{
+        if(shouldSkip(e.target))return;
+        __lpMoved=false;
+        __lpStartY=(e.touches&&e.touches[0]&&e.touches[0].clientY)||0;
+        clearTimeout(__lpTimer);
+        __lpTimer=setTimeout(()=>{
+          if(!__lpMoved)captureAndShowSave();
+        },600);
+      },{passive:true});
+      res.addEventListener("touchmove",(e)=>{
+        const y=(e.touches&&e.touches[0]&&e.touches[0].clientY)||0;
+        if(Math.abs(y-__lpStartY)>8){__lpMoved=true;clearTimeout(__lpTimer);}
+      },{passive:true});
+      res.addEventListener("touchend",()=>{clearTimeout(__lpTimer);});
+      res.addEventListener("touchcancel",()=>{clearTimeout(__lpTimer);});
+      /* 桌面端：右键菜单触发保存 */
+      res.addEventListener("contextmenu",(e)=>{
+        if(shouldSkip(e.target))return;
+        e.preventDefault();
+        captureAndShowSave();
+      });
+    }
+
+    let __capturing=false;
+    /* 生成截图：返回 Promise<{dataUrl, blob}> */
+    function captureResult(){
+      return new Promise((resolve,reject)=>{
+        if(typeof html2canvas!=="function"||window.__h2cFailed){
+          reject(new Error("截图组件加载失败"));return;
+        }
+        const res=document.getElementById("res");
+        if(!res){reject(new Error("结果区未就绪"));return;}
+        /* 临时隐藏右下角 FAB，避免入图 */
+        const hadFabClass=document.body.classList.contains("show-save-fab");
+        if(hadFabClass)document.body.classList.remove("show-save-fab");
+        /* 临时给结果区和 body 加干净白底，避免 bg.png 被截进去呈现"灰色" */
+        const prevResBg=res.style.background;
+        const prevBodyBg=document.body.style.background;
+        res.style.background="#ffffff";
+        document.body.style.background="#ffffff";
+        /* 强制结果区进入"动画完成态"，避免 html2canvas 拍到 opacity<1 的中间帧导致整张发灰 */
+        res.classList.add("capturing");
+        /* 截图时隐藏"心愿抽奖/输入框"和叠层等非海报元素，只保留分享海报主体 */
+        const hideSelectors=["#wishBox","#saveOverlay",".save-card",".others-title"];
+        const hiddenEls=[];
+        hideSelectors.forEach(sel=>{
+          res.querySelectorAll(sel).forEach(el=>{
+            /* 记录节点自身以及它最近的 .res-section 父容器（若存在），整体隐藏避免留下空白 */
+            const section=el.closest(".res-section");
+            const target=section||el;
+            if(hiddenEls.some(it=>it.el===target))return;
+            hiddenEls.push({el:target,display:target.style.display});
+            target.style.display="none";
+          });
+        });
+        const restoreBg=()=>{
+          res.style.background=prevResBg;
+          document.body.style.background=prevBodyBg;
+          res.classList.remove("capturing");
+          hiddenEls.forEach(it=>{it.el.style.display=it.display;});
+        };
+        html2canvas(res,{
+          backgroundColor:"#ffffff",
+          scale:Math.min(window.devicePixelRatio||1,2),
+          useCORS:true,
+          allowTaint:true,
+          logging:false,
+          windowWidth:document.documentElement.clientWidth
+        }).then((canvas)=>{
+          const dataUrl=canvas.toDataURL("image/png");
+          canvas.toBlob((blob)=>{
+            resolve({dataUrl:dataUrl,blob:blob});
+          },"image/png",0.95);
+        }).catch(reject).finally(()=>{
+          restoreBg();
+          if(hadFabClass)document.body.classList.add("show-save-fab");
+        });
+      });
+    }
+    function captureAndShowSave(){
+      if(__capturing)return;
+      __capturing=true;
+      setSaveFabLoading(true,"生成中…");
+      captureResult().then(({dataUrl})=>{
+        const overlay=document.getElementById("saveOverlay");
+        const img=document.getElementById("saveOverlayImg");
+        if(img)img.src=dataUrl;
+        if(overlay)overlay.hidden=false;
+        document.body.classList.add("save-overlay-open");
+        document.body.style.overflow="hidden";
+      }).catch((err)=>{
+        console.warn("截图失败",err);
+        alert(err&&err.message==="截图组件加载失败"?"截图组件加载失败，请检查网络后重试":"截图失败，请稍后再试");
+      }).finally(()=>{
+        __capturing=false;
+        setSaveFabLoading(false);
+      });
+    }
+
+    /* 点击右下角"保存图片"按钮：优先调起系统共享（可保存到相册），不支持则降级到 overlay */
+    function saveToAlbum(){
+      if(__capturing)return;
+      __capturing=true;
+      setSaveFabLoading(true,"生成中…");
+      const name=(document.getElementById("rName")&&document.getElementById("rName").textContent)||"AI设计师人格";
+      captureResult().then(({dataUrl,blob})=>{
+        /* 优先 Web Share API：iOS Safari / 现代 Android Chrome 支持，
+           用户可在共享菜单里选「存储图像 / 保存到相册」 */
+        if(blob&&navigator.canShare){
+          const file=new File([blob],`我的大师人格-${name}.png`,{type:"image/png"});
+          if(navigator.canShare({files:[file]})){
+            return navigator.share({files:[file],title:"我的 AI 设计师人格",text:"来看看我的大师人格～"})
+              .then(()=>{/* 分享面板里选「存储到照片」即完成保存 */})
+              .catch((e)=>{
+                /* 用户取消不算错误；否则降级到 overlay */
+                if(e&&e.name==="AbortError")return;
+                return fallbackOverlay(dataUrl);
+              });
+          }
+        }
+        /* 无 Web Share 能力：桌面直接下载；移动端无 share 能力时进入 overlay 提示长按图片保存 */
+        const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if(!isMobile){
+          triggerDownload(dataUrl,`我的大师人格-${name}.png`);
+          toast&&toast("已下载到本地");
+          return;
+        }
+        return fallbackOverlay(dataUrl);
+      }).catch((err)=>{
+        console.warn("保存失败",err);
+        alert("保存失败，请稍后再试");
+      }).finally(()=>{
+        __capturing=false;
+        setSaveFabLoading(false);
+      });
+    }
+    function fallbackOverlay(dataUrl){
+      const overlay=document.getElementById("saveOverlay");
+      const img=document.getElementById("saveOverlayImg");
+      if(img)img.src=dataUrl;
+      if(overlay)overlay.hidden=false;
+      document.body.classList.add("save-overlay-open");
+      document.body.style.overflow="hidden";
+    }
+    function triggerDownload(href,filename){
+      const a=document.createElement("a");
+      a.href=href;a.download=filename;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    }
+    /* overlay 内"分享"按钮：调起手机系统原生分享面板（Web Share API）
+       - 优先把海报图作为 File 分享出去（iOS/Android 原生面板会出现「信息 / 微信 / 朋友圈 / 存储到照片」等选项）
+       - 不支持文件分享时尝试仅分享文案 + 链接
+       - 浏览器完全不支持 navigator.share（如桌面端、微信内置浏览器）时，提示用户长按图片或点右边的下载 */
+    function shareSaveImage(){
+      const img=document.getElementById("saveOverlayImg");
+      if(!img||!img.src){alert("图片未就绪");return;}
+      const name=(document.getElementById("rName")&&document.getElementById("rName").textContent)||"AI设计师人格";
+      const fileName=`我的大师人格-${name}.png`;
+      const shareTitle="我的 AI 设计师人格";
+      const shareText="来看看我的大师人格～";
+
+      /* dataURL -> blob */
+      let blob=null,mime="image/png";
+      try{
+        const arr=img.src.split(",");
+        mime=(arr[0].match(/:(.*?);/)||[])[1]||"image/png";
+        const bstr=atob(arr[1]);let n=bstr.length;const u8=new Uint8Array(n);
+        while(n--){u8[n]=bstr.charCodeAt(n);}
+        blob=new Blob([u8],{type:mime});
+      }catch(e){/* ignore */}
+
+      /* ① 文件分享（最理想：系统面板里可选微信/朋友圈/信息/存储到照片…） */
+      if(blob&&navigator.canShare&&navigator.share){
+        try{
+          const file=new File([blob],fileName,{type:mime});
+          if(navigator.canShare({files:[file]})){
+            navigator.share({files:[file],title:shareTitle,text:shareText})
+              .catch((e)=>{
+                if(e&&e.name==="AbortError")return; // 用户主动取消
+                /* 文件分享失败再退化为文案分享 */
+                shareTextFallback(shareTitle,shareText);
+              });
+            return;
+          }
+        }catch(e){/* 继续走文案分享 */}
+      }
+
+      /* ② 仅文案分享（不支持文件时） */
+      if(navigator.share){
+        shareTextFallback(shareTitle,shareText);
+        return;
+      }
+
+      /* ③ 浏览器不支持 Web Share（桌面端 / 微信内置浏览器）：引导用户长按或下载 */
+      alert("当前环境不支持系统分享，\n可长按图片保存/转发，或点击「下载」按钮保存到相册。");
+    }
+
+    /* 仅分享文案（当文件分享不可用时） */
+    function shareTextFallback(title,text){
+      try{
+        navigator.share({title:title,text:text,url:location.href})
+          .catch((e)=>{
+            if(e&&e.name==="AbortError")return;
+            alert("分享失败，可长按图片或点击「下载」保存。");
+          });
+      }catch(e){
+        alert("当前环境不支持系统分享，可长按图片或点击「下载」保存。");
+      }
+    }
+
+    /* 通用：blob 文件下载（对 iOS Safari 友好，会触发系统"下载"菜单） */
+    function downloadBlob(blob,filename){
+      try{
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url;a.download=filename;a.rel="noopener";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>{
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        },1500);
+        toast&&toast("已开始下载，在系统菜单中可选择「存储到照片」");
+      }catch(e){
+        alert("请长按上方图片，在弹出的菜单中选择「存储图像 / 保存到相册」");
+      }
+    }
+
+    function closeSaveOverlay(){
+      const overlay=document.getElementById("saveOverlay");
+      if(overlay)overlay.hidden=true;
+      document.body.classList.remove("save-overlay-open");
+      document.body.style.overflow="";
+    }
+
+    function downloadSaveImage(){
+      const img=document.getElementById("saveOverlayImg");
+      if(!img||!img.src){alert("图片未就绪");return;}
+      const name=(document.getElementById("rName")&&document.getElementById("rName").textContent)||"AI设计师人格";
+      const fileName=`我的大师人格-${name}.png`;
+      /* dataURL -> blob，再通过 blob:URL 触发下载（iOS Safari 会弹"下载"面板，可存储到照片/文件） */
+      try{
+        const arr=img.src.split(",");
+        const mime=(arr[0].match(/:(.*?);/)||[])[1]||"image/png";
+        const bstr=atob(arr[1]);let n=bstr.length;const u8=new Uint8Array(n);
+        while(n--){u8[n]=bstr.charCodeAt(n);}
+        const blob=new Blob([u8],{type:mime});
+        downloadBlob(blob,fileName);
+      }catch(e){
+        /* 兜底：直接用 dataURL 触发 */
+        const a=document.createElement("a");
+        a.href=img.src;
+        a.download=fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    }
+
+    function renderShareCard(topRole,rc){
+      const imgEl=document.getElementById("rSaveImg");
+      if(!imgEl)return;
+      const link=getQuizEntryLink();
+      /* 异步生成 */
+      buildShareImage(topRole,rc,link).then((dataUrl)=>{
+        imgEl.src=dataUrl;
+      }).catch((err)=>{console.warn("生成分享图失败",err);});
+    }
+
+    function getQuizEntryLink(){
+      /* 问卷 H5 入口：当前页面的 URL 去掉 query/hash 作为入口 */
+      try{
+        const u=new URL(location.href);
+        u.search="";u.hash="";
+        return u.toString();
+      }catch(_){return location.origin+location.pathname;}
+    }
+
+    /* ====== 纯 JS QR Code 生成（Model 2 / ECC L，最小实现，支持中英文短链） ====== */
+    /* 参考：基于 Nayuki 算法的极简版 */
+    const QR=(function(){
+      function QRCode(text,ecc){
+        const segs=[{mode:4,data:toBytes(text),numChars:toBytes(text).length}]; /* byte mode */
+        for(let ver=1;ver<=40;ver++){
+          const cap=getNumDataCodewords(ver,ecc)*8;
+          const need=4+8+segs[0].numChars*8;
+          if(need<=cap){return encode(ver,ecc,segs);}
+        }
+        throw new Error("QR data too long");
+      }
+      function toBytes(s){const u=unescape(encodeURIComponent(s));const a=new Uint8Array(u.length);for(let i=0;i<u.length;i++)a[i]=u.charCodeAt(i);return a;}
+      const ECC_L=0,ECC_M=1,ECC_Q=2,ECC_H=3;
+      const ECC_CODEWORDS_PER_BLOCK=[
+        [-1,7,10,15,20,26,18,20,24,30,18,20,24,26,30,22,24,28,30,28,28,28,28,30,30,26,28,30,30,30,30,30,30,30,30,30,30,30,30,30,30],
+        [-1,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26,26,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28],
+        [-1,13,22,18,26,18,24,18,22,20,24,28,26,24,20,30,24,28,28,26,30,28,30,30,30,30,28,30,30,30,30,30,30,30,30,30,30,30,30,30,30],
+        [-1,17,28,22,16,22,28,26,26,24,28,24,28,22,24,24,30,28,28,26,28,30,24,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30]
+      ];
+      const NUM_ERROR_CORRECTION_BLOCKS=[
+        [-1,1,1,1,1,1,2,2,2,2,4,4,4,4,4,6,6,6,6,7,8,8,9,9,10,12,12,13,14,15,16,17,18,19,19,20,21,22,24,25],
+        [-1,1,1,1,2,2,4,4,4,5,5,5,8,9,9,10,10,11,13,14,16,17,17,18,20,21,23,25,26,28,29,31,33,35,37,38,40,43,45,47,49],
+        [-1,1,1,2,2,4,4,6,6,8,8,8,10,12,16,12,17,16,18,21,20,23,23,25,27,29,34,34,35,38,40,43,45,48,51,53,56,59,62,65,68],
+        [-1,1,1,2,4,4,4,5,6,8,8,11,11,16,16,18,16,19,21,25,25,25,34,30,32,35,37,40,42,45,48,51,54,57,60,63,66,70,74,77,81]
+      ];
+      function getNumRawDataModules(ver){
+        let r=(16*ver+128)*ver+64;
+        if(ver>=2){const n=Math.floor(ver/7)+2;r-=(25*n-10)*n-55;if(ver>=7)r-=36;}
+        return r;
+      }
+      function getNumDataCodewords(ver,ecc){
+        return Math.floor(getNumRawDataModules(ver)/8)-ECC_CODEWORDS_PER_BLOCK[ecc][ver]*NUM_ERROR_CORRECTION_BLOCKS[ecc][ver];
+      }
+      function encode(ver,ecc,segs){
+        const bits=[];
+        for(const seg of segs){
+          appendBits(seg.mode,4,bits);
+          appendBits(seg.numChars,8,bits);
+          for(const b of seg.data)appendBits(b,8,bits);
+        }
+        const dataCodewords=Math.floor(getNumRawDataModules(ver)/8)-ECC_CODEWORDS_PER_BLOCK[ecc][ver]*NUM_ERROR_CORRECTION_BLOCKS[ecc][ver];
+        appendBits(0,Math.min(4,dataCodewords*8-bits.length),bits);
+        appendBits(0,(8-bits.length%8)%8,bits);
+        for(let pad=0xEC;bits.length<dataCodewords*8;pad^=0xEC^0x11)appendBits(pad,8,bits);
+        const dataBytes=new Uint8Array(bits.length/8);
+        for(let i=0;i<bits.length;i++)dataBytes[i>>>3]|=bits[i]<<(7-(i&7));
+        const allCodewords=addEccAndInterleave(dataBytes,ver,ecc);
+        return drawMatrix(ver,ecc,allCodewords);
+      }
+      function appendBits(val,len,arr){for(let i=len-1;i>=0;i--)arr.push((val>>>i)&1);}
+      function addEccAndInterleave(data,ver,ecc){
+        const numBlocks=NUM_ERROR_CORRECTION_BLOCKS[ecc][ver];
+        const blockEccLen=ECC_CODEWORDS_PER_BLOCK[ecc][ver];
+        const rawCodewords=Math.floor(getNumRawDataModules(ver)/8);
+        const numShortBlocks=numBlocks-rawCodewords%numBlocks;
+        const shortBlockLen=Math.floor(rawCodewords/numBlocks);
+        const blocks=[];
+        const rsDiv=reedSolomonComputeDivisor(blockEccLen);
+        let k=0;
+        for(let i=0;i<numBlocks;i++){
+          const dat=data.slice(k,k+shortBlockLen-blockEccLen+(i<numShortBlocks?0:1));
+          k+=dat.length;
+          const ecc=reedSolomonComputeRemainder(dat,rsDiv);
+          const block=new Uint8Array(shortBlockLen+1);
+          block.set(dat,0);
+          if(i<numShortBlocks)block[shortBlockLen-blockEccLen]=0;
+          block.set(ecc,block.length-blockEccLen);
+          blocks.push(block);
+        }
+        const result=new Uint8Array(rawCodewords);
+        let idx=0;
+        for(let i=0;i<blocks[0].length;i++){
+          for(let j=0;j<blocks.length;j++){
+            if(i!==shortBlockLen-blockEccLen||j>=numShortBlocks){
+              result[idx++]=blocks[j][i];
+            }
+          }
+        }
+        return result;
+      }
+      function reedSolomonComputeDivisor(degree){
+        const result=new Uint8Array(degree);result[degree-1]=1;
+        let root=1;
+        for(let i=0;i<degree;i++){
+          for(let j=0;j<degree;j++){
+            result[j]=reedSolomonMultiply(result[j],root);
+            if(j+1<degree)result[j]^=result[j+1];
+          }
+          root=reedSolomonMultiply(root,0x02);
+        }
+        return result;
+      }
+      function reedSolomonComputeRemainder(data,divisor){
+        const result=new Uint8Array(divisor.length);
+        for(const b of data){
+          const factor=b^result[0];
+          result.copyWithin(0,1);result[result.length-1]=0;
+          for(let j=0;j<result.length;j++)result[j]^=reedSolomonMultiply(divisor[j],factor);
+        }
+        return result;
+      }
+      function reedSolomonMultiply(x,y){
+        let z=0;
+        for(let i=7;i>=0;i--){
+          z=(z<<1)^((z>>>7)*0x11D);
+          z^=((y>>>i)&1)*x;
+        }
+        return z&0xff;
+      }
+      function drawMatrix(ver,ecc,data){
+        const size=ver*4+17;
+        const modules=[];const isFunction=[];
+        for(let i=0;i<size;i++){modules.push(new Uint8Array(size));isFunction.push(new Uint8Array(size));}
+        /* function patterns */
+        drawFinder(modules,isFunction,size,3,3);
+        drawFinder(modules,isFunction,size,size-4,3);
+        drawFinder(modules,isFunction,size,3,size-4);
+        const alignPos=getAlignmentPatternPositions(ver);
+        for(let i=0;i<alignPos.length;i++)for(let j=0;j<alignPos.length;j++){
+          if(!((i===0&&j===0)||(i===0&&j===alignPos.length-1)||(i===alignPos.length-1&&j===0)))
+            drawAlignment(modules,isFunction,alignPos[i],alignPos[j]);
+        }
+        for(let i=0;i<size;i++){
+          setFunc(modules,isFunction,6,i,i%2===0?1:0);
+          setFunc(modules,isFunction,i,6,i%2===0?1:0);
+        }
+        /* format & version info placeholders */
+        drawFormatBits(modules,isFunction,size,ecc,0);
+        if(ver>=7)drawVersion(modules,isFunction,size,ver);
+        /* data */
+        drawCodewords(modules,isFunction,size,data);
+        /* mask: try all 8, pick lowest penalty */
+        let bestMask=0,minPen=1e9;
+        for(let m=0;m<8;m++){
+          applyMask(modules,isFunction,size,m);
+          drawFormatBits(modules,isFunction,size,ecc,m);
+          const p=penalty(modules,size);
+          if(p<minPen){minPen=p;bestMask=m;}
+          applyMask(modules,isFunction,size,m);
+        }
+        applyMask(modules,isFunction,size,bestMask);
+        drawFormatBits(modules,isFunction,size,ecc,bestMask);
+        return {size:size,modules:modules};
+      }
+      function setFunc(modules,isFunction,x,y,v){modules[y][x]=v;isFunction[y][x]=1;}
+      function drawFinder(modules,isFunction,size,x,y){
+        for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){
+          const xx=x+dx,yy=y+dy;if(xx<0||xx>=size||yy<0||yy>=size)continue;
+          const d=Math.max(Math.abs(dx),Math.abs(dy));
+          setFunc(modules,isFunction,xx,yy,(d!==2&&d!==4)?1:0);
+        }
+      }
+      function drawAlignment(modules,isFunction,x,y){
+        for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+          const d=Math.max(Math.abs(dx),Math.abs(dy));
+          setFunc(modules,isFunction,x+dx,y+dy,d!==1?1:0);
+        }
+      }
+      function getAlignmentPatternPositions(ver){
+        if(ver===1)return[];
+        const numAlign=Math.floor(ver/7)+2;
+        const step=(ver===32)?26:Math.ceil((ver*4+4)/(numAlign*2-2))*2;
+        const result=[6];
+        for(let pos=ver*4+10;result.length<numAlign;pos-=step)result.splice(1,0,pos);
+        return result;
+      }
+      function drawFormatBits(modules,isFunction,size,ecc,mask){
+        const eccBits=[1,0,3,2][ecc];
+        const data=(eccBits<<3)|mask;
+        let rem=data;
+        for(let i=0;i<10;i++)rem=(rem<<1)^((rem>>>9)*0x537);
+        const bits=((data<<10)|rem)^0x5412;
+        for(let i=0;i<=5;i++)setFunc(modules,isFunction,8,i,(bits>>>i)&1);
+        setFunc(modules,isFunction,8,7,(bits>>>6)&1);
+        setFunc(modules,isFunction,8,8,(bits>>>7)&1);
+        setFunc(modules,isFunction,7,8,(bits>>>8)&1);
+        for(let i=9;i<15;i++)setFunc(modules,isFunction,14-i,8,(bits>>>i)&1);
+        for(let i=0;i<8;i++)setFunc(modules,isFunction,size-1-i,8,(bits>>>i)&1);
+        for(let i=8;i<15;i++)setFunc(modules,isFunction,8,size-15+i,(bits>>>i)&1);
+        setFunc(modules,isFunction,8,size-8,1);
+      }
+      function drawVersion(modules,isFunction,size,ver){
+        let rem=ver;
+        for(let i=0;i<12;i++)rem=(rem<<1)^((rem>>>11)*0x1F25);
+        const bits=(ver<<12)|rem;
+        for(let i=0;i<18;i++){
+          const bit=(bits>>>i)&1;
+          const a=size-11+i%3,b=Math.floor(i/3);
+          setFunc(modules,isFunction,a,b,bit);
+          setFunc(modules,isFunction,b,a,bit);
+        }
+      }
+      function drawCodewords(modules,isFunction,size,data){
+        let i=0;
+        for(let right=size-1;right>=1;right-=2){
+          if(right===6)right=5;
+          for(let vert=0;vert<size;vert++){
+            for(let j=0;j<2;j++){
+              const x=right-j;
+              const upward=((right+1)&2)===0;
+              const y=upward?size-1-vert:vert;
+              if(!isFunction[y][x]&&i<data.length*8){
+                modules[y][x]=(data[i>>>3]>>>(7-(i&7)))&1;
+                i++;
+              }
+            }
+          }
+        }
+      }
+      function applyMask(modules,isFunction,size,mask){
+        for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+          if(isFunction[y][x])continue;
+          let invert;
+          switch(mask){
+            case 0:invert=(x+y)%2===0;break;
+            case 1:invert=y%2===0;break;
+            case 2:invert=x%3===0;break;
+            case 3:invert=(x+y)%3===0;break;
+            case 4:invert=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;
+            case 5:invert=(x*y)%2+(x*y)%3===0;break;
+            case 6:invert=((x*y)%2+(x*y)%3)%2===0;break;
+            case 7:invert=((x+y)%2+(x*y)%3)%2===0;break;
+          }
+          if(invert)modules[y][x]^=1;
+        }
+      }
+      function penalty(modules,size){
+        let p=0;
+        for(let y=0;y<size;y++){let run=1;for(let x=1;x<size;x++){if(modules[y][x]===modules[y][x-1]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+        for(let x=0;x<size;x++){let run=1;for(let y=1;y<size;y++){if(modules[y][x]===modules[y-1][x]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+        for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=modules[y][x];if(c===modules[y][x+1]&&c===modules[y+1][x]&&c===modules[y+1][x+1])p+=3;}
+        let dark=0;for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(modules[y][x])dark++;
+        const total=size*size;const k=Math.ceil(Math.abs(dark*20-total*10)/total)-1;
+        p+=k*10;
+        return p;
+      }
+      return {encode:function(text){return QRCode(text,ECC_L);}};
+    })();
+
+    /* 把 QR 模块矩阵画到 canvas 上 */
+    function drawQrToCanvas(ctx,qr,ox,oy,size,quietZone){
+      const scale=Math.floor(size/(qr.size+(quietZone?8:0)));
+      const pad=quietZone?scale*4:0;
+      ctx.fillStyle="#fff";
+      ctx.fillRect(ox,oy,size,size);
+      ctx.fillStyle="#1a1a2e";
+      for(let y=0;y<qr.size;y++)for(let x=0;x<qr.size;x++){
+        if(qr.modules[y][x]){
+          ctx.fillRect(ox+pad+x*scale,oy+pad+y*scale,scale,scale);
+        }
+      }
+    }
+
+    /* 构建分享图：Canvas -> dataURL */
+    function buildShareImage(topRole,rc,link){
+      return new Promise((resolve,reject)=>{
+        const W=720,H=1040; /* 2x 分辨率 */
+        const canvas=document.createElement("canvas");
+        canvas.width=W;canvas.height=H;
+        const ctx=canvas.getContext("2d");
+        /* 背景（米色） */
+        ctx.fillStyle="#f6f1e7";
+        ctx.fillRect(0,0,W,H);
+        /* 顶部卡片 */
+        roundRect(ctx,24,24,W-48,H-48,28,"#fff","#ece4d2");
+
+        const avatarSrc=topRole&&topRole.img?topRole.img:"";
+        const loadImg=(src)=>new Promise((res,rej)=>{
+          if(!src)return res(null);
+          const img=new Image();img.crossOrigin="anonymous";
+          img.onload=()=>res(img);img.onerror=()=>res(null);
+          img.src=src;
+        });
+        loadImg(avatarSrc).then((img)=>{
+          /* 头像相框 */
+          const afW=240,afH=240,afX=(W-afW)/2,afY=64;
+          roundRect(ctx,afX,afY,afW,afH,24,"#fff","#d9cdb3",2);
+          if(img){
+            ctx.save();
+            roundClip(ctx,afX+16,afY+16,afW-32,afH-32,16);
+            const iw=img.naturalWidth,ih=img.naturalHeight;
+            const r=Math.max((afW-32)/iw,(afH-32)/ih);
+            const dw=iw*r,dh=ih*r;
+            ctx.drawImage(img,afX+16+((afW-32)-dw)/2,afY+16+((afH-32)-dh)/2,dw,dh);
+            ctx.restore();
+          }
+          /* 名称 */
+          ctx.fillStyle="#1a1a2e";
+          ctx.textAlign="center";
+          ctx.font="900 56px Georgia,\"Times New Roman\",serif";
+          ctx.fillText(topRole.name||"",W/2,afY+afH+72);
+          /* 副标题 */
+          ctx.fillStyle="#8a7658";
+          ctx.font="500 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText(topRole.real||"",W/2,afY+afH+108);
+          /* tagline 卡 */
+          const tagY=afY+afH+144,tagH=120;
+          roundRect(ctx,56,tagY,W-112,tagH,18,"#faf4e7","#ece4d2");
+          /* 引号 */
+          ctx.fillStyle="#c89a4a";
+          ctx.font="700 44px Georgia,serif";
+          ctx.textAlign="left";
+          ctx.fillText("\u201C",80,tagY+44);
+          /* 文案 */
+          ctx.fillStyle="#5a5245";
+          ctx.font="500 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          wrapText(ctx,rc.tagline||topRole.desc||"",120,tagY+42,W-180,32);
+
+          /* 二维码区域（底部） */
+          const qrSize=220;
+          const qrX=64,qrY=H-qrSize-120;
+          try{
+            const qr=QR.encode(link);
+            drawQrToCanvas(ctx,qr,qrX,qrY,qrSize,true);
+          }catch(err){console.warn("QR encode 失败",err);}
+          /* 二维码说明 */
+          ctx.fillStyle="#1a1a2e";
+          ctx.textAlign="left";
+          ctx.font="700 28px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("扫码测测你的本命大师",qrX+qrSize+24,qrY+60);
+          ctx.fillStyle="#8a7658";
+          ctx.font="500 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("6 个维度 · 2 分钟 · AI 解锁指数",qrX+qrSize+24,qrY+98);
+          ctx.fillStyle="#c89a4a";
+          ctx.font="700 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("长按识别二维码",qrX+qrSize+24,qrY+qrSize-20);
+          /* 底部 brand */
+          ctx.fillStyle="#8a7658";
+          ctx.textAlign="center";
+          ctx.font="500 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("ARDOT · 你的 AI 设计本命诊断",W/2,H-58);
+
+          try{resolve(canvas.toDataURL("image/png"));}
+          catch(e){reject(e);}
+        }).catch(reject);
+      });
+    }
+
+    function roundRect(ctx,x,y,w,h,r,fill,stroke,strokeW){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+      if(fill){ctx.fillStyle=fill;ctx.fill();}
+      if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=strokeW||1;ctx.stroke();}
+    }
+    function roundClip(ctx,x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.clip();
+    }
+    function wrapText(ctx,text,x,y,maxW,lineH){
+      const chars=(text||"").split("");
+      let line="",yy=y;
+      for(let i=0;i<chars.length;i++){
+        const test=line+chars[i];
+        if(ctx.measureText(test).width>maxW&&line){
+          ctx.fillText(line,x,yy);line=chars[i];yy+=lineH;
+        }else{line=test;}
+      }
+      if(line)ctx.fillText(line,x,yy);
+    }
+
+    function setText(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt||"";}
+
+    /* 6 维雷达图（纯 SVG，移动端友好） */
+    function renderRadarSvg(hostId,personality){
+      const host=document.getElementById(hostId);
+      if(!host)return;
+      const dims=(personality&&personality.radarData)||[];
+      if(!dims.length){host.innerHTML="";return;}
+      const SIZE=320,CX=SIZE/2,CY=SIZE/2,R=100;
+      const n=dims.length;
+      /* 轴端点坐标（起点在正上方 -90°） */
+      function axisPt(i,rr){
+        const a=-Math.PI/2 + (Math.PI*2*i)/n;
+        return [CX+Math.cos(a)*rr, CY+Math.sin(a)*rr];
+      }
+      /* 背景网格（4 圈） */
+      const rings=[];
+      for(let k=1;k<=4;k++){
+        const rr=R*k/4;
+        const pts=[];
+        for(let i=0;i<n;i++){pts.push(axisPt(i,rr).join(","));}
+        rings.push(`<polygon class="r-grid" points="${pts.join(" ")}"/>`);
+      }
+      /* 轴线 */
+      const axes=[];
+      for(let i=0;i<n;i++){
+        const [x,y]=axisPt(i,R);
+        axes.push(`<line class="r-axis" x1="${CX}" y1="${CY}" x2="${x}" y2="${y}"/>`);
+      }
+      /* 数据多边形 */
+      const dataPts=dims.map((d,i)=>{
+        const v=Math.max(0,Math.min(100,Number(d.value)||0));
+        return axisPt(i,R*v/100);
+      });
+      const areaPts=dataPts.map(p=>p.join(",")).join(" ");
+      /* 数据点 */
+      const dots=dataPts.map((p)=>`<circle class="r-point" cx="${p[0]}" cy="${p[1]}" r="3.5"/>`).join("");
+      /* 轴标签（维度名 + 百分比） */
+      const labels=dims.map((d,i)=>{
+        const [lx,ly]=axisPt(i,R+22);
+        const pct=Math.max(0,Math.min(100,Number(d.value)||0));
+        /* 根据方位调 text-anchor */
+        const ang=-Math.PI/2 + (Math.PI*2*i)/n;
+        const cos=Math.cos(ang),sin=Math.sin(ang);
+        let anchor="middle";
+        if(cos>0.3)anchor="start";
+        else if(cos<-0.3)anchor="end";
+        let dy=0;
+        if(sin<-0.5)dy=-4;else if(sin>0.5)dy=12;else dy=4;
+        return `<text class="r-label" x="${lx}" y="${ly+dy}" text-anchor="${anchor}">${d.dimension}</text>
+                <text class="r-label-pct" x="${lx}" y="${ly+dy+14}" text-anchor="${anchor}">${pct}%</text>`;
+      }).join("");
+      host.innerHTML=`<svg class="radar-svg" viewBox="0 0 ${SIZE} ${SIZE}" aria-hidden="true">
+        ${rings.join("")}
+        ${axes.join("")}
+        <polygon class="r-area" points="${areaPts}"/>
+        ${dots}
+        ${labels}
+      </svg>`;
+    }
+
+    /* 6 维解锁指数表格：按 radarValue 从大到小；最高行高亮 */
+    function renderDimTable(tableId,personality,topRole){
+      const tbody=document.querySelector("#"+tableId+" tbody");
+      if(!tbody)return;
+      const scores=(personality&&personality.scores)||[];
+      const sorted=scores.slice().sort((a,b)=>{
+        if(b.radarValue!==a.radarValue)return b.radarValue-a.radarValue;
+        return (b.finalScore||0)-(a.finalScore||0);
+      });
+      const topName=topRole&&topRole.name?topRole.name:"";
+      tbody.innerHTML=sorted.map((s)=>{
+        const pct=Number.isFinite(s.radarValue)?s.radarValue:0;
+        const isTop=(s.role===topName);
+        return `<tr class="${isTop?"top":""}"><td>${s.dimensionName||s.dimensionId||""}</td><td>${pct}%</td></tr>`;
+      }).join("");
     }
 
     function renderSurveyOnlyResult(){
-      document.getElementById("rImg").style.display="none";
-      document.getElementById("wishBox").style.display="none";
-      document.getElementById("othersTitle").style.display="none";
-      document.getElementById("othersRow").style.display="none";
+      /* 仅调研模式：移除全部 .res-section 和 tagline，只保留头像框 + 名称占位 */
+      document.querySelectorAll(".res-section").forEach((el)=>el.remove());
+      const tagWrap=document.querySelector(".res-tagline-wrap");if(tagWrap)tagWrap.remove();
+      const rImg=document.getElementById("rImg");if(rImg)rImg.style.display="none";
+      const frame=document.querySelector(".res-avatar-frame");if(frame)frame.style.display="none";
       document.getElementById("rName").textContent="问卷已提交";
       document.getElementById("rReal").textContent="感谢你的参与";
-      document.getElementById("rDesc").textContent="当前为普通问卷收集模式，本次不展示测试结果反馈。";
       latestResult={id:"",name:"问卷用户"};
-      const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
       document.getElementById("res").classList.add("active");
       window.scrollTo({top:0,behavior:"smooth"});
       return {id:"",name:""};
@@ -1266,16 +2816,20 @@
 
     function roleIdealName(role){
       const byId={
-        pica:"毕加索",
-        mona:"莫奈",
-        dali:"达利",
-        slow:"唐纳德"
+        d1:"毕加索",
+        d2:"原研哉",
+        d3:"蒙德里安",
+        d4:"草间弥生",
+        d5:"梵高",
+        d6:"莫奈"
       };
       const byName={
-        "毕加班索":"毕加索",
-        "莫奈何":"莫奈",
-        "达利谱":"达利",
-        "唐纳德诺慢":"唐纳德"
+        "草稿太多的毕加班索":"毕加索",
+        "还在抠图的原研灾":"原研哉",
+        "对不齐的蒙得里不安":"蒙德里安",
+        "复制到崩溃的草间弥死":"草间弥生",
+        "风格断片的梵稿":"梵高",
+        "睡莲迁移失败的莫奈何":"莫奈"
       };
       if(role&&role.id&&byId[role.id])return byId[role.id];
       const raw=role&&role.name?String(role.name):"";
@@ -1309,6 +2863,7 @@
         if(!surveyArr[idx].answers||typeof surveyArr[idx].answers!=="object")surveyArr[idx].answers={};
         surveyArr[idx].answers.q12=text;
         surveyArr[idx].q12_ai_wish=text;
+        surveyArr[idx].wish=text;
         localStorage.setItem("ardot_survey",JSON.stringify(surveyArr));
       }
       if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
@@ -1324,33 +2879,109 @@
       setTimeout(()=>{
         document.getElementById("ld").classList.remove("active");
         const result=FEEDBACK_ENABLED ? renderResult() : renderSurveyOnlyResult();
-        submit(result);
+        submit(result,result&&result.personality);
         document.getElementById("bar").style.width="100%";
       },2200);
     }
 
     function share(){
-      var n=document.getElementById("rName").textContent;
       var roleId=(latestResult&&latestResult.id)||"";
-      var txt="我在 AI 时代的设计生存状态是「"+n+"」，你也来测测看。";
-      // 构造带角色参数的分享链接，朋友打开时可展示"TA 的结果是 XXX"
-      var shareLink=location.origin+location.pathname.replace(/[^\/]*$/,"")+"quiz-h5.html"+(roleId?("?from="+encodeURIComponent(roleId)):"");
-      var shareImg=document.getElementById("rImg").src||"https://ardot-quiz.edgeone.dev/img/picasso.png";
-      // 更新分享卡片 meta（部分社交平台会重读）
-      updateShareMeta({title:"我是「"+n+"」型设计师",desc:txt,img:shareImg,link:shareLink});
-      // 微信环境：尝试通过 JSSDK 更新分享内容（需后端签名）；未签名或失败 → 弹出引导遮罩
+      /* 分享卡片使用问卷调研自身的标题/副标题/首页海报（不带角色结果），吸引朋友进来做测试 */
+      var title="好险，差点就做完了";
+      // 题数 & 预计时长（按每题约 20 秒估算，向上取整，最少 1 分钟）
+      var qCount=(typeof T==="number"&&T>0)?T:((typeof QUESTION_ORDER!=="undefined"&&QUESTION_ORDER&&QUESTION_ORDER.length)||11);
+      var estMin=Math.max(1,Math.ceil(qCount*20/60));
+      var txt="测一测你是哪位还没下班的设计大师 · 共 "+qCount+" 题 · 预计 "+estMin+" 分钟";
+      // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
+      //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=poster-share.jpg
+      //  - 结果页（有 roleId）：指向 share-<roleId>.html 这类专属中转页，每个页面的 <head>
+      //    og:image 写死对应角色图。真实用户打开后被 location.replace 立即跳回 quiz-h5.html，
+      //    朋友进来依然落到问卷首页；微信爬虫只读 head、不跟随跳转，所以卡片缩略图 = 角色图。
+      // v 参数是静态构建号，改版 meta/分享图时递增即可让微信/社交平台重新抓取缓存
+      var SHARE_BUILD="20260426b";
+      var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
+      var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
+      var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
+      // 分享卡片图（供 H5 原生面板 / 朋友圈 JSSDK 即时使用；微信右上角会读 URL 对应 html 的 <head>）：
+      //  - 已到结果页（有 roleId）：用当前结果角色图（rImg）
+      //  - 还没到结果页（封面/答题中）：用首页海报压缩版 poster-share.jpg（<300K，避免微信丢图）
+      var posterImg=baseDir+"img/poster-share.jpg";
+      var rImgEl=document.getElementById("rImg");
+      var shareImg=(roleId&&rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
+      // 更新分享卡片 meta（社交平台/微信会重读）
+      updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
+
+      // ① 微信内置浏览器：Web Share API 被屏蔽，只能用 JSSDK + 引导右上角
       if(window.__IS_WX__){
-        var ok=tryUpdateWxShare({title:"我是「"+n+"」型设计师 — AI时代设计生存状态",desc:txt,link:shareLink,imgUrl:shareImg});
+        tryUpdateWxShare({title:title,desc:txt,link:shareLink,imgUrl:shareImg});
         showShareMask();
-        if(!ok){/* 未接入 JSSDK 签名时，用户手动点右上角，分享出去的标题/图会由微信读取当前页 meta */}
         return;
       }
-      // 非微信：复制链接到剪贴板
+
+      // ② 非微信：直接调起手机系统原生分享面板（iOS/Android 都支持）
+      //    优先把结果角色图作为文件一并分享；失败或不支持文件分享时退化为仅分享链接+文案
+      if(navigator.share){
+        tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
+          // 带图失败 → 退化到仅分享链接+文案
+          shareTextOnly(title,txt,shareLink);
+        });
+        return;
+      }
+
+      // ③ 完全不支持 Web Share：复制链接到剪贴板 + 提示粘贴到微信
+      fallbackCopyLink(txt,shareLink);
+    }
+
+    /* 原生分享：用传入的 shareImg 作为分享图（优先结果角色图，兜底首页海报） */
+    function tryShareWithImage(title,txt,shareLink,shareImg){
+      return new Promise(function(resolve,reject){
+        if(!navigator.canShare||!navigator.share)return reject();
+        var imgUrl=shareImg||"img/poster-share.jpg";
+        var tipToast=typeof toast==="function"?toast("正在准备分享…"):null;
+        // 拉取分享图作为文件（同源 public 资源，fetch 无跨域问题）
+        fetch(imgUrl,{cache:"force-cache"}).then(function(r){
+          if(!r||!r.ok)throw new Error("share img fetch failed");
+          return r.blob();
+        }).then(function(blob){
+          if(!blob)return reject();
+          var file=new File([blob],"ai-designer-quiz.png",{type:blob.type||"image/png"});
+          var payload={files:[file],title:title,text:txt+"\n"+shareLink};
+          if(!navigator.canShare(payload))return reject();
+          navigator.share(payload).then(resolve).catch(function(e){
+            if(e&&e.name==="AbortError")return resolve(); // 用户取消算正常
+            reject(e);
+          });
+        }).catch(reject);
+      });
+    }
+
+    /* 仅分享文案+链接（系统面板里会把链接做成小卡片） */
+    function shareTextOnly(title,txt,shareLink){
+      navigator.share({title:title,text:txt,url:shareLink})
+        .catch(function(e){
+          if(e&&e.name==="AbortError")return; // 用户取消
+          fallbackCopyLink(txt,shareLink);
+        });
+    }
+    function fallbackCopyLink(txt,shareLink){
       var fallback=txt+" "+shareLink;
       if(navigator.clipboard&&navigator.clipboard.writeText){
-        navigator.clipboard.writeText(fallback).then(function(){toast("已复制分享链接")},function(){toast("复制失败，请长按链接复制")});
+        navigator.clipboard.writeText(fallback).then(
+          function(){toast("链接已复制，打开微信粘贴发送给好友")},
+          function(){toast("复制失败，请长按链接手动复制")}
+        );
       }else{
-        toast("请长按页面分享");
+        // 兜底：选中 textarea 再 execCommand("copy")
+        try{
+          var ta=document.createElement("textarea");
+          ta.value=fallback;ta.style.position="fixed";ta.style.opacity="0";
+          document.body.appendChild(ta);ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          toast("链接已复制，打开微信粘贴发送给好友");
+        }catch(e){
+          toast("请长按链接复制后到微信分享");
+        }
       }
     }
 
@@ -1444,14 +3075,134 @@
       }catch(e){}
     })();
 
+    /* =========================================================
+     * AI 设计人格测试：6 维 × 6 角色 结果计算
+     * - Q1–Q6：ABCD=1/2/3/4 → PainScore[D1–D6]
+     * - Q7   ：六选项完整排序 → 权重 6/21,5/21,4/21,3/21,2/21,1/21
+     * - FinalScore[D] = PainScore[D] × Q7Weight[D]
+     * - FinalRole    = FinalScore 最高的维度
+     *   并列规则：1) Q7 排名更靠前  2) PainScore 更高  3) D1→D6 顺序
+     * - RadarValue[D] = FinalScore[D] / Max(FinalScore) × 100
+     * 入参 answers 格式：
+     *   {
+     *     q1:"A"|"B"|"C"|"D", ..., q6:"A".."D",
+     *     q7:[Q7选项key数组，顺序=排名]  // key 可以是 1..6 / "1".."6" / "A".."F"
+     *   }
+     * 返回结构见用户需求的 JSON。
+     * ========================================================= */
+    (function(){
+      var DIMENSIONS=[
+        {id:"D1",name:"灵感发散与筛选",role:"草稿太多的毕加班索"},
+        {id:"D2",name:"图像与素材处理",role:"还在抠图的原研灾"},
+        {id:"D3",name:"版式与结构处理",role:"对不齐的蒙得里不安"},
+        {id:"D4",name:"重复执行与批量操作",role:"复制到崩溃的草间弥死"},
+        {id:"D5",name:"项目上下文管理",role:"风格断片的梵稿"},
+        {id:"D6",name:"工作流衔接",role:"睡莲迁移失败的莫奈何"}
+      ];
+      /* Q7 选项 key → 维度 index（0-based，对应 DIMENSIONS）
+         同时兼容数字 key（"1".."6"）和字母 key（"A".."F"），方便不同配置源。 */
+      var Q7_KEY_TO_DIM_INDEX={
+        "1":0,"2":1,"3":2,"4":3,"5":4,"6":5,
+        "A":0,"B":1,"C":2,"D":3,"E":4,"F":5
+      };
+      var Q7_WEIGHTS=[6/21,5/21,4/21,3/21,2/21,1/21];
+      var PAIN_OPTION_SCORE={A:1,B:2,C:3,D:4};
+
+      function painScoreOf(val){
+        /* 兼容 "A"/"a"/1/"1" 多种写法 */
+        if(val==null)return 0;
+        var s=String(val).trim().toUpperCase();
+        if(PAIN_OPTION_SCORE[s]!=null)return PAIN_OPTION_SCORE[s];
+        var n=Number(s);
+        if(Number.isFinite(n)&&n>=1&&n<=4)return n;
+        return 0;
+      }
+      function normalizeQ7(order){
+        /* 把用户提交的排序归一成"长度为 6、每个元素是维度 index(0..5)"的数组。
+           未出现的维度按 D1→D6 的顺序补到末尾，保证总长为 6。 */
+        var out=[];
+        var seen={};
+        (Array.isArray(order)?order:[]).forEach(function(k){
+          var idx=Q7_KEY_TO_DIM_INDEX[String(k).trim().toUpperCase()];
+          if(idx==null||seen[idx])return;
+          seen[idx]=true;
+          out.push(idx);
+        });
+        for(var i=0;i<6;i++){if(!seen[i]){seen[i]=true;out.push(i);}}
+        return out;
+      }
+      function round3(n){return Math.round(n*1000)/1000;}
+
+      function computeDesignerPersonality(answers){
+        answers=answers||{};
+        var painByDim=[0,0,0,0,0,0];
+        for(var i=1;i<=6;i++){
+          painByDim[i-1]=painScoreOf(answers["q"+i]);
+        }
+        var q7Order=normalizeQ7(answers.q7);
+        /* 维度 → Q7 排名(1..6) 与 权重 */
+        var q7RankByDim=[0,0,0,0,0,0];
+        var q7WeightByDim=[0,0,0,0,0,0];
+        q7Order.forEach(function(dimIdx,rankIdx){
+          q7RankByDim[dimIdx]=rankIdx+1;
+          q7WeightByDim[dimIdx]=Q7_WEIGHTS[rankIdx];
+        });
+        /* FinalScore */
+        var finalByDim=painByDim.map(function(p,i){return p*q7WeightByDim[i];});
+
+        /* 选最终维度：按 finalScore desc；并列时按 Q7 排名 asc；再并列按 painScore desc；再并列按 D1→D6 */
+        var order=DIMENSIONS.map(function(_,i){return i;});
+        order.sort(function(a,b){
+          if(finalByDim[b]!==finalByDim[a])return finalByDim[b]-finalByDim[a];
+          if(q7RankByDim[a]!==q7RankByDim[b])return q7RankByDim[a]-q7RankByDim[b];
+          if(painByDim[b]!==painByDim[a])return painByDim[b]-painByDim[a];
+          return a-b;
+        });
+        var winnerIdx=order[0];
+
+        var maxFinal=Math.max.apply(null,finalByDim);
+        var radarByDim=finalByDim.map(function(v){
+          if(maxFinal<=0)return 0;
+          return Math.round(v/maxFinal*100);
+        });
+
+        var scores=DIMENSIONS.map(function(dim,i){
+          return {
+            dimensionId:dim.id,
+            dimensionName:dim.name,
+            role:dim.role,
+            painScore:painByDim[i],
+            q7Rank:q7RankByDim[i],
+            q7Weight:round3(q7WeightByDim[i]),
+            finalScore:round3(finalByDim[i]),
+            radarValue:radarByDim[i]
+          };
+        });
+        var radarData=DIMENSIONS.map(function(dim,i){
+          return {dimension:dim.name,value:radarByDim[i]};
+        });
+
+        return {
+          finalRole:DIMENSIONS[winnerIdx].role,
+          finalDimension:DIMENSIONS[winnerIdx].name,
+          scores:scores,
+          radarData:radarData
+        };
+      }
+
+      /* 暴露到全局，方便在页面脚本或控制台调用 */
+      window.computeDesignerPersonality=computeDesignerPersonality;
+      window.AI_DESIGN_PERSONALITY_DIMENSIONS=DIMENSIONS;
+    })();
+
     /* 默认（进入即可分享）微信分享配置：首次加载时就让用户点右上角能分享出"邀请测试"的卡片 */
     (function defaultWxShare(){
       if(!window.__IS_WX__)return;
       var defaultShare={
-        title:"AI时代，你活成了哪种大师？",
-        desc:"9 道题 · 约 6 分钟，测测你在 AI 时代的设计生存状态。",
+        title:"AI时代，你活成了哪种艺术大师？",
+        desc:"11 道题 · 约 6 分钟，测测你在 AI 时代最像哪位被逼疯的艺术大师。",
         link:location.href.split("#")[0],
-        imgUrl:location.origin+location.pathname.replace(/[^\/]*$/,"")+"img/picasso.png"
+        imgUrl:location.origin+location.pathname.replace(/[^\/]*$/,"")+"img/picasso.png?v=2"
       };
       tryUpdateWxShare(defaultShare);
     })();
