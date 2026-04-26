@@ -2057,6 +2057,9 @@
       bindLongPressSave();
       /* 渲染"扫码测你"二维码（保存图里会被一并拍进去） */
       renderShareQr();
+      /* 预置微信/社交平台分享卡：把 og:image/og:url/title 立刻切到当前角色
+         这样用户不点页面内"分享"按钮，直接右上角…也能读到角色图 + share-dX.html */
+      presetShareForResult();
 
       /* 心愿抽奖区 */
       const wishBox=document.getElementById("wishBox");if(wishBox)wishBox.style.display="";
@@ -3035,6 +3038,29 @@
         }catch(e){
           toast("请长按链接复制后到微信分享");
         }
+      }
+    }
+
+    /* 进结果页时立刻把分享卡预置成「当前角色」：
+       - 改 og:image / twitter:image → 角色图
+       - 改 og:url → share-dX.html 中转页（微信爬虫只读 head 拿角色图，再 replace 回 quiz-h5.html，对用户无感）
+       - 改 title / description → 角色名 + tagline
+       - 在微信里若 JSSDK 可用，也同步调 updateAppMessageShareData；不可用则静默跳过
+       这样用户进结果页就**直接点右上角 …** 分享，卡片图也是角色图。 */
+    function presetShareForResult(){
+      var role=latestResult;if(!role||!role.id)return;
+      var SHARE_BUILD="20260426b";
+      var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
+      var shareLink=baseDir+"share-"+encodeURIComponent(role.id)+".html?v="+SHARE_BUILD;
+      var rImgEl=document.getElementById("rImg");
+      var posterImg=baseDir+"img/poster-share.jpg";
+      var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
+      var title="我是「"+(role.name||"设计大师")+"」— 还没下班的设计大师";
+      var desc=role.tagline||"测测你是哪位还没下班的设计大师";
+      updateShareMeta({title:title,desc:desc,img:shareImg,link:shareLink});
+      /* 微信 JSSDK 能成功时顺带设一次；签名没接也无所谓，反正 og 已经改好了 */
+      if(window.__IS_WX__){
+        tryUpdateWxShare({title:title,desc:desc,link:shareLink,imgUrl:shareImg});
       }
     }
 
