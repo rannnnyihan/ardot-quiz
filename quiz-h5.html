@@ -488,7 +488,7 @@
           subtitle:"来看看你在 AI 时代是哪种生存状态，最后会映射到你的角色原型。",
           note:"9 题 · 约 6 分钟",
           feedbackEnabled:true,
-          questionSchema:"prompt_refactor_v14",
+          questionSchema:"prompt_refactor_v15",
           roleSetVersion:5
         },
         roles:[
@@ -498,36 +498,36 @@
           {id:"slow",name:"唐纳德诺慢",real:"流程效率型生存状态",img:"img/beethoven.png",desc:"你最关注效率和稳定性，核心诉求是“别崩、别慢、别绕”。你希望 AI 真正进入工作流，而不是演示功能。"}
         ],
         questions:{
-          q1:{type:"rank",title:"好险，差点就让我学会了，盘一盘要 AI 能力升级的顺序",desc:"请排序（从最希望到最不希望）",options:[{key:"A",label:"A. 不懂主动追问，不用我硬写超长小作文"},{key:"B",label:"B. 陪我筛选方案，不盲目堆砌大量草稿"},{key:"C",label:"C. 摆脱金鱼记忆，牢记项目"},{key:"D",label:"D. 紧跟我的审美，我说改哪里就改哪里"},{key:"E",label:"E. 优化画面细节，兼顾质感和规范"},{key:"F",label:"F. 告别单机，打通工作流程"}]},
-          q2:{type:"single",title:"刚接到一个需求时，如果让 AI 参与，哪种情况最容易让你血压上来？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 它还没听懂，就开始自信开麦"},{key:"B",label:"B. 它拿着上个项目的剧本来演这场戏"},{key:"C",label:"C. 整理得像模像样，但我还是得重写一遍"},{key:"D",label:"D. 聊完像一场梦，后面接不上"}]},
-          q3:{type:"single",title:"做研究和竞品分析时，AI 哪种“认真”最容易让你感觉白忙一场？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 它给我的信息像自助餐，什么都有但不知道吃啥"},{key:"B",label:"B. 分析着分析着，忘了我到底在做什么项目"},{key:"C",label:"C. 研究做完了，没沉淀成方案可用的洞察"},{key:"D",label:"D. 研究结果还是散的，后面怎么用还得我自己整理"}]},
-          q4:{type:"single",title:"发散创意的时候，AI 哪种输出最容易让你从“有点期待”变成“算了吧”？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 草稿很多，但没有一条真的能往下走"},{key:"B",label:"B. 品牌调性仿佛刚认识"},{key:"C",label:"C. 第一眼看有点东西，第二眼看细节想报警"},{key:"D",label:"D. 越发散越散，最后根本收不回来"}]},
-          q5:{type:"single",title:"真正开始做方案时，AI 哪种表现最容易让你觉得“这活还是落回我头上了”？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 好看是好看，但它到底在解决什么"},{key:"B",label:"B. 忘记业务目标，忘记需求"},{key:"C",label:"C. 看着像完成了，布局、层级、间距、组件、视觉细节都要重修"},{key:"D",label:"D. 生的图不能分层，缝缝补补又一天"}]},
-          q6:{type:"single",title:"多个设计师一起做项目时，AI 哪种“协作感”最像在旁边围观？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 评论很多，它只看到了字面意思"},{key:"B",label:"B. 每条反馈在它眼里都是孤儿"},{key:"C",label:"C. 它会总结：大家意见很多。也不帮我先试一步"},{key:"D",label:"D. 版本越改越多，记录越理越乱"}]},
-          q7:{type:"single",title:"改稿时，AI 哪种操作最容易让你当场沉默？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 我只是扩个图，它把主角也扩没了"},{key:"B",label:"B. 上一版为什么那样做，它已经失忆"},{key:"C",label:"C. 我说动一根头发，它换了整颗头"},{key:"D",label:"D. 改了 A，B/C/D 还在原地等我手动同步"}]},
-          q8:{type:"single",title:"到交付这一步，AI 哪种“不靠谱”最让你不敢放手？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 交互逻辑、页面状态一点不给研发标记"},{key:"B",label:"B. 之前做的交互逻辑还要和他再说一遍"},{key:"C",label:"C. 间距、状态、边界、响应式、动效全要重新调"},{key:"D",label:"D. 原型是原型，代码是代码，谁也不认识谁"}]},
-          q9:{type:"single",title:"项目收尾做沉淀时，AI 哪种表现最容易让资产库继续“长草”？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 它不问我要沉淀什么，就什么都沉淀不出来"},{key:"B",label:"B. 关键背景埋在长聊天里，谁找谁痛苦"},{key:"C",label:"C. 存进去了，但下次用还得先验货"},{key:"D",label:"D. 资产库的尽头，是另一个杂物间"}]},
-          q10:{type:"single",title:"设计师工作类型（单选）",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 图形 / Logo"},{key:"B",label:"B. 界面体验"},{key:"C",label:"C. 角色人设"},{key:"D",label:"D. 流程原型"}]},
-          q11:{type:"multi",maxSelect:3,title:"常用 AI 工具（最多选 3 个）",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Figma"},{key:"B",label:"B. Sketch"},{key:"C",label:"C. Axure"},{key:"D",label:"D. MasterGo"},{key:"E",label:"E. PhotoShop"},{key:"F",label:"F. Pixso"},{key:"G",label:"G. Motiff"},{key:"H",label:"H. Penpot"},{key:"I",label:"I. Adobe XD"}]},
+          q1:{type:"single",title:"老板甩来一个需求，说「做几个方向看看」，我会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 用多个 AI 工具生成、筛选并落地方向，但工具切换多，流程不够连贯"},{key:"B",label:"B. 用 AI 生成参考或概念，但还需要自己大量筛选、重组和修改"},{key:"C",label:"C. 聊了半天都不对味，最后还是去翻参考"},{key:"D",label:"D. 不折腾 AI，直接开网站找案例"}]},
+          q2:{type:"single",title:"手里这张素材，主体要抠出来、还要放大、修边并合成到新背景里。你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 抠图、放大、合成分给几个 AI 做"},{key:"B",label:"B. 让 AI 先抠个大概，毛边我自己收拾"},{key:"C",label:"C. 试几次不是糊就是假，最后返工"},{key:"D",label:"D. 钢笔、蒙版、修边，一步步手动来"}]},
+          q3:{type:"single",title:"打开空白画板，要做一个新的页面设计，我准备：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用 AI 按规范生成初版结构，再在对话中让它修改"},{key:"B",label:"B. 让 AI 给个布局骨架，我再调间距和组件"},{key:"C",label:"C. AI 画出来像“差不多”，但规范全得重做"},{key:"D",label:"D. 基本不用 AI，因为 AI 很难理解我的规范"}]},
+          q4:{type:"single",title:"老板说「改掉这个按钮的样式」——你看了眼 83 张稿子：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 会用脚本、插件或 AI 批量处理，但配置复杂、检查成本高"},{key:"B",label:"B. 用 AI 或插件处理一部分，但仍要逐张检查和手动补漏"},{key:"C",label:"C. 尝试过自动化工具，但修改不一致或容易出错，最后返工更多"},{key:"D",label:"D. 基本手动逐个修改，因为现有工具很难可靠地批量处理设计稿"}]},
+          q5:{type:"single",title:"新方案需要复用过去项目的设计逻辑，你通常会：",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 让 AI 找到之前的上下文，直接接进新方案"},{key:"B",label:"B. 把旧稿和说明丢给 AI，让它先帮我捋"},{key:"C",label:"C. 尝试过让 AI 理解历史项目，但它经常抓不到关键逻辑或风格原则"},{key:"D",label:"D. 自己翻聊天、翻文件、靠记忆把逻辑拼回来"}]},
+          q6:{type:"single",title:"开发发来消息：「稿子定了吗？标注和原型今天能给我吗？」",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 先用工具一键转原型，再补命名和标注细节"},{key:"B",label:"B. 自动生成一部分，再人工补一部分"},{key:"C",label:"C. 在不同工具之间来回导出和调整格式"},{key:"D",label:"D. 从设计稿开始，手动做原型和标注"}]},
+          q7:{type:"rank",topN:3,title:"下班前跟电脑说一声「晚安」，早上醒来想看到它已经替你整理好了什么？",desc:"长按拖动排序（前 3 名计分）",options:[{key:"A",label:"1. 一组概念图和 moodboard"},{key:"B",label:"2. 按我要求该抠的抠、该修的修的图片"},{key:"C",label:"3. 按我的要求和规范的组件生成的界面"},{key:"D",label:"4. 在我要求的范围里替换了我新修改的设计"},{key:"E",label:"5. 梳理了过去项目的设计逻辑和复用建议"},{key:"F",label:"6. 把设计稿同步在其他软件中的形式"}]},
+          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. 我的设计风格"},{key:"B",label:"B. 我的组件规范"},{key:"C",label:"C. 我的项目上下文"},{key:"D",label:"D. 我的操作习惯"},{key:"E",label:"E. 我的素材库"},{key:"F",label:"F. 我的历史方案逻辑"}]},
+          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. 结果不稳定，需要反复调整"},{key:"B",label:"B. 工具太分散，流程不连贯"},{key:"C",label:"C. 不理解我的设计规范和项目背景"},{key:"D",label:"D. 很难直接生成可用的设计稿"},{key:"E",label:"E. 不适合处理批量修改和重复执行"},{key:"F",label:"F. 学习成本高，不知道怎么用"}]},
+          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选",mapsToRoles:true,options:[{key:"A",label:"A. UI / 产品设计"},{key:"B",label:"B. 视觉 / 品牌设计"},{key:"C",label:"C. 电商 / 运营设计"},{key:"D",label:"D. 平面 / 包装设计"},{key:"E",label:"E. 动效 / 视频设计"}]},
+          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:true,options:[{key:"A",label:"A. Midjourney"},{key:"B",label:"B. 即梦（Dreamina）"},{key:"C",label:"C. Stable Diffusion / ComfyUI"},{key:"D",label:"D. Ideogram"},{key:"E",label:"E. Recraft"},{key:"F",label:"F. ChatGPT / Claude（文字发散）"},{key:"G",label:"G. Figma Make"},{key:"H",label:"H. Galileo AI"},{key:"I",label:"I. Uizard"},{key:"J",label:"J. v0（Vercel）"},{key:"K",label:"K. Framer AI"},{key:"L",label:"L. MasterGo AI"},{key:"M",label:"M. Pixso AI"}]},
           q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能理解上下文，在多轮修改中保持稳定风格与可编辑性。"}
         },
         mappings:{
           single:{
-            q2:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q3:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q4:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q5:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q6:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q7:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q8:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q9:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1}},
-            q10:{A:{pica:2,dali:1},B:{mona:2,slow:1},C:{dali:2,pica:1},D:{slow:3}}
+            q1:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q2:{A:{dali:2,slow:1},B:{pica:2,mona:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q3:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q4:{A:{dali:2,slow:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q5:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q6:{A:{slow:2,dali:1},B:{pica:2,slow:1},C:{mona:2,pica:1},D:{slow:2,mona:1}},
+            q9:{A:{mona:3},B:{slow:3},C:{slow:2,mona:1},D:{pica:3},E:{slow:2,dali:1},F:{dali:2,pica:1}},
+            q10:{A:{slow:2,pica:1},B:{mona:2,dali:1},C:{pica:2,dali:1},D:{mona:2,dali:1},E:{dali:2,pica:1}}
           },
           rank:{
-            q1:{A:{dali:1},B:{pica:1},C:{mona:1},D:{slow:1},E:{mona:1},F:{slow:1}}
+            q7:{A:{dali:3,pica:2,mona:1},B:{pica:3,mona:2,dali:1},C:{slow:3,mona:2,pica:1},D:{mona:3,pica:2,slow:1},E:{slow:3,pica:2,mona:1},F:{slow:3,dali:2,pica:1}}
           },
           multi:{
-            q11:{A:{slow:3},B:{mona:1,slow:1},C:{slow:3},D:{slow:3},E:{pica:2,mona:1},F:{slow:3},G:{slow:3},H:{slow:3},I:{mona:2,slow:1},J:{dali:2,pica:1}}
+            q8:{A:{mona:3},B:{slow:3},C:{slow:2,pica:1},D:{slow:2,mona:1},E:{dali:2,pica:1},F:{pica:2,slow:1}},
+            q11:{A:{dali:2,pica:1},B:{dali:2,pica:1},C:{dali:3},D:{dali:2,mona:1},E:{dali:2,mona:1},F:{pica:2,slow:1},G:{slow:3},H:{slow:2,pica:1},I:{slow:2,pica:1},J:{slow:3},K:{slow:2,pica:1},L:{slow:2,mona:1},M:{slow:2,mona:1}}
           },
           score:{},
           scale:{}
@@ -1078,13 +1078,13 @@
     }
 
     function buildQ1PriorityMultipliers(){
-      const order=A.q1;
+      const order=A.q7;
       if(!Array.isArray(order)||!order.length)return null;
       const factors=[1,0.75,0.5,0.25];
       const agg={};
       masters.forEach((m)=>{agg[m.id]=0;});
       order.forEach((key,idx)=>{
-        const map=RANK_MAP.q1&&RANK_MAP.q1[key];
+        const map=RANK_MAP.q7&&RANK_MAP.q7[key];
         if(!map)return;
         const factor=factors[idx]!==undefined?factors[idx]:0;
         Object.keys(map).forEach((rid)=>{agg[rid]+=(Number(map[rid])||0)*factor;});
@@ -1099,7 +1099,7 @@
       return out;
     }
     function questionMapsToRoles(qid){
-      if(qid==="q1")return false;
+      if(qid==="q7")return false;
       const q=CFG.questions&&CFG.questions[qid];
       if(!q)return false;
       if(q.type==="text"||q.resultOnly)return false;
@@ -1181,7 +1181,7 @@
         if(!questionMapsToRoles(qid))return;
         if(q.type==="single")applySingle(score,qid,A[qid],priorityMult);
         if(q.type==="multi")applyMulti(score,qid,A[qid],priorityMult);
-        if(q.type==="rank"&&qid!=="q1")applyRank(score,qid,A[qid],priorityMult);
+        if(q.type==="rank"&&qid!=="q7")applyRank(score,qid,A[qid],priorityMult);
         if(q.type==="score")applyScore(score,qid,Number(A[qid]),priorityMult);
         if(q.type==="scale")applyScale(score,qid,priorityMult);
       });
