@@ -41,6 +41,8 @@
   <!-- 微信 JSSDK（需要后端签名才能真正调用 wx.config；未签名时仅作占位，不影响页面可用性） -->
   <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" onerror="window.__wxSDKFailed=true"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" onerror="window.__h2cFailed=true"></script>
+  <!-- 二维码库：纯本地 canvas 生成（html2canvas 能直接拍到），<10KB，失败时降级到在线 API -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" onerror="window.__qrLibFailed=true"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -331,6 +333,15 @@
     .mantra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .mantra-pill{position:relative;padding:12px 14px 12px 28px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#5a5245;line-height:1.5}
     .mantra-pill::before{content:"\201C";position:absolute;top:6px;left:10px;font-size:18px;color:#c89a4a;font-family:Georgia,serif;font-weight:700;line-height:1}
+    /* 扫码测你（结果页 & 保存图都会展示） */
+    .qr-section{margin-top:4px}
+    .qr-card{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#fff;border:1px solid #ece4d2}
+    .qr-card-meta{flex:1;min-width:0}
+    .qr-card-title{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+    .qr-card-sub{font-size:11.5px;color:#8a7658;line-height:1.5;margin-bottom:6px}
+    .qr-card-url{font-size:10.5px;color:#c46a1a;word-break:break-all;letter-spacing:.02em;font-weight:600}
+    .qr-card-img{width:88px;height:88px;flex-shrink:0;padding:6px;border-radius:10px;background:#fff;border:1px solid #ece4d2;display:flex;align-items:center;justify-content:center}
+    .qr-card-img canvas,.qr-card-img img{width:100%!important;height:100%!important;display:block}
     /* 底部保存图片引导 */
     .save-card{padding:14px;border-radius:14px;background:#fff;border:1px solid #ece4d2}
     .save-card-inner{display:flex;gap:12px;align-items:center;margin-bottom:12px}
@@ -850,6 +861,12 @@
     #res .save-card-sub{color:#6b7280!important}
     #res .save-card-preview{border:1px solid #e5e7e5!important;background:#f7f8f7!important}
     #res .save-card-hint{color:#2ea24a!important}
+    /* 二维码卡片（结果页统一浅灰底） */
+    #res .qr-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
+    #res .qr-card-title{color:#111!important}
+    #res .qr-card-sub{color:#6b7280!important}
+    #res .qr-card-url{color:#2ea24a!important}
+    #res .qr-card-img{background:#fff!important;border:1px solid #e5e7e5!important}
 
     /* 心愿抽奖卡 */
     #res .wish-box{background:#eaf7ed!important;border:1px solid #2ea24a!important}
@@ -955,6 +972,18 @@
         <div class="res-section">
           <div class="res-section-title">口头禅</div>
           <div class="mantra-grid" id="rMantras"></div>
+        </div>
+
+        <!-- 扫码测你（二维码会被 html2canvas 一并拍进"保存图片"长图里） -->
+        <div class="res-section qr-section">
+          <div class="qr-card">
+            <div class="qr-card-meta">
+              <div class="qr-card-title">扫码测你是哪位大师</div>
+              <div class="qr-card-sub">还没下班的设计大师测试 · 共 11 题 · 约 4 分钟</div>
+              <div class="qr-card-url">ardot-quiz-1cuu5ds1xs.edgeone.dev</div>
+            </div>
+            <div class="qr-card-img" id="qrBox" aria-label="扫码进入测试"></div>
+          </div>
         </div>
 
         <!-- 底部心愿抽奖 -->
@@ -2026,6 +2055,8 @@
       /* 结果页右下角"保存图片"悬浮按钮 + 绑定长按截图保存（兼容老交互） */
       showSaveFab();
       bindLongPressSave();
+      /* 渲染"扫码测你"二维码（保存图里会被一并拍进去） */
+      renderShareQr();
 
       /* 心愿抽奖区 */
       const wishBox=document.getElementById("wishBox");if(wishBox)wishBox.style.display="";
@@ -2066,6 +2097,28 @@
       const t=fab.querySelector(".save-fab-txt");
       fab.classList.toggle("loading",!!on);
       if(t)t.textContent=on?(txt||"生成中…"):"保存图片";
+    }
+
+    /* 渲染"扫码测你"二维码：优先用 qrcodejs 本地 canvas 生成（html2canvas 能同源拍到），
+       库未加载成功时降级到在线 API（crossOrigin=anonymous，避免 html2canvas 污染 canvas）。 */
+    function renderShareQr(){
+      const box=document.getElementById("qrBox");
+      if(!box)return;
+      box.innerHTML=""; /* 清掉旧内容，避免重复渲染 */
+      const url="https://ardot-quiz-1cuu5ds1xs.edgeone.dev/quiz-h5.html";
+      const size=176; /* 实际渲染 176，显示 88，提高扫描清晰度 */
+      if(typeof QRCode==="function" && !window.__qrLibFailed){
+        try{
+          new QRCode(box,{text:url,width:size,height:size,colorDark:"#1a1a2e",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+          return;
+        }catch(e){/* 降级到在线 API */}
+      }
+      /* 降级：在线 API 生成 PNG（quickchart.io 返回 CORS 允许的 PNG） */
+      const img=document.createElement("img");
+      img.crossOrigin="anonymous";
+      img.alt="扫码进入测试";
+      img.src="https://api.qrserver.com/v1/create-qr-code/?size="+size+"x"+size+"&margin=0&data="+encodeURIComponent(url);
+      box.appendChild(img);
     }
 
     let __lpBound=false,__lpTimer=null,__lpStartY=0,__lpMoved=false;
