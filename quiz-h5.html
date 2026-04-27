@@ -59,42 +59,55 @@
     .scene.active{display:block}
     .welcome.scene.active{display:flex}
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    /* ===== 首页：整张海报完整显示（不裁切）+ 底部固定按钮 ===== */
-    .welcome{position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+    /* ===== 首页（新版）：顶部文字 + 底部插画，背景白 ===== */
+    .welcome{position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;
       min-height:calc(100vh - 120px);
-      padding:0 0 28px;margin:-20px -4px 0;
-      border-radius:22px;overflow:hidden;
-      background:#0b0c0b;                          /* 海报 contain 后四周的留白使用页面黑色 */
-      box-shadow:0 18px 42px rgba(0,0,0,.32)}
-    /* 海报本体：真正的 <img>，object-fit:contain → 完整显示，不裁切 */
-    .welcome-poster{position:absolute;inset:0;width:100%;height:100%;
-      object-fit:contain;object-position:center center;
-      user-select:none;-webkit-user-drag:none;pointer-events:none;z-index:0}
-    /* 底部加一层柔和渐变，让按钮更清晰 */
-    .welcome::after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;
-      background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0));pointer-events:none;z-index:1}
-    /* 原来的结构全部隐藏，只保留按钮 */
+      padding:28px 0 0;margin:-12px 0 0;
+      border-radius:0;overflow:hidden;
+      background:#ffffff;
+      box-shadow:none}
+    /* 顶部文字区（标题 / 副标题 / 预计时间 / 按钮） */
+    .welcome-head{padding:8px 20px 0;text-align:center;width:100%;max-width:560px;margin:0 auto}
+    .welcome-badge{display:inline-block;font-size:11px;letter-spacing:.22em;color:#8a7658;
+      font-weight:600;text-transform:uppercase;padding:6px 12px;border:1px solid #ece4d2;
+      border-radius:999px;background:#fff;margin-bottom:18px}
+    .welcome-title{font-size:28px;line-height:1.35;color:#1a1a2e;font-weight:800;
+      letter-spacing:.01em;margin:0 auto 14px;max-width:18em}
+    .welcome-title em{font-style:normal;color:#c46a1a;font-weight:800}
+    .welcome-sub{font-size:14px;line-height:1.7;color:#5a5245;margin:0 auto 18px;
+      max-width:24em;padding:0 8px}
+    .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
+      background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
+      margin-bottom:24px;letter-spacing:.02em}
+    /* 底部封面插画条带：高度固定 392px，背景图居中 + 横向平铺
+       - 窄屏（手机）：只露图中间一段
+       - 宽屏（电脑）：横向自动 repeat 接上第二、三遍 */
+    .welcome-poster{position:static;display:block;width:100%;height:392px;
+      margin:12px 0 0;inset:auto;border-radius:0;
+      background-image:url("img/image 23.png?v=20260427");
+      background-repeat:repeat-x;
+      background-position:center bottom;
+      background-size:auto 392px;              /* 按原比例缩放到高度 392 */
+      user-select:none;-webkit-user-drag:none;pointer-events:none}
+    /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
-    .welcome-sub,
-    .welcome h1,
-    .welcome>p,
-    .master-preview,
-    .welcome-note{display:none!important}
-    /* 按钮：绝对定位锁在容器底部中央 → 图怎么缩放按钮都不动 */
-    .welcome-cta{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);
-      z-index:2;display:flex;flex-direction:column;align-items:center;
-      width:100%;max-width:420px;padding:0 20px;box-sizing:border-box}
+    .master-preview{display:none!important}
+    /* 按钮：正常文档流，在文字区内居中 */
+    .welcome-cta{position:static;left:auto;bottom:auto;transform:none;
+      display:flex;flex-direction:column;align-items:center;
+      width:100%;max-width:420px;margin:0 auto;padding:0 20px;box-sizing:border-box}
     .welcome.quiz-started .welcome-cta{display:none}
     .btn-go{position:relative;display:flex;align-items:center;justify-content:space-between;
-      width:100%;height:64px;padding:0 10px 0 34px;border-radius:999px;
-      border:2px solid #f6f1e5;background:#f6f1e5;color:#0f1110;
-      font-size:19px;font-weight:800;letter-spacing:.04em;cursor:pointer;
-      transition:transform .15s ease,box-shadow .2s ease;
-      box-shadow:0 6px 0 #0f1110,0 12px 26px rgba(0,0,0,.4);
+      width:100%;height:60px;padding:0 8px 0 30px;border-radius:999px;
+      border:2px solid #111;background:#111;color:#fff;
+      font-size:18px;font-weight:800;letter-spacing:.04em;cursor:pointer;
+      transition:transform .15s ease,box-shadow .2s ease,background .2s ease;
+      box-shadow:0 6px 16px rgba(0,0,0,.18);
       -webkit-tap-highlight-color:transparent}
     .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
-      box-shadow:0 8px 0 #0f1110,0 16px 30px rgba(0,0,0,.45);outline:none}
-    .btn-go:active{transform:translateY(2px);box-shadow:0 2px 0 #0f1110,0 6px 14px rgba(0,0,0,.3)}
+      background:#2ea24a;border-color:#2ea24a;
+      box-shadow:0 10px 22px rgba(46,162,74,.28);outline:none}
+    .btn-go:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(0,0,0,.18)}
     .btn-go>span:first-child{flex:1;text-align:center;padding-right:12px}
     .btn-go .arr{flex-shrink:0;display:inline-flex;width:46px;height:46px;border-radius:50%;
       background:#2ea24a;color:#fff;align-items:center;justify-content:center;
@@ -629,47 +642,68 @@
     }
 
     /* ============================================================ */
-    /* ==========  首屏：海报按内容宽度显示 + 按钮固定视口底部 ========== */
+    /* ==========  新版首屏：白底 · 文字在上 · 插画贴底 ========== */
     /* ============================================================ */
-    /* 首屏 wrap 保持正常内容宽度（不再解除 max-width），给底部按钮留出空间避免遮挡 */
+    /* 首屏 body 背景换成纯白，wrap 上下留出正常内边距 */
+    body:has(#s0.welcome.active){background:#ffffff}
     body:has(#s0.welcome.active) .wrap{
       padding-top:16px;
-      padding-bottom:120px;               /* 给底部 fixed 按钮留出安全间距 */
+      padding-bottom:0;                  /* 插画贴底，不留额外空白 */
+      padding-left:0;padding-right:0;
+      max-width:720px;
     }
-    /* 首屏海报容器：普通块级容器 → 高度由图自然撑开 */
+    /* 首屏 welcome 容器：纵向 flex，文字在上、插画在下 */
     body:has(#s0.welcome.active) .welcome{
-      display:block;                     /* 覆盖原 flex 布局 */
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      align-items:stretch;
       margin:0;
-      min-height:0;                      /* 覆盖原 min-height:calc(100vh-120px) */
+      min-height:calc(100vh - 56px);     /* 顶栏 56px */
       width:100%;
-      padding:0;
-      border-radius:16px;
-      background:transparent;
+      padding:28px 0 0;
+      border-radius:0;
+      background:#ffffff;
+      overflow:hidden;
+      box-shadow:none;
     }
-    /* 海报本体：宽度跟随内容宽度（≤560px），居中，不再被视口拉伸 */
-    body:has(#s0.welcome.active) .welcome-poster{
-      position:static;                   /* 从 absolute 改为 static */
-      display:block;
-      width:100%;height:auto;
-      max-width:560px;                   /* 关键：限制最大宽度，避免宽屏下被拉得过长 */
-      margin:0 auto;
-      inset:auto;
-      border-radius:16px;
-    }
-    /* 底部渐变遮罩关掉，按钮自己有背景 */
-    body:has(#s0.welcome.active) .welcome::after{display:none}
-    /* 按钮：fixed 固定在视口底部，永不随页面滚动 */
-    body:has(#s0.welcome.active) .welcome-cta{
-      position:fixed;
-      left:50%;
-      bottom:calc(24px + env(safe-area-inset-bottom,0px));
-      transform:translateX(-50%);
-      margin:0;
-      width:calc(100% - 32px);
+    /* 顶部文字容器 */
+    body:has(#s0.welcome.active) .welcome-head{
+      padding:8px 24px 0;
+      width:100%;
       max-width:560px;
-      padding:0;
-      z-index:50;
+      margin:0 auto;
     }
+    /* 底部插画条带：高度固定 392，窄屏只看中间，宽屏横向平铺 */
+    body:has(#s0.welcome.active) .welcome-poster{
+      position:static;
+      display:block;
+      width:100%;
+      height:392px;                      /* 固定高度 */
+      max-width:none;
+      margin:24px 0 0;                   /* 与文字保持距离，左右贴边 */
+      inset:auto;
+      border-radius:0;
+      align-self:stretch;
+      background-image:url("img/image 23.png?v=20260427");
+      background-repeat:repeat-x;        /* 宽屏不够就横向接上 */
+      background-position:center bottom; /* 窄屏保留图中心部分 */
+      background-size:auto 392px;        /* 按原比例缩放到 392 高 */
+    }
+    /* 按钮回归文档流 */
+    body:has(#s0.welcome.active) .welcome-cta{
+      position:static;
+      left:auto;
+      bottom:auto;
+      transform:none;
+      margin:0 auto;
+      width:100%;
+      max-width:420px;
+      padding:0 20px;
+      z-index:auto;
+    }
+    /* 旧的底部渐变遮罩关掉（新版没 ::after 规则，这里保底） */
+    body:has(#s0.welcome.active) .welcome::after{display:none}
 
     /* ============================================================ */
     /* ==========  做题态皮肤：白底 + 选中黑框 + 绿色点缀 ========== */
@@ -903,15 +937,26 @@
 
   <div class="wrap">
     <div class="welcome scene active" id="s0">
-      <img class="welcome-poster" src="img/poster.png" alt="好险，差点就做完了" />
-      <div class="welcome-cta">
-        <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
-          <span>开始测试</span>
-          <span class="arr" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13m0 0l-5-5m5 5l-5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-        </button>
+      <!-- 顶部：标题 / 副标题 / 预计时间 / 开始按钮（正常文档流，从上到下排列） -->
+      <div class="welcome-head">
+        <div class="welcome-badge">AI Designer Personality Test</div>
+        <h1 class="welcome-title">《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》</h1>
+        <p class="welcome-sub">11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。</p>
+        <div class="welcome-note">11 题 · 约 6 分钟</div>
+        <div class="welcome-cta">
+          <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
+            <span>开始测试</span>
+            <span class="arr" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13m0 0l-5-5m5 5l-5 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
+        </div>
       </div>
+      <!-- 底部：封面插画（image 23.png）作为背景条带
+           · 固定高度 392px
+           · 居中显示，窄屏只露中间一段，宽屏不够则横向 repeat 接上
+           · 用 div + background 而不是 <img>，才能实现平铺 -->
+      <div class="welcome-poster" role="img" aria-label="还没下班的设计大师"></div>
     </div>
 
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
@@ -1493,9 +1538,9 @@
     function applyConfigToPage(){
       const welcome=document.getElementById("s0");
       if(welcome){
-        const sub=welcome.querySelector(".welcome-sub");if(sub)sub.textContent=CFG.meta.badge||"AI Design Survival Quiz";
-        const h1=welcome.querySelector("h1");if(h1)h1.innerHTML=CFG.meta.mainTitle||"";
-        const p=welcome.querySelector("p");if(p)p.textContent=CFG.meta.subtitle||"";
+        const badge=welcome.querySelector(".welcome-badge");if(badge)badge.textContent=CFG.meta.badge||"AI Design Survival Quiz";
+        const h1=welcome.querySelector(".welcome-title")||welcome.querySelector("h1");if(h1)h1.innerHTML=CFG.meta.mainTitle||"";
+        const sub=welcome.querySelector(".welcome-sub");if(sub)sub.textContent=CFG.meta.subtitle||"";
         const note=welcome.querySelector(".welcome-note");if(note)note.textContent=CFG.meta.note||"8 题 · 约 4 分钟";
         const chips=welcome.querySelector(".master-preview");
         if(chips)chips.innerHTML=masters.map(m=>`<span class="chip">${m.name}</span>`).join("");
@@ -3147,7 +3192,7 @@
         if(!role)return;
         var welcome=document.getElementById("s0");
         if(!welcome)return;
-        var p=welcome.querySelector("p");
+        var p=welcome.querySelector(".welcome-sub")||welcome.querySelector("p");
         if(p){
           p.innerHTML='你的朋友测得的是「<strong style="color:#c46a1a">'+role.name+'</strong>」，来看看你是哪种？';
         }
