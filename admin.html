@@ -1943,7 +1943,7 @@
       const hint=document.getElementById("autoSaveHint");
       if(hint)hint.textContent="正在从服务端拉取最新配置…";
       const res=await pullConfigFromServer();
-      if(!res.ok||!res.data||typeof res.data!=="object"||!Array.isArray(res.data.questions)){
+      if(!res.ok||!res.data||typeof res.data!=="object"||!res.data.questions||typeof res.data.questions!=="object"||Array.isArray(res.data.questions)||!Array.isArray(res.data.roles)){
         if(hint)hint.textContent=res.ok?"服务端暂无配置，使用本地缓存":"服务端拉取失败，使用本地缓存";
         return;
       }

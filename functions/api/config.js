@@ -46,8 +46,13 @@ export async function onRequest({ request, env }) {
         return json({ ok: false, msg: "invalid json" }, { status: 400 });
       }
       // 基本结构校验，避免把空对象写上去
-      if (!cfg || typeof cfg !== "object" || !Array.isArray(cfg.questions) || !Array.isArray(cfg.roles)) {
-        return json({ ok: false, msg: "config must contain questions[] and roles[]" }, { status: 400 });
+      // 注意：admin 里 questions 是对象映射 {q1:{...}, q2:{...}}，不是数组；roles 才是数组
+      const questionsOk = cfg && typeof cfg === "object"
+        && cfg.questions && typeof cfg.questions === "object" && !Array.isArray(cfg.questions)
+        && Object.keys(cfg.questions).length > 0;
+      const rolesOk = cfg && Array.isArray(cfg.roles) && cfg.roles.length > 0;
+      if (!questionsOk || !rolesOk) {
+        return json({ ok: false, msg: "config must contain non-empty questions{} and roles[]" }, { status: 400 });
       }
       // 附加一个服务端时间戳，方便前端判断新鲜度
       cfg.meta = cfg.meta && typeof cfg.meta === "object" ? cfg.meta : {};

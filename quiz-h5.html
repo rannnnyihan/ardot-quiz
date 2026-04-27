@@ -1576,7 +1576,8 @@
         if(xhr.status<200||xhr.status>=300)return;
         const j=JSON.parse(xhr.responseText||"{}");
         if(!j||!j.ok||!j.data||typeof j.data!=="object")return;
-        if(!Array.isArray(j.data.questions)||!Array.isArray(j.data.roles))return;
+        if(!j.data.questions||typeof j.data.questions!=="object"||Array.isArray(j.data.questions))return;
+        if(!Array.isArray(j.data.roles))return;
         /* 与本地缓存对比，内容一致就不写，避免无谓的 localStorage 写入 */
         const nextStr=JSON.stringify(j.data);
         let prevStr="";
