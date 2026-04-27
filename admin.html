@@ -185,8 +185,8 @@
           <div class="note">示例：`A|A. 想图形，磨 Logo`</div>
           <div class="row mt" id="multiEditor" style="display:none">
             <div>
-              <label>最多可选数量</label>
-              <input id="multiMaxSelect" type="text" value="3">
+              <label>至少选数量</label>
+              <input id="multiMinSelect" type="text" value="3">
             </div>
           </div>
         </div>
@@ -385,7 +385,7 @@
             {key:"E",label:"梳理过去项目的风格与复用建议"},
             {key:"F",label:"同步到原型/标注/其他软件里的交付物"}
           ]},
-          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
+          q8:{type:"multi",minSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
             {key:"A",label:"我的设计风格"},
             {key:"B",label:"我的组件规范"},
             {key:"C",label:"我的项目上下文"},
@@ -406,7 +406,7 @@
             {key:"D",label:"D. 平面 / 包装设计"},
             {key:"E",label:"E. 动效 / 视频设计"}
           ]},
-          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
+          q11:{type:"multi",minSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
             {key:"A",label:"A. Midjourney"},
             {key:"B",label:"B. 即梦（Dreamina）"},
             {key:"C",label:"C. Stable Diffusion / ComfyUI"},
@@ -821,8 +821,8 @@
       q.type=nextType;
       if(nextType==="single"||nextType==="rank"||nextType==="multi"){
         q.options=Array.isArray(q.options)&&q.options.length?q.options:[{key:"A",label:"A. 选项一"},{key:"B",label:"B. 选项二"}];
-        if(nextType==="multi")q.maxSelect=safePositiveInt(q.maxSelect,3);
-        else delete q.maxSelect;
+        if(nextType==="multi"){q.minSelect=safePositiveInt(q.minSelect||q.maxSelect,3);delete q.maxSelect;}
+        else {delete q.maxSelect;delete q.minSelect;}
         delete q.stems;
         delete q.placeholder;
         delete q.min;
@@ -831,6 +831,7 @@
         q.stems=Array.isArray(q.stems)&&q.stems.length?q.stems:["请填写分项 1","请填写分项 2"];
         delete q.options;
         delete q.maxSelect;
+        delete q.minSelect;
         delete q.placeholder;
         delete q.min;
         delete q.max;
@@ -839,12 +840,14 @@
         q.max=Number(q.max||7);
         delete q.options;
         delete q.maxSelect;
+        delete q.minSelect;
         delete q.stems;
         delete q.placeholder;
       }else{
         q.placeholder=q.placeholder||"请输入";
         delete q.options;
         delete q.maxSelect;
+        delete q.minSelect;
         delete q.stems;
         delete q.min;
         delete q.max;
@@ -921,7 +924,7 @@
           :"文本题用于收集开放回答，不参与角色映射。";
       if(isSingle||isRank||isMulti){
         document.getElementById("singleOptions").value=(q.options||[]).map(o=>`${o.key}|${o.label}`).join("\n");
-        if(isMulti)document.getElementById("multiMaxSelect").value=String(safePositiveInt(q.maxSelect,3));
+        if(isMulti)document.getElementById("multiMinSelect").value=String(safePositiveInt(q.minSelect||q.maxSelect,3));
         renderSingleMappingEditor(q.options||[], mappingFor(activeQid));
       }else if(isScale){
         document.getElementById("scaleStems").value=(q.stems||[]).join("\n");
@@ -1220,7 +1223,7 @@
       }else if(q.type==="multi"){
         const entries=ds.labels.map((l,idx)=>({label:ds.shortLabels[idx],val:ds.values[idx],full:l})).sort((a,b)=>b.val-a.val);
         const max=Math.max(...entries.map(e=>e.val),1);
-        title.textContent=`${displayQid(activeQid).toUpperCase()} 多选分布（最多选 ${ds.maxSelect}，${ds.valid}/${ds.total} 有效）`;
+        title.textContent=`${displayQid(activeQid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`;
         box.innerHTML=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
       }else if(q.type==="rank"){
         title.textContent=`${displayQid(activeQid).toUpperCase()} 排序分布（按名次统计）`;
@@ -1323,7 +1326,7 @@
         const labels=(q.options||[]).map(o=>o.label);
         const shortLabels=(q.options||[]).map(o=>o.key);
         const values=(q.options||[]).map(o=>cnt[o.key]||0);
-        return {type:"multi",labels,shortLabels,values,valid,total:data.length,maxSelect:safePositiveInt(q.maxSelect,3)};
+        return {type:"multi",labels,shortLabels,values,valid,total:data.length,minSelect:safePositiveInt(q.minSelect||q.maxSelect,3)};
       }
       if(q.type==="rank"){
         const options=(q.options||[]);
@@ -1579,7 +1582,7 @@
         document.getElementById("chartNote").textContent=ds.type==="single"
           ? `${displayQid(qid).toUpperCase()} 单选分布（${ds.valid}/${ds.total} 有效）`
           : ds.type==="multi"
-            ? `${displayQid(qid).toUpperCase()} 多选分布（最多选 ${ds.maxSelect}，${ds.valid}/${ds.total} 有效）`
+            ? `${displayQid(qid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`
           : ds.type==="rank"
             ? `${displayQid(qid).toUpperCase()} 排序分布 · 第 ${Number(ds.rankIndex||0)+1} 位（${ds.valid}/${ds.total} 有效）`
           : ds.type==="score"
@@ -1690,11 +1693,13 @@
           if(q.type==="single")cfg.mappings.single[activeQid]=nextMap;
           else if(q.type==="rank")cfg.mappings.rank[activeQid]=nextMap;
           else{
-            q.maxSelect=safePositiveInt(document.getElementById("multiMaxSelect").value,3);
+            q.minSelect=safePositiveInt(document.getElementById("multiMinSelect").value,3);
+            delete q.maxSelect;
             cfg.mappings.multi[activeQid]=nextMap;
           }
         }else if(q.type==="multi"){
-          q.maxSelect=safePositiveInt(document.getElementById("multiMaxSelect").value,3);
+          q.minSelect=safePositiveInt(document.getElementById("multiMinSelect").value,3);
+          delete q.maxSelect;
         }
       }else if(q.type==="scale"){
         q.stems=document.getElementById("scaleStems").value.split("\n").map(s=>s.trim()).filter(Boolean);

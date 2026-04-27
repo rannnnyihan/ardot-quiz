@@ -213,8 +213,9 @@
     },
     "q7": {
       "type": "rank",
+      "ui": "pickOrdered",
       "title": "下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",
-      "desc": "长按拖动排序",
+      "desc": "按你最希望的顺序依次点选（可只选最在意的几项）",
       "options": [
         {
           "key": "A",
@@ -245,9 +246,9 @@
     },
     "q8": {
       "type": "multi",
-      "maxSelect": 3,
+      "minSelect": 3,
       "title": "你最希望 AI 设计工具帮你记住什么？",
-      "desc": "多选（最多 3 项）",
+      "desc": "多选（至少 3 项）",
       "mapsToRoles": false,
       "options": [
         {
@@ -330,9 +331,9 @@
     },
     "q11": {
       "type": "multi",
-      "maxSelect": 3,
+      "minSelect": 3,
       "title": "你目前最常使用的 AI 设计工具是？",
-      "desc": "多选（最多 3 项）",
+      "desc": "多选（至少 3 项）",
       "mapsToRoles": false,
       "options": [
         {

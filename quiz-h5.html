@@ -80,16 +80,20 @@
     .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
       background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
       margin-bottom:24px;letter-spacing:.02em}
-    /* 底部封面插画：原图 1280×392，手机上不缩小整张图，而是居中裁出 402px 宽视窗
-       · 视窗宽 = min(402px, 100vw)；居中
-       · 高度锁 392px，图按原像素展示（object-fit:none + object-position:center），
-         自动把左右两侧多余部分裁掉，只露中间的人物群 */
+    /* 底部封面插画：用背景图而不是 <img>，这样：
+       · 容器宽度 = 100vw（不限制 max-width），居中
+       · background-size: auto 100% —— 图高铺满容器，宽度保持原比例
+       · background-position: center bottom —— 居中对齐底部
+       · 窄屏只露中间人物群，宽屏自动向两侧展开更多画面内容 */
     .welcome-poster{position:relative;display:block;
-      width:100%;max-width:402px;height:392px;
-      margin:0 auto;                         /* 居中 */
-      border-radius:0;
-      object-fit:none;                       /* 不缩放，按原像素 */
-      object-position:center center;         /* 居中裁剪 */
+      width:100vw;                           /* 铺满视口宽度 */
+      margin-left:calc(50% - 50vw);          /* 抵消外层 .wrap 的 padding，让图真正贴到视口边 */
+      margin-right:calc(50% - 50vw);
+      height:392px;
+      background-image:url("img/image 23.png?v=20260427");
+      background-repeat:no-repeat;
+      background-position:center bottom;     /* 居中 + 底部对齐 */
+      background-size:auto 100%;             /* 高度 100%，宽度按原图比例 */
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
@@ -107,13 +111,14 @@
       box-shadow:0 6px 16px rgba(0,0,0,.18);
       -webkit-tap-highlight-color:transparent}
     .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
-      background:#2ea24a;border-color:#2ea24a;
-      box-shadow:0 10px 22px rgba(46,162,74,.28);outline:none}
+      background:#00EC00;border-color:#00EC00;color:#111;
+      box-shadow:0 10px 22px rgba(0,236,0,.28);outline:none}
+    .btn-go:hover .arr,.btn-go:focus-visible .arr{background:#111;color:#00EC00}
     .btn-go:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(0,0,0,.18)}
     .btn-go>span:first-child{flex:1;text-align:center;padding-right:12px}
     .btn-go .arr{flex-shrink:0;display:inline-flex;width:46px;height:46px;border-radius:50%;
-      background:#2ea24a;color:#fff;align-items:center;justify-content:center;
-      box-shadow:inset 0 -2px 0 rgba(0,0,0,.2)}
+      background:#00EC00;color:#111;align-items:center;justify-content:center;
+      box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
     .btn-go .arr svg{width:22px;height:22px;display:block}
     /* 兼容旧 class，不破坏其他页面 */
     .chip{padding:8px 12px;border:1px solid #e8e5e0;border-radius:999px;background:#fff;font-size:12px;color:#555}
@@ -149,9 +154,9 @@
     .chip-counter-txt{font-size:13px;color:#6b5a3e}
     .chip-counter-txt b{font-size:16px;color:#c46a1a;margin:0 2px;font-weight:700}
     .chip-counter-hint{font-size:11px;color:#b3a894}
-    .chip-counter.full{background:#fff4e0;border-color:#e0b87a}
-    .chip-counter.full .chip-counter-txt b{color:#a05b16}
-    .chip-counter.full .chip-counter-hint{color:#a46d30}
+    .chip-counter.full,.chip-counter.ok{background:#fff4e0;border-color:#e0b87a}
+    .chip-counter.full .chip-counter-txt b,.chip-counter.ok .chip-counter-txt b{color:#a05b16}
+    .chip-counter.full .chip-counter-hint,.chip-counter.ok .chip-counter-hint{color:#a46d30}
     .chip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     .chip{position:relative;display:flex;align-items:center;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;border:1.5px solid #e8e5e0;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .15s cubic-bezier(.2,.7,.3,1),border-color .18s,background .18s,box-shadow .18s,color .18s;text-align:center}
     .chip:hover{border-color:#d5cfc5;background:#fdfcfa;transform:translateY(-1px)}
@@ -216,10 +221,13 @@
     #res.capturing,#res.capturing *{animation:none!important;transition:none!important;opacity:1!important;filter:none!important}
     .res-card{border-radius:0;border:0;background:transparent;overflow:visible;margin-bottom:0;box-shadow:none}
     .res-top{padding:28px 24px 12px;text-align:center}
+    /* 头像上方小字 */
+    .res-kicker{font-size:13px;color:#111;letter-spacing:.08em;margin:0 0 10px;font-weight:500;text-align:left}
     /* 头像外框（参考图：细边框圆角相框） */
     .res-avatar-frame{width:100%;aspect-ratio:1/1;margin:0 0 18px;border:1px solid #d9cdb3;border-radius:18px;background:#fff;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 0 #fff inset;overflow:hidden}
     .res-avatar{width:100%;height:100%;border-radius:18px;object-fit:cover;display:block;background:#f2ece0}
-    .res-name{font-size:44px;font-weight:900;color:#1a1a2e;margin-bottom:6px;letter-spacing:.04em;font-family:Georgia,"Times New Roman",serif}
+    /* 类型名：整行不换行，字号随容器宽度自适应，任何屏幕都能单行显示 */
+    .res-name{font-size:clamp(20px,7.2vw,44px);font-weight:900;color:#1a1a2e;margin-bottom:6px;letter-spacing:.02em;font-family:Georgia,"Times New Roman",serif;white-space:nowrap;overflow:visible;line-height:1.15}
     .res-real{font-size:13px;color:#8a7658;margin-bottom:0;font-weight:500;letter-spacing:.04em}
     .res-desc{font-size:14px;color:#888;line-height:1.7;max-width:460px;margin:0 auto;padding-bottom:24px}
     .match-bar{margin-bottom:12px}
@@ -235,6 +243,7 @@
     .wish-box textarea{width:100%;min-height:92px;border:1px solid #e4d7c5;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6;outline:none;resize:vertical;background:#fff}
     .wish-actions{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
     .wish-btn{height:36px;padding:0 14px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+    .wish-btn:disabled,.wish-btn.is-done{background:#c9c6c0!important;color:#fff!important;cursor:not-allowed!important;opacity:.85;pointer-events:none}
     .wish-result{font-size:12px;color:#8f5d24}
     .others-title{font-size:11px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;padding:0 32px}
     .others{display:flex;gap:12px;overflow-x:auto;padding:0 32px 20px;-webkit-overflow-scrolling:touch}
@@ -321,6 +330,22 @@
     /* 性格标签（2×2 胶囊） */
     .tag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .tag-pill{padding:12px 14px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:13px;color:#3a3428;text-align:center;font-weight:500;line-height:1.4}
+    /* 雷达：整行 */
+    .radar-wrap.radar-full{width:100%;max-width:100%;aspect-ratio:1/1;max-height:360px;padding:8px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;overflow:hidden}
+    .radar-wrap.radar-full .radar-svg{width:100%!important;height:100%!important;max-width:100%!important;display:block;overflow:visible}
+    /* 性格标签 + 选择解读：并排两列（左标签，右解读） */
+    .tags-reading-row{display:grid;grid-template-columns:1fr 1.25fr;gap:12px;align-items:stretch}
+    .tags-reading-row .tags-block{min-width:0;display:flex;flex-direction:column}
+    .tags-reading-row .reading-block{min-width:0;display:flex;flex-direction:column}
+    .tags-reading-row .tag-list{display:flex;flex-direction:column;gap:8px}
+    .tags-reading-row .tag-list .tag-pill{padding:10px 10px;font-size:12.5px;line-height:1.35}
+    .tags-reading-row .reading-block .reading-box{flex:1 1 auto;overflow:auto;padding:12px 12px;font-size:12.5px;line-height:1.7}
+    .tags-reading-row .reading-block .reading-box p{margin:0 0 8px}
+    /* 极窄屏（< 360px）退化为上下堆叠 */
+    @media (max-width:360px){
+      .tags-reading-row{grid-template-columns:1fr;gap:14px}
+      .tags-reading-row .tag-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    }
     /* 暗格解读/精华解读：米橘填充块 + 引号 */
     .insight-box{position:relative;padding:16px 18px 16px 38px;border-radius:12px;background:#f3d9a8;border:1px solid #e4c380;color:#5a3d12;font-size:13px;line-height:1.8;font-weight:500}
     .insight-box::before{content:"\201C";position:absolute;top:6px;left:14px;font-size:32px;color:#8f5d24;font-family:Georgia,serif;line-height:1;font-weight:700}
@@ -330,10 +355,10 @@
     .reading-box p:last-child{margin-bottom:0}
     /* 副属性：两张并列大数字卡 */
     .substat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .substat-card{padding:14px 12px;border-radius:12px;background:#fff;border:1px solid #ece4d2;text-align:center}
-    .substat-label{font-size:11px;color:#8a7658;font-weight:600;margin-bottom:6px;letter-spacing:.02em}
-    .substat-val{font-size:36px;font-weight:900;color:#1a1a2e;line-height:1.1;font-family:Georgia,"Times New Roman",serif;margin-bottom:4px;letter-spacing:-.02em}
-    .substat-state{font-size:14px;font-weight:700;color:#1a1a2e;line-height:1.55;letter-spacing:.01em}
+    .substat-card{padding:14px 12px;border-radius:12px;background:#fff;border:1px solid #ece4d2;text-align:left}
+    .substat-label{font-size:11px;color:#111;font-weight:600;margin-bottom:6px;letter-spacing:.02em}
+    .substat-val{font-size:36px;font-weight:900;color:#111;line-height:1.1;font-family:Georgia,"Times New Roman",serif;margin-bottom:4px;letter-spacing:-.02em}
+    .substat-state{font-size:14px;font-weight:700;color:#111;line-height:1.55;letter-spacing:.01em}
     .substat-desc{font-size:11px;color:#8a7658;line-height:1.5}
     /* 雷达图：黑色线框六边形 */
     .radar-wrap{display:flex;justify-content:center;padding:8px 0 4px;background:#fff;border-radius:12px;border:1px solid #ece4d2}
@@ -348,8 +373,9 @@
     .mantra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .mantra-pill{position:relative;padding:12px 14px 12px 28px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#5a5245;line-height:1.5}
     .mantra-pill::before{content:"\201C";position:absolute;top:6px;left:10px;font-size:18px;color:#c89a4a;font-family:Georgia,serif;font-weight:700;line-height:1}
-    /* 扫码测你（结果页 & 保存图都会展示） */
-    .qr-section{margin-top:4px}
+    /* 扫码测你：结果页隐藏（仅在"保存图片"截图时临时显示），避免页面上占位 */
+    .qr-section{margin-top:4px;display:none}
+    #res.capturing .qr-section{display:block!important}
     .qr-card{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:#fff;border:1px solid #ece4d2}
     .qr-card-meta{flex:1;min-width:0}
     .qr-card-title{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
@@ -390,7 +416,7 @@
     .save-overlay-title{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em;opacity:.92}
     .save-overlay-img{display:block;max-width:100%;max-height:76vh;width:auto;height:auto;border-radius:12px;background:#fff;-webkit-touch-callout:default;user-select:none;object-fit:contain;box-shadow:0 4px 18px rgba(0,0,0,.35)}
     .save-overlay-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-    .save-overlay-btn{appearance:none;border:0;padding:10px 20px;border-radius:999px;background:#2ea24a;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+    .save-overlay-btn{appearance:none;border:0;padding:10px 20px;border-radius:999px;background:#00EC00;color:#111;font-size:13px;font-weight:600;cursor:pointer}
     .save-overlay-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.32);color:#fff}
     /* 维度表格（保留但弱化） */
     .dim-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #ece4d2;margin-top:12px}
@@ -421,7 +447,6 @@
     .advice-list li::before{content:"\2713";display:inline-flex;width:18px;height:18px;border-radius:50%;background:#c89a4a;color:#fff;font-size:11px;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
     .advice-outro{font-size:12.5px;color:#8a7658;line-height:1.7}
     @media(max-width:640px){
-      .res-name{font-size:36px}
       .res-avatar-frame{width:100%;aspect-ratio:1/1}
       .substat-val{font-size:30px}
       .radar-svg{max-width:280px}
@@ -430,7 +455,7 @@
       .res-section{padding:0 32px 24px}
       .res-tagline-wrap{padding:0 32px;margin-bottom:24px}
       .res-avatar-frame{width:100%;aspect-ratio:1/1}
-      .res-name{font-size:52px}
+      .res-name{font-size:clamp(28px,5.2vw,56px)}
     }
 
     /* ============================================================ */
@@ -440,10 +465,10 @@
       --bk:#0b0c0b;         /* 主黑（页面底） */
       --bk-2:#141614;       /* 次黑（卡片底） */
       --bk-3:#1d201d;       /* 三黑（选项底） */
-      --gn:#2ea24a;         /* 主绿 */
-      --gn-2:#49c466;       /* 亮绿 hover */
-      --gn-3:#1d7a36;       /* 深绿 */
-      --gn-soft:rgba(46,162,74,.14); /* 绿色透明背景 */
+      --gn:#00EC00;         /* 主绿 */
+      --gn-2:#33ff33;       /* 亮绿 hover */
+      --gn-3:#00b800;       /* 深绿 */
+      --gn-soft:rgba(0,236,0,.14); /* 绿色透明背景 */
       --wh:#ffffff;         /* 主白 */
       --wh-2:#f6f7f6;       /* 次白 */
       --ln:#26292a;         /* 暗分割线 */
@@ -469,7 +494,10 @@
     .btn-go{background:var(--bk-2);color:var(--wh);border-color:var(--bk-2);
       box-shadow:0 6px 0 var(--gn-3),0 12px 26px rgba(0,0,0,.5)}
     .btn-go:hover,.btn-go:focus-visible{background:#1d201d;border-color:#1d201d;
+      color:var(--wh);                                     /* 锁住文字为白色，覆盖上面旧的 #111 */
       box-shadow:0 8px 0 var(--gn-3),0 16px 30px rgba(0,0,0,.55)}
+    .btn-go:hover .arr,.btn-go:focus-visible .arr{         /* 箭头继续保持绿底白箭头，不翻转成黑 */
+      background:var(--gn);color:#fff}
     .btn-go:active{box-shadow:0 2px 0 var(--gn-3),0 6px 14px rgba(0,0,0,.4)}
     .btn-go .arr{background:var(--gn);color:#fff;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
 
@@ -486,7 +514,7 @@
     .opt:hover{border-color:var(--gn);background:#1a2a1f}
     .opt:hover .opt-r{border-color:var(--gn)}
     .opt:hover .opt-t{color:#fff}
-    .opt.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 6px 18px rgba(46,162,74,.25)}
+    .opt.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 6px 18px rgba(0,236,0,.25)}
     .opt.sel .opt-t{color:#fff}
     .opt-r{border-color:#4a4f4a;background:transparent}
     .opt.sel .opt-r{border-color:var(--gn);background:var(--gn)}
@@ -497,16 +525,16 @@
     .chip:hover{border-color:var(--gn);background:#1a2a1f}
     .chip:hover .chip-name{color:#fff}
     .chip-name{color:var(--tx)}
-    .chip.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 4px 12px rgba(46,162,74,.25)}
+    .chip.sel{border-color:var(--gn);background:var(--gn-soft);box-shadow:0 0 0 1px var(--gn),0 4px 12px rgba(0,236,0,.25)}
     .chip.sel .chip-name{color:#fff}
     .chip-check{background:var(--gn);color:#fff}
     .chip-counter{background:var(--bk-2);border-color:var(--ln)}
     .chip-counter-txt{color:var(--tx)}
     .chip-counter-txt b{color:var(--gn-2)}
     .chip-counter-hint{color:var(--tx-3)}
-    .chip-counter.full{background:var(--gn-soft);border-color:var(--gn)}
-    .chip-counter.full .chip-counter-txt b{color:var(--gn-2)}
-    .chip-counter.full .chip-counter-hint{color:var(--gn-2)}
+    .chip-counter.full,.chip-counter.ok{background:var(--gn-soft);border-color:var(--gn)}
+    .chip-counter.full .chip-counter-txt b,.chip-counter.ok .chip-counter-txt b{color:var(--gn-2)}
+    .chip-counter.full .chip-counter-hint,.chip-counter.ok .chip-counter-hint{color:var(--gn-2)}
 
     /* ===== 排序题 rank ===== */
     .rank-item{border:1px solid var(--ln);background:var(--bk-3);color:var(--tx)}
@@ -520,7 +548,7 @@
     .rank-label{color:var(--tx)}
     .rank-handle{color:var(--tx-3)}
     .btn-rank{background:var(--gn-soft);border:1px solid var(--gn);color:var(--gn-2)}
-    .btn-rank:hover{background:rgba(46,162,74,.22)}
+    .btn-rank:hover{background:rgba(0,236,0,.22)}
 
     /* ===== 量表 scale ===== */
     .scale-item{background:var(--bk-3);border:1px solid var(--ln);color:var(--tx)}
@@ -568,8 +596,8 @@
     .btn-share:hover{border-color:var(--gn);color:var(--gn-2)}
     .btn-redo{background:var(--bk-2);border:1px solid var(--ln);color:var(--tx-2)}
     .btn-redo:hover{border-color:var(--gn);color:var(--gn-2)}
-    .btn-explore{background:var(--gn);color:#fff;box-shadow:0 4px 12px rgba(46,162,74,.35)}
-    .btn-explore:hover{background:var(--gn-2);box-shadow:0 6px 16px rgba(46,162,74,.45)}
+    .btn-explore{background:var(--gn);color:#fff;box-shadow:0 4px 12px rgba(0,236,0,.35)}
+    .btn-explore:hover{background:var(--gn-2);box-shadow:0 6px 16px rgba(0,236,0,.45)}
     .toast{background:#f2f3f2;color:var(--bk)}
     .wx-hint{background:var(--gn-soft);border-bottom:1px solid var(--gn);color:var(--gn-2)}
     .wx-hint a{color:var(--gn-2)}
@@ -646,24 +674,26 @@
     /* ============================================================ */
     /* ==========  新版首屏：白底 · 文字在上 · 插画贴底 ========== */
     /* ============================================================ */
-    /* 首屏 body 背景换成纯白，wrap 上下留出正常内边距 */
-    body:has(#s0.welcome.active){background:#ffffff}
+    /* 首屏 body 背景换成纯白，并去掉底部安全区 padding，避免底下留一条空白 */
+    body:has(#s0.welcome.active){background:#ffffff;padding-bottom:0!important}
     body:has(#s0.welcome.active) .wrap{
-      padding-top:16px;
+      padding-top:0;                     /* 顶部 padding 由 .welcome 自己的 padding 负责 */
       padding-bottom:0;                  /* 插画贴底，不留额外空白 */
       padding-left:0;padding-right:0;
       max-width:720px;
     }
-    /* 首屏 welcome 容器：纵向 flex，文字在上、插画在下 */
+    /* 首屏 welcome 容器：纵向 flex，文字在上、插画在下
+       min-height 用 100dvh，并扣掉顶栏 56px，确保整个容器正好撑到视口底边 */
     body:has(#s0.welcome.active) .welcome{
       display:flex;
       flex-direction:column;
       justify-content:space-between;
       align-items:stretch;
       margin:0;
-      min-height:calc(100vh - 56px);     /* 顶栏 56px */
+      min-height:calc(100vh - 56px);     /* 兜底 */
+      min-height:calc(100dvh - 56px);    /* 现代浏览器：动态视口，地址栏收起也能贴底 */
       width:100%;
-      padding:28px 0 0;
+      padding:24px 0 0;
       border-radius:0;
       background:#ffffff;
       overflow:visible;                  /* 关键：让底部插画的 100vw 溢出可见，不被裁 */
@@ -676,22 +706,13 @@
       max-width:560px;
       margin:0 auto;
     }
-    /* 底部插画：撑满视口宽，高度按原图比例自适应，完整显示整张（原图 1280×392） */
+    /* 欢迎页下：把插画推到 flex 容器底部（只管定位，样式走上面的 .welcome-poster）
+       margin-bottom 负值是为了吃掉 PNG 底部可能存在的 1~2% 透明像素条，让画面真的贴底 */
     body:has(#s0.welcome.active) .welcome-poster{
-      position:relative;
-      display:block;
-      width:100vw;                       /* 撑满整个视口宽 */
-      height:auto;                       /* 按原图比例自动算高度，保证完整显示 */
-      max-width:none;
-      margin-top:auto;                   /* 把插画推到 flex 容器最底 */
+      margin-top:auto;                   /* 推到最底 */
       margin-bottom:0;                   /* 紧贴 .welcome 底边 */
-      margin-left:calc(50% - 50vw);      /* 从容器中心拉到视口左边 */
-      margin-right:calc(50% - 50vw);     /* 同理拉到视口右边 */
-      inset:auto;
-      border-radius:0;
       align-self:stretch;
-      object-fit:contain;                /* 不裁切，完整展示 */
-      object-position:bottom center;
+      display:block;
     }
     /* 按钮回归文档流 */
     body:has(#s0.welcome.active) .welcome-cta{
@@ -712,12 +733,12 @@
     /* ==========  做题态皮肤：白底 + 选中黑框 + 绿色点缀 ========== */
     /* ============================================================ */
     /* 调色板：白 #ffffff / 选中黑框 #111 / 次灰 #f5f6f5 / 边框灰 #e5e7e5
-              文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 绿点缀 #2ea24a */
+              文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 绿点缀 #00EC00 */
 
     /* 页面底色与进度条 */
     body.quiz-on-q{background:#ffffff!important;color:#1a1d1a!important}
     body.quiz-on-q .bar{background:#eef0ee!important}
-    body.quiz-on-q .bar-fill{background:#2ea24a!important}
+    body.quiz-on-q .bar-fill{background:#00EC00!important}
 
     /* 顶部 nav 保持白底 */
     body.quiz-on-q .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
@@ -725,12 +746,12 @@
     body.quiz-on-q .nav-logo-icon{background:#111!important}
     body.quiz-on-q .nav-logo-icon svg path{fill:#fff!important}
     body.quiz-on-q .nav-back{color:#6b7280!important}
-    body.quiz-on-q .nav-back:hover{color:#2ea24a!important}
+    body.quiz-on-q .nav-back:hover{color:#00EC00!important}
 
     /* 题目文字 */
     body.quiz-on-q .q-title{color:#1a1d1a!important}
     body.quiz-on-q .q-desc{color:#6b7280!important}
-    body.quiz-on-q .q-num{color:#2ea24a!important}         /* 题号用绿点缀 */
+    body.quiz-on-q .q-num{color:#00EC00!important}         /* 题号用绿点缀 */
 
     /* 单选选项：白底 → hover 浅灰 → 选中黑框 + 微黑底 */
     body.quiz-on-q .opt{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
@@ -757,20 +778,20 @@
     body.quiz-on-q .chip .chip-name{color:#1a1d1a!important}
     body.quiz-on-q .chip.sel .chip-name{color:#ffffff!important;font-weight:600}
     /* 右上角对勾徽章：静默绿色→选中时换白底黑勾，与黑底搭配 */
-    body.quiz-on-q .chip .chip-check{background:#2ea24a!important;color:#ffffff!important}
+    body.quiz-on-q .chip .chip-check{background:#00EC00!important;color:#111!important}
     body.quiz-on-q .chip.sel .chip-check{background:#ffffff!important;color:#111!important}
     body.quiz-on-q .chip-counter{background:#f5f6f5!important;border-color:#e5e7e5!important}
     body.quiz-on-q .chip-counter-txt{color:#1a1d1a!important}
-    body.quiz-on-q .chip-counter-txt b{color:#2ea24a!important}          /* 计数数字绿色点缀 */
+    body.quiz-on-q .chip-counter-txt b{color:#00EC00!important}          /* 计数数字绿色点缀 */
     body.quiz-on-q .chip-counter-hint{color:#6b7280!important}
-    body.quiz-on-q .chip-counter.full{background:#eaf7ed!important;border-color:#2ea24a!important}
-    body.quiz-on-q .chip-counter.full .chip-counter-txt b{color:#2ea24a!important}
-    body.quiz-on-q .chip-counter.full .chip-counter-hint{color:#2ea24a!important}
+    body.quiz-on-q .chip-counter.full,body.quiz-on-q .chip-counter.ok{background:#e3ffe3!important;border-color:#00EC00!important}
+    body.quiz-on-q .chip-counter.full .chip-counter-txt b,body.quiz-on-q .chip-counter.ok .chip-counter-txt b{color:#00EC00!important}
+    body.quiz-on-q .chip-counter.full .chip-counter-hint,body.quiz-on-q .chip-counter.ok .chip-counter-hint{color:#00EC00!important}
 
     /* 排序题 rank */
     body.quiz-on-q .rank-item{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
     body.quiz-on-q .rank-item:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
-    body.quiz-on-q .rank-item:hover .rank-handle{color:#2ea24a!important}
+    body.quiz-on-q .rank-item:hover .rank-handle{color:#00EC00!important}
     body.quiz-on-q .rank-item.press{background:#f0f2f0!important}
     body.quiz-on-q .rank-item.lift{
       border-color:#111!important;background:#111!important;color:#ffffff!important;
@@ -778,11 +799,35 @@
     }
     body.quiz-on-q .rank-item.lift .rank-label{color:#ffffff!important}
     body.quiz-on-q .rank-item.lift .rank-handle{color:#ffffff!important}
-    body.quiz-on-q .rank-index{background:#eaf7ed!important;color:#2ea24a!important}  /* 序号徽章绿色 */
+    body.quiz-on-q .rank-index{background:#e3ffe3!important;color:#00EC00!important}  /* 序号徽章绿色 */
     body.quiz-on-q .rank-label{color:#1a1d1a!important}
     body.quiz-on-q .rank-handle{color:#9aa0a6!important}
-    body.quiz-on-q .btn-rank{background:#eaf7ed!important;border:1px solid #2ea24a!important;color:#2ea24a!important}
-    body.quiz-on-q .btn-rank:hover{background:#dcf1e1!important}
+    body.quiz-on-q .btn-rank{background:#e3ffe3!important;border:1px solid #00EC00!important;color:#00EC00!important}
+    body.quiz-on-q .btn-rank:hover{background:#c9ffc9!important}
+
+    /* 排序题的 pickOrdered 变体（q7 点选自动编号） */
+    .pick-wrap{display:grid;gap:10px}
+    .pick-help{font-size:12px;color:#888;line-height:1.55}
+    .pick-help b{font-weight:700;color:#00EC00}
+    .pick-list{display:grid;gap:10px}
+    .pick-item{display:grid;grid-template-columns:32px 1fr;align-items:center;gap:12px;
+      padding:14px 16px;border-radius:12px;border:1.5px solid #e5e7e5;background:#fff;color:#1a1d1a;
+      cursor:pointer;user-select:none;-webkit-user-select:none;
+      transition:border-color .15s ease,background .15s ease,transform .15s cubic-bezier(.2,.7,.3,1),box-shadow .2s ease}
+    .pick-item:hover{border-color:#111;background:#fafbfa}
+    .pick-item:active{transform:scale(.985)}
+    .pick-item.sel{border-color:#111;background:#111;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.14)}
+    .pick-item.sel .pick-label{color:#fff}
+    .pick-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:700;
+      background:transparent;border:1.5px solid #d4d7d4;color:transparent;
+      transition:background .15s ease,border-color .15s ease,color .15s ease}
+    .pick-item.sel .pick-badge{background:#00EC00;border-color:#00EC00;color:#111}
+    .pick-label{font-size:14px;line-height:1.5;color:#1a1d1a}
+    @media(min-width:640px){
+      .pick-item{padding:16px 20px}
+      .pick-label{font-size:15px}
+    }
 
     /* 量表 scale */
     body.quiz-on-q .scale-item{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
@@ -792,20 +837,20 @@
       box-shadow:0 6px 18px rgba(0,0,0,.18)!important;
     }
     body.quiz-on-q .scale-item.sel .scale-no{color:#ffffff!important}
-    body.quiz-on-q .scale-no{color:#2ea24a!important}       /* 编号绿点缀 */
-    body.quiz-on-q .scale-side.agree{color:#2ea24a!important}
+    body.quiz-on-q .scale-no{color:#00EC00!important}       /* 编号绿点缀 */
+    body.quiz-on-q .scale-side.agree{color:#00EC00!important}
     body.quiz-on-q .scale-side.disagree{color:#6b7280!important}
     body.quiz-on-q .scale-help{color:#9aa0a6!important}
 
     /* 底部按钮 */
     body.quiz-on-q .qa .btn-b{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
     body.quiz-on-q .qa .btn-b:hover{border-color:#111!important;color:#111!important}
-    body.quiz-on-q .qa .btn-n{background:#2ea24a!important;color:#fff!important;border:none!important}
-    body.quiz-on-q .qa .btn-n:hover{background:#26893d!important}
+    body.quiz-on-q .qa .btn-n{background:#00EC00!important;color:#111!important;border:none!important}
+    body.quiz-on-q .qa .btn-n:hover{background:#00b800!important;color:#fff!important}
     body.quiz-on-q .qa .btn-n:disabled{opacity:.35!important;background:#d4d7d4!important;color:#9aa0a6!important}
 
     /* Loading 旋转器 */
-    body.quiz-on-q .spinner{border-color:#e5e7e5!important;border-top-color:#2ea24a!important}
+    body.quiz-on-q .spinner{border-color:#e5e7e5!important;border-top-color:#00EC00!important}
 
     /* ============================================================ */
     /* ==========  Loading 态皮肤：白底 + 绿色转圈 + 黑字 ========== */
@@ -816,8 +861,8 @@
     body:has(#ld.active) .nav-logo-icon{background:#111!important}
     body:has(#ld.active) .nav-logo-icon svg path{fill:#fff!important}
     body:has(#ld.active) .nav-back{color:#6b7280!important}
-    body:has(#ld.active) .nav-back:hover{color:#2ea24a!important}
-    body:has(#ld.active) .spinner{border-color:#e5e7e5!important;border-top-color:#2ea24a!important}
+    body:has(#ld.active) .nav-back:hover{color:#00EC00!important}
+    body:has(#ld.active) .spinner{border-color:#e5e7e5!important;border-top-color:#00EC00!important}
     body:has(#ld.active) .ld-t{color:#111!important}
     body:has(#ld.active) .ld-s{color:#6b7280!important}
 
@@ -827,28 +872,29 @@
     /* 用 :has 锁定"结果场景激活"时的 body。
        调色板同做题态：白 #ffffff / 主黑 #111 / 文字 #1a1d1a /
        次灰 #6b7280 / 弱灰 #9aa0a6 / 边框 #e5e7e5 / 次底 #f7f8f7 /
-       绿点缀 #2ea24a / 浅绿底 #eaf7ed */
+       绿点缀 #00EC00 / 浅绿底 #e3ffe3 */
     body:has(#res.active){background:#ffffff!important;color:#1a1d1a!important}
     body:has(#res.active) .bar{background:#eef0ee!important}
-    body:has(#res.active) .bar-fill{background:#2ea24a!important}
+    body:has(#res.active) .bar-fill{background:#00EC00!important}
     body:has(#res.active) .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
     body:has(#res.active) .nav-logo{color:#1a1d1a!important}
     body:has(#res.active) .nav-logo-icon{background:#111!important}
     body:has(#res.active) .nav-logo-icon svg path{fill:#fff!important}
     body:has(#res.active) .nav-back{color:#6b7280!important}
-    body:has(#res.active) .nav-back:hover{color:#2ea24a!important}
+    body:has(#res.active) .nav-back:hover{color:#00EC00!important}
 
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
     #res .res-avatar-frame{border-color:#e5e7e5!important;background:#ffffff!important;box-shadow:0 1px 0 #fff inset!important}
     #res .res-avatar{background:#f7f8f7!important}
+    #res .res-kicker{color:#111!important;text-align:left!important}  /* 头像上方小字：黑色左对齐 */
     #res .res-name{color:#111!important}                   /* 角色名：主黑 */
     #res .res-real{color:#6b7280!important}                /* 副标题：次灰 */
     #res .res-desc{color:#6b7280!important}
 
     /* 金句 tagline */
     #res .res-tagline{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .res-tagline::before{color:#2ea24a!important}     /* 引号绿点缀 */
+    #res .res-tagline::before{color:#00EC00!important}     /* 引号绿点缀 */
 
     /* section 小标题 */
     #res .res-section-title{color:#6b7280!important}
@@ -858,61 +904,72 @@
 
     /* 暗格解读 insight-box：黑底白字 + 绿引号 */
     #res .insight-box{background:#111!important;border:1px solid #111!important;color:#ffffff!important}
-    #res .insight-box::before{color:#2ea24a!important}
+    #res .insight-box::before{color:#00EC00!important}
 
     /* 选择解读 reading-box */
     #res .reading-box{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .reading-box b,#res .reading-box strong{color:#2ea24a!important}
+    #res .reading-box b,#res .reading-box strong{color:#00EC00!important}
 
     /* 副属性 */
-    #res .substat-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
-    #res .substat-label{color:#6b7280!important}
+    #res .substat-card{background:#ffffff!important;border:1px solid #e5e7e5!important;text-align:left!important}
+    /* 第 1 张：大师的状态 —— 黑底白字 */
+    #res .substat-grid>.substat-card:nth-child(1){background:#111!important;border-color:#111!important}
+    #res .substat-grid>.substat-card:nth-child(1) .substat-label,
+    #res .substat-grid>.substat-card:nth-child(1) .substat-state,
+    #res .substat-grid>.substat-card:nth-child(1) .substat-val{color:#fff!important}
+    /* 第 2 张：你的下班阻碍 —— 绿底黑字 */
+    #res .substat-grid>.substat-card:nth-child(2){background:#00EC00!important;border-color:#00EC00!important}
+    #res .substat-grid>.substat-card:nth-child(2) .substat-label,
+    #res .substat-grid>.substat-card:nth-child(2) .substat-state,
+    #res .substat-grid>.substat-card:nth-child(2) .substat-val{color:#111!important}
+    #res .substat-label{color:#111!important}
     #res .substat-val{color:#111!important}                /* 大数字：主黑 */
-    #res .substat-state{color:#1a1d1a!important}           /* 状态句：主黑 */
+    #res .substat-state{color:#111!important}           /* 状态句：主黑 */
     #res .substat-desc{color:#6b7280!important}
 
     /* 魅力雷达 */
     #res .radar-wrap{background:#ffffff!important;border:1px solid #e5e7e5!important}
     #res .radar-svg .r-grid{stroke:#e5e7e5!important}
     #res .radar-svg .r-axis{stroke:#d4d7d4!important}
-    #res .radar-svg .r-area{fill:rgba(46,162,74,.15)!important;stroke:#111!important}  /* 区域线：黑 / 填充：绿半透 */
+    #res .radar-svg .r-area{fill:rgba(0,236,0,.45)!important;stroke:#111!important}  /* 区域线：黑 / 填充：#00EC00 45% */
     #res .radar-svg .r-point{fill:#111!important;stroke:#ffffff!important}
     #res .radar-svg .r-label{fill:#1a1d1a!important}
     #res .radar-svg .r-label-pct{fill:#6b7280!important}
 
     /* 你缺的工具 */
     #res .advice-intro{color:#1a1d1a!important}
-    #res .advice-intro em{color:#2ea24a!important;font-weight:700}
+    #res .advice-intro em{color:#00EC00!important;font-weight:700}
     #res .advice-outro{color:#6b7280!important}
     #res .advice-list li{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .advice-list li::before{background:#2ea24a!important;color:#ffffff!important}  /* 勾选圆点：绿 */
+    #res .advice-list li::before{background:#00EC00!important;color:#111!important}  /* 勾选圆点：绿底黑字 */
 
     /* 口头禅 */
     #res .mantra-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .mantra-pill::before{color:#2ea24a!important}
+    #res .mantra-pill::before{color:#00EC00!important}
 
     /* 保存卡片 */
     #res .save-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
-    #res .save-card-icon{background:#eaf7ed!important}
+    #res .save-card-icon{background:#e3ffe3!important}
     #res .save-card-title{color:#111!important}
     #res .save-card-sub{color:#6b7280!important}
     #res .save-card-preview{border:1px solid #e5e7e5!important;background:#f7f8f7!important}
-    #res .save-card-hint{color:#2ea24a!important}
+    #res .save-card-hint{color:#00EC00!important}
     /* 二维码卡片（结果页统一浅灰底） */
     #res .qr-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
     #res .qr-card-title{color:#111!important}
     #res .qr-card-sub{color:#6b7280!important}
-    #res .qr-card-url{color:#2ea24a!important}
+    #res .qr-card-url{color:#00EC00!important}
     #res .qr-card-img{background:#fff!important;border:1px solid #e5e7e5!important}
 
     /* 心愿抽奖卡 */
-    #res .wish-box{background:#eaf7ed!important;border:1px solid #2ea24a!important}
+    #res .wish-box{background:#e3ffe3!important;border:1px solid #00EC00!important}
     #res .wish-title{color:#1a1d1a!important}
     #res .wish-desc{color:#6b7280!important}
     #res .wish-box textarea{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
     #res .wish-btn{background:#111!important;color:#ffffff!important}
-    #res .wish-btn:hover{background:#2ea24a!important}
-    #res .wish-result{color:#2ea24a!important}
+    #res .wish-btn:hover{background:#00EC00!important;color:#111!important}
+    #res .wish-btn:disabled,#res .wish-btn.is-done,#res .wish-btn.is-done:hover{background:#c9c6c0!important;color:#fff!important;cursor:not-allowed!important;opacity:.85;pointer-events:none}
+    #res .wish-result{color:#00EC00!important}
 
     /* 相关角色列表 */
     #res .others-title{color:#6b7280!important}
@@ -921,10 +978,10 @@
     #res .other-card .oc-pct{color:#9aa0a6!important}
 
     /* 底部操作按钮 */
-    #res .btn-explore{background:#2ea24a!important;color:#ffffff!important;box-shadow:0 4px 12px rgba(46,162,74,.25)!important}
-    #res .btn-explore:hover{background:#26893d!important;box-shadow:0 6px 16px rgba(46,162,74,.35)!important}
+    #res .btn-explore{background:#00EC00!important;color:#111!important;box-shadow:0 4px 12px rgba(0,236,0,.25)!important}
+    #res .btn-explore:hover{background:#00b800!important;color:#fff!important;box-shadow:0 6px 16px rgba(0,236,0,.35)!important}
     #res .btn-share{background:#111!important;border:none!important;color:#ffffff!important}
-    #res .btn-share:hover{background:#2ea24a!important}
+    #res .btn-share:hover{background:#00EC00!important;color:#111!important}
     #res .btn-redo{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
     #res .btn-redo:hover{border-color:#111!important;color:#111!important}
 
@@ -955,11 +1012,10 @@
           </button>
         </div>
       </div>
-      <!-- 底部：封面插画（image 23.png）作为背景条带
-           · 固定高度 392px
-           · 居中显示，窄屏只露中间一段，宽屏不够则横向 repeat 接上
-           · 用 div + background 而不是 <img>，才能实现平铺 -->
-      <img class="welcome-poster" src="img/image 23.png?v=20260427" alt="还没下班的设计大师" />
+      <!-- 底部：封面插画作为背景条带
+           · 宽度铺满视口、居中对齐
+           · 窄屏只露中间人物群，宽屏自动向两侧展开更多内容 -->
+      <div class="welcome-poster" role="img" aria-label="还没下班的设计大师"></div>
     </div>
 
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
@@ -973,6 +1029,7 @@
     <div class="res" id="res">
       <div class="res-card">
         <div class="res-top">
+          <div class="res-kicker">AI设计时代你是：</div>
           <div class="res-avatar-frame"><img class="res-avatar" id="rImg" src="" alt></div>
           <div class="res-name" id="rName">草稿太多的毕加班索</div>
           <div class="res-real" id="rReal" style="display:none">D1 · 灵感发散与筛选</div>
@@ -984,16 +1041,24 @@
           <div class="insight-box" id="rComment"></div>
         </div>
 
-        <!-- 性格标签（2×2 胶囊） -->
+        <!-- 下班困局来自（雷达，整行） -->
         <div class="res-section">
-          <div class="res-section-title">性格标签</div>
-          <div class="tag-grid" id="rTags"></div>
+          <div class="res-section-title">下班困局来自</div>
+          <div class="radar-wrap radar-full" id="rRadar"></div>
         </div>
 
-        <!-- 选择解读（why + 差距合成段落） -->
+        <!-- 性格标签 + 选择解读（同一行，左右两列） -->
         <div class="res-section">
-          <div class="res-section-title">选择解读</div>
-          <div class="reading-box" id="rReading"></div>
+          <div class="tags-reading-row">
+            <div class="tags-block">
+              <div class="res-section-title">口头禅</div>
+              <div class="tag-list" id="rMantras"></div>
+            </div>
+            <div class="reading-block">
+              <div class="res-section-title">选择解读</div>
+              <div class="reading-box" id="rReading"></div>
+            </div>
+          </div>
         </div>
 
         <!-- 你的两个副属性 -->
@@ -1002,11 +1067,7 @@
           <div class="substat-grid" id="rSubStats"></div>
         </div>
 
-        <!-- 魅力雷达 -->
-        <div class="res-section">
-          <div class="res-section-title">魅力雷达</div>
-          <div class="radar-wrap" id="rRadar"></div>
-        </div>
+        <!-- 下班困局来自（雷达）已经合并到上面的横排 section -->
 
         <!-- 你缺的工具（解锁建议） -->
         <div class="res-section">
@@ -1016,19 +1077,13 @@
           <div class="advice-outro">的 AI 设计工具。</div>
         </div>
 
-        <!-- 口头禅（2×2 胶囊） -->
-        <div class="res-section">
-          <div class="res-section-title">口头禅</div>
-          <div class="mantra-grid" id="rMantras"></div>
-        </div>
-
         <!-- 扫码测你（二维码会被 html2canvas 一并拍进"保存图片"长图里） -->
         <div class="res-section qr-section">
           <div class="qr-card">
             <div class="qr-card-meta">
               <div class="qr-card-title">扫码测你是哪位大师</div>
               <div class="qr-card-sub">还没下班的设计大师测试 · 共 11 题 · 约 4 分钟</div>
-              <div class="qr-card-url">ardot-quiz-1cuu5ds1xs.edgeone.dev</div>
+              <div class="qr-card-url">ardot-quiz.edgeone.dev</div>
             </div>
             <div class="qr-card-img" id="qrBox" aria-label="扫码进入测试"></div>
           </div>
@@ -1037,9 +1092,9 @@
         <!-- 底部心愿抽奖 -->
         <div class="res-section">
           <div class="wish-box" id="wishBox" style="margin:0">
-            <div class="wish-title" id="wishTitle">从「草稿太多的毕加班索」到「毕加索」</div>
-            <div class="wish-desc" id="wishDesc">请填写你需要的 AI 功能，提交后可参与抽奖</div>
-            <textarea id="wishInput" placeholder="我希望 AI 有这样的能力..."></textarea>
+            <div class="wish-title" id="wishTitle">你是「草稿太多的毕加班索」，要成为大师「毕加索」</div>
+            <div class="wish-desc" id="wishDesc">分享一下你想要的 AI 设计技能，提交后可参与抽奖</div>
+            <textarea id="wishInput" placeholder="我希望 AI 能有这样的设计技能……"></textarea>
             <div class="wish-actions">
               <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿并抽奖</button>
               <span class="wish-result" id="wishResult"></span>
@@ -1167,8 +1222,8 @@
                 "它能给你很多图，却不一定能帮你判断哪一个更值得继续。"
               ],
               masterComment:"你的脑子里有很多视角。问题不是没有想法，而是每个想法都在喊\u201c选我\u201d。",
-              masterState:"把混乱视角变成结构。",
-              userState:"让草稿越堆越多，方向越来越难选。",
+              masterState:"你像毕加索，也会把一个问题拆成很多角度：不同构图、不同风格、不同表达方式，很容易看到\"还可以这样做\"。",
+              userState:"但你还没成为毕加索，因为想法经常停在发散阶段。方向越想越多，方案越推越散，最后缺少一个能真正定下来的主方案。",
               advice:[
                 "快速生成多个设计方向",
                 "自动整理 moodboard",
@@ -1176,9 +1231,10 @@
                 "把概念方向落成初稿"
               ],
               mantras:[
-                "\u201c这个方向也不是不行。\u201d",
-                "\u201c我再找几张参考。\u201d",
-                "\u201c先别删，万一后面用得上。\u201d"
+                "\u201c这个方向也不错。\u201d",
+                "\u201c再试一版，万一更好呢？\u201d",
+                "\u201c我先把想法都摊开。\u201d",
+                "\u201c等等，我又想到一个。\u201d"
               ],
               tags:["灵感爆发 MAX","方向选择困难","参考永远不够","草稿删不动"],
               subStats:[{val:"42%",label:"灵感留存率",desc:"100 个想法里能真正推下去的比例"},{val:"3.7",label:"同时在跑的方向",desc:"一张稿子平均并行的探索条数"}],
@@ -1199,8 +1255,8 @@
                 "设计还没开始，时间已经被素材消耗掉了。"
               ],
               masterComment:"你追求干净、克制和质感。可惜最消耗你的，往往是那一圈永远修不干净的毛边。",
-              masterState:"用留白制造秩序。",
-              userState:"还在和毛边、糊图、假合成拉扯。",
+              masterState:"你像原研哉，也在意画面的干净、留白、材质、边缘和整体质感。你能察觉到\"这个素材不够高级\"\"这个画面太脏\"。",
+              userState:"但你还没成为原研哉，因为容易被素材细节消耗。抠图、修边、调质感、找替代素材占掉太多时间，最后画面还不一定更干净。",
               advice:[
                 "自动抠图和修边",
                 "自动放大并补足细节",
@@ -1208,9 +1264,10 @@
                 "清理素材瑕疵"
               ],
               mantras:[
-                "\u201c这个边缘有点脏。\u201d",
-                "\u201c放大以后糊了。\u201d",
-                "\u201c我先处理一下素材。\u201d"
+                "\u201c这个边缘怎么还有毛边？\u201d",
+                "\u201c素材再干净一点就好了。\u201d",
+                "\u201c我就再修最后一下。\u201d",
+                "\u201c这个质感还不够高级。\u201d"
               ],
               tags:["像素级强迫症","毛边雷达常开","合成不接受将就","细节死磕派"],
               subStats:[{val:"28%",label:"素材返工率",desc:"一张图平均要重修的像素比例"},{val:"1.8h",label:"每天耗在素材上",desc:"真正落在设计上之前的时间"}],
@@ -1231,8 +1288,8 @@
                 "真正接进设计规范后，你还是要重画、重调、重对齐。"
               ],
               masterComment:"你心里有秩序，但画板上总有几块东西不听话。",
-              masterState:"把网格变成语言。",
-              userState:"还在把网格一格一格手动摆正。",
+              masterState:"你像蒙德里安，也会在意方块、线条、网格、比例和秩序。你能敏感地发现哪里不齐、哪里太挤、哪里层级不稳。",
+              userState:"但你还没成为蒙德里安，因为常常先把内容堆上去，再回来补救结构。版式不是一开始搭出来的，而是在最后一轮又一轮地\"救回来\"。",
               advice:[
                 "理解设计规范",
                 "调用组件库",
@@ -1240,9 +1297,10 @@
                 "检查间距、对齐和层级"
               ],
               mantras:[
-                "\u201c这个间距不对。\u201d",
-                "\u201c组件不能这么用。\u201d",
-                "\u201c先拉一下网格。\u201d"
+                "\u201c它是不是没对齐？\u201d",
+                "\u201c这里是不是差了 1px？\u201d",
+                "\u201c这个间距不太对。\u201d",
+                "\u201c我先把网格拉一下。\u201d"
               ],
               tags:["网格信徒","对齐偏执狂","规范第一位","间距检察官"],
               subStats:[{val:"51%",label:"返工对齐率",desc:"AI 出稿后仍需手动微调的比例"},{val:"6px",label:"可容忍误差",desc:"你对像素级偏移的最大忍让值"}],
@@ -1263,8 +1321,8 @@
                 "改一个按钮，要检查几十张稿子；自动化跑完，还要担心漏掉哪一页。"
               ],
               masterComment:"重复本可以成为风格。但在你的画板里，重复更像工伤。",
-              masterState:"把重复变成系统。",
-              userState:"把重复变成加班。",
+              masterState:"你像草间弥生，也能理解重复带来的节奏、统一感和视觉冲击。你知道同一套元素反复出现，会让作品更有系统感。",
+              userState:"但你还没成为草间弥生，因为重复还停留在手动劳动。复制、改尺寸、套模板、换文字、导出多版，都在一遍遍消耗你的耐心。",
               advice:[
                 "批量替换设计元素",
                 "多稿同步更新",
@@ -1272,9 +1330,10 @@
                 "自动检查遗漏页面"
               ],
               mantras:[
-                "\u201c怎么还有 83 张？\u201d",
-                "\u201c这个也要改？\u201d",
-                "\u201c检查比修改还累。\u201d"
+                "\u201c怎么又要复制一遍？\u201d",
+                "\u201c这件事不能批量做吗？\u201d",
+                "\u201c我已经改到第 38 个了。\u201d",
+                "\u201c重复劳动真的会杀人。\u201d"
               ],
               tags:["Ctrl+D 常驻","多稿同步焦虑","检查比改还累","批量心态濒临崩溃"],
               subStats:[{val:"83",label:"单次平均稿数",desc:"一次小改动要检查的稿子数"},{val:"2.5x",label:"重复耗时倍数",desc:"你比批处理工具慢的倍数"}],
@@ -1295,8 +1354,8 @@
                 "AI 能总结表面内容，却不一定抓得住真正的设计判断。"
               ],
               masterComment:"你的笔触很强，但上下文总是断。真正麻烦的不是做新方案，而是重新找回旧方案为什么成立。",
-              masterState:"让风格持续生长。",
-              userState:"每个新项目都像重新开始。",
+              masterState:"你像梵高，也有明显的情绪、审美和个人表达倾向。你不是没有风格，而是经常能做出一些很有感觉的片段。",
+              userState:"但你还没成为梵高，因为风格还不够连续。文件、素材、参考、修改意见和版本散在各处，导致每次打开项目都像重新开始。",
               advice:[
                 "记住项目背景",
                 "提取历史方案逻辑",
@@ -1304,9 +1363,10 @@
                 "帮新方案接上旧项目上下文"
               ],
               mantras:[
-                "\u201c这个项目之前是不是做过类似的？\u201d",
-                "\u201c让我翻一下旧文件。\u201d",
-                "\u201cAI 总结得像，但没抓到重点。\u201d"
+                "\u201c我刚刚那版去哪了？\u201d",
+                "\u201c这个风格怎么又变了？\u201d",
+                "\u201c我记得之前有个参考。\u201d",
+                "\u201c现在到底用哪一版？\u201d"
               ],
               tags:["记忆断片","翻旧文件大师","风格不稳定","上下文失踪人口"],
               subStats:[{val:"35%",label:"历史复用率",desc:"旧方案能被新项目顺利复用的比例"},{val:"4.2h",label:"每周翻旧稿时间",desc:"找回上次设计决策耗掉的时间"}],
@@ -1327,8 +1387,8 @@
                 "设计完成之后，流程还没有结束。"
               ],
               masterComment:"你的画面已经完成了，但它总是在去往原型、标注和交付的路上迷路。",
-              masterState:"让水面自然流动。",
-              userState:"让文件在工具之间反复漂流。",
+              masterState:"你像莫奈，也会围绕同一个主题不断尝试不同版本：换颜色、换构图、换气氛、换输出形式，直到接近想要的效果。",
+              userState:"但你还没成为莫奈，因为缺少稳定的版本迁移和交付流程。前面创作还算顺，最后却卡在命名、导出、压缩、格式适配和发文件。",
               advice:[
                 "自动生成原型",
                 "自动生成标注",
@@ -1337,9 +1397,10 @@
                 "跨工具同步设计稿"
               ],
               mantras:[
-                "\u201c原型我马上补。\u201d",
-                "\u201c这个格式怎么又乱了？\u201d",
-                "\u201c我再导一版给你。\u201d"
+                "\u201c怎么还是旧版本？\u201d",
+                "\u201c到底用哪一版？\u201d",
+                "\u201c怎么整理成交付文档？\u201d",
+                "\u201cfinal_v7 还不是最终版？\u201d"
               ],
               tags:["交付流浪汉","导出格式焦虑","原型最后一公里","标注补丁工"],
               subStats:[{val:"5",label:"经手工具数",desc:"单个项目交付涉及的软件数量"},{val:"31%",label:"交付耗时占比",desc:"设计完成后仍要处理的时间比例"}],
@@ -1384,7 +1445,7 @@
             {key:"C",label:"C. 在不同软件之间反复导入导出，光格式就磨半天"},
             {key:"D",label:"D. 从设计稿到原型/标注几乎全手动"}
           ]},
-          q7:{type:"rank",title:"下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"长按拖动排序",mapsToRoles:true,options:[
+          q7:{type:"rank",ui:"pickOrdered",title:"下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"按你最希望的顺序依次点选（可只选最在意的几项）",mapsToRoles:true,options:[
             {key:"A",label:"一组概念图和 moodboard"},
             {key:"B",label:"该抠的抠、该修的修的图片素材"},
             {key:"C",label:"符合我规范、对得齐的界面版式"},
@@ -1392,7 +1453,7 @@
             {key:"E",label:"梳理过去项目的风格与复用建议"},
             {key:"F",label:"同步到原型/标注/其他软件里的交付物"}
           ]},
-          q8:{type:"multi",maxSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
+          q8:{type:"multi",minSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
             {key:"A",label:"我的设计风格"},
             {key:"B",label:"我的组件规范"},
             {key:"C",label:"我的项目上下文"},
@@ -1413,7 +1474,7 @@
             {key:"D",label:"D. 平面 / 包装设计"},
             {key:"E",label:"E. 动效 / 视频设计"}
           ]},
-          q11:{type:"multi",maxSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
+          q11:{type:"multi",minSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
             {key:"A",label:"A. Midjourney"},
             {key:"B",label:"B. 即梦（Dreamina）"},
             {key:"C",label:"C. Stable Diffusion / ComfyUI"},
@@ -1597,18 +1658,18 @@
         return;
       }
       if(q.type==="multi"){
-        const maxSelect=safePositiveInt(q.maxSelect,3);
+        const minSelect=safePositiveInt(q.minSelect,3);
         const selected=Array.isArray(A[qid])?A[qid]:[];
         /* 外层 wrap：计数器 + chip 网格 */
         const wrap=document.createElement("div");
         wrap.className="chip-wrap";
         wrap.dataset.q=qid;
         wrap.dataset.t="m";
-        wrap.dataset.max=String(maxSelect);
+        wrap.dataset.min=String(minSelect);
         const counter=document.createElement("div");
         counter.className="chip-counter";
-        counter.innerHTML=`<span class="chip-counter-txt">已选 <b class="chip-cur">${selected.length}</b> / ${maxSelect}</span>`;
-        if(selected.length>=maxSelect)counter.classList.add("full");
+        counter.innerHTML=`<span class="chip-counter-txt">已选 <b class="chip-cur">${selected.length}</b>（至少 ${minSelect} 项）</span>`;
+        if(selected.length>=minSelect)counter.classList.add("ok");
         wrap.appendChild(counter);
         const grid=document.createElement("div");
         grid.className="chip-grid";
@@ -1621,10 +1682,38 @@
         wrap.appendChild(grid);
         scene.insertBefore(wrap,qa);
         const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
-        if(btn)btn.disabled=selected.length===0;
+        if(btn)btn.disabled=selected.length<minSelect;
         return;
       }
       if(q.type==="rank"){
+        /* === 分支一：pickOrdered —— 多选 + 按点击顺序自动编号（q7 使用）=== */
+        if(q.ui==="pickOrdered"){
+          const selected=Array.isArray(A[qid])?A[qid].slice():[];
+          A[qid]=selected;
+          const pickWrap=document.createElement("div");
+          pickWrap.className="pick-wrap";
+          pickWrap.dataset.q=qid;
+          const picked=selected.length;
+          const total=(q.options||[]).length;
+          const pickHelp=`按你最在意的顺序依次点选（已选 <b class="pick-cur">${picked}</b> / ${total}，可只选你最关心的几项）`;
+          pickWrap.innerHTML=`<div class="pick-help">${pickHelp}</div>
+            <div class="pick-list" data-q="${qid}">
+              ${(q.options||[]).map((opt)=>{
+                const rank=selected.indexOf(opt.key);
+                const activeCls=rank>=0?" sel":"";
+                const badge=rank>=0?(rank+1):"";
+                return `<div class="pick-item${activeCls}" data-key="${opt.key}" onclick="pkOrdered(this)">
+                  <div class="pick-badge">${badge}</div>
+                  <div class="pick-label">${opt.label}</div>
+                </div>`;
+              }).join("")}
+            </div>`;
+          scene.insertBefore(pickWrap,qa);
+          const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
+          if(btn)btn.disabled=selected.length===0;
+          return;
+        }
+        /* === 分支二：默认长按拖拽排序 === */
         const rankWrap=document.createElement("div");
         rankWrap.className="rank-wrap";
         const rankState=Array.isArray(A[qid])&&A[qid].length ? A[qid].slice() : (q.options||[]).map((o)=>o.key);
@@ -1793,7 +1882,7 @@
       /* 找到包含 data-q 的容器：新版 .chip-wrap 或旧版 .opts */
       const g=el.closest("[data-q]")||el.parentElement;
       const qid=g.dataset.q;
-      const maxSelect=safePositiveInt(g.dataset.max,3);
+      const minSelect=safePositiveInt(g.dataset.min,3);
       const key=el.dataset.v;
       const selected=Array.isArray(A[qid])?A[qid].slice():[];
       const idx=selected.indexOf(key);
@@ -1801,12 +1890,6 @@
         selected.splice(idx,1);
         el.classList.remove("sel");
       }else{
-        if(selected.length>=maxSelect){
-          /* 满员态：抖动一下当前被点项 + 轻震 */
-          el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");
-          try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
-          return;
-        }
         selected.push(key);
         el.classList.add("sel");
       }
@@ -1816,10 +1899,48 @@
       if(counter){
         const cur=counter.querySelector(".chip-cur");
         if(cur)cur.textContent=String(selected.length);
-        counter.classList.toggle("full",selected.length>=maxSelect);
+        counter.classList.toggle("ok",selected.length>=minSelect);
       }
       const b=document.getElementById("b"+S);
-      if(b)b.disabled=selected.length===0;
+      if(b)b.disabled=selected.length<minSelect;
+    }
+    /* q7 专用：点击顺序 = 排名；再点一次取消，其它项序号自动重排 */
+    function pkOrdered(el){
+      const list=el.closest(".pick-list");
+      if(!list)return;
+      const qid=list.dataset.q;
+      const key=el.dataset.key;
+      const selected=Array.isArray(A[qid])?A[qid].slice():[];
+      const idx=selected.indexOf(key);
+      if(idx!==-1){
+        selected.splice(idx,1);   // 取消
+      }else{
+        selected.push(key);       // 追加到末尾 → 下一个序号
+      }
+      A[qid]=selected;
+      /* 重排所有项的徽章和选中态 */
+      list.querySelectorAll(".pick-item").forEach((item)=>{
+        const k=item.dataset.key;
+        const rank=selected.indexOf(k);
+        const badge=item.querySelector(".pick-badge");
+        if(rank>=0){
+          item.classList.add("sel");
+          if(badge)badge.textContent=String(rank+1);
+        }else{
+          item.classList.remove("sel");
+          if(badge)badge.textContent="";
+        }
+      });
+      /* 更新计数器文案 */
+      const wrap=el.closest(".pick-wrap");
+      if(wrap){
+        const cur=wrap.querySelector(".pick-cur");
+        if(cur)cur.textContent=String(selected.length);
+      }
+      const btn=document.getElementById("b"+S);
+      if(btn)btn.disabled=selected.length===0;
+      /* 轻震反馈 */
+      try{if(navigator.vibrate)navigator.vibrate(8);}catch(e){}
     }
     /* ===== 排序题：长按拖拽（触屏 + 鼠标统一） =====
        交互：按住 120ms 或手指纵向滑动超阈值立即激活 → 短震动 + 浮起 → 跟手移动 → 实时换位（其它项平滑让位） → 松手落位 */
@@ -2100,11 +2221,6 @@
       /* 暗格解读（大师点评） */
       setText("rComment",rc.masterComment||"");
 
-      /* 性格标签 */
-      const tagEl=document.getElementById("rTags");
-      const tags=Array.isArray(rc.tags)&&rc.tags.length?rc.tags:[rc.archetype||"","被困："+(rc.stuck||""),rc.dimension||"","等待解锁"];
-      if(tagEl)tagEl.innerHTML=tags.slice(0,4).map(t=>`<div class="tag-pill">${t}</div>`).join("");
-
       /* 选择解读：whyLines + 总结 */
       const reading=document.getElementById("rReading");
       if(reading){
@@ -2118,8 +2234,8 @@
       /* 副属性（两张卡片：大师的状态 / 你的状态） */
       const subEl=document.getElementById("rSubStats");
       const stateCards=[
-        {label:"大师的状态",val:rc.masterState||"—"},
-        {label:"你的状态",  val:rc.userState  ||"—"}
+        {label:"你的大师基因",val:rc.masterState||"—"},
+        {label:"你的下班阻碍",val:rc.userState  ||"—"}
       ];
       if(subEl)subEl.innerHTML=stateCards.map(s=>`<div class="substat-card"><div class="substat-label">${s.label}</div><div class="substat-state">${s.val}</div></div>`).join("");
 
@@ -2131,10 +2247,10 @@
       const advArr=Array.isArray(rc.advice)?rc.advice:[];
       if(advEl)advEl.innerHTML=advArr.map(a=>`<li>${a}</li>`).join("");
 
-      /* 口头禅 2×2 */
+      /* 口头禅（左栏列表：复用 tag-list / tag-pill 样式，竖排 4 条） */
       const mtEl=document.getElementById("rMantras");
       const mtArr=Array.isArray(rc.mantras)?rc.mantras:[];
-      if(mtEl)mtEl.innerHTML=mtArr.slice(0,4).map(m=>`<div class="mantra-pill">${(m||"").replace(/^[\u201C"]/,"").replace(/[\u201D"]$/,"")}</div>`).join("");
+      if(mtEl)mtEl.innerHTML=mtArr.slice(0,4).map(m=>`<div class="tag-pill">${(m||"").replace(/^[\u201C"]/,"").replace(/[\u201D"]$/,"")}</div>`).join("");
 
       /* 结果页右下角"保存图片"悬浮按钮 + 绑定长按截图保存（兼容老交互） */
       showSaveFab();
@@ -2148,10 +2264,10 @@
       /* 心愿抽奖区 */
       const wishBox=document.getElementById("wishBox");if(wishBox)wishBox.style.display="";
       const wishTitle=document.getElementById("wishTitle");
-      if(wishTitle)wishTitle.textContent=`从「${topRole.name}」到「${roleIdealName(topRole)}」`;
+      if(wishTitle)wishTitle.textContent=`你是「${topRole.name}」，要成为大师「${roleIdealName(topRole)}」`;
       const wishDesc=document.getElementById("wishDesc");
       const hasWish=String(A.q12||"").trim().length>0;
-      if(wishDesc)wishDesc.textContent=hasWish?"你已填写需要的 AI 功能，可点击按钮参与抽奖":"请填写你需要的 AI 功能，提交后可参与抽奖";
+      if(wishDesc)wishDesc.textContent=hasWish?"你已分享想要的 AI 设计技能，可点击按钮参与抽奖":"分享一下你想要的 AI 设计技能，提交后可参与抽奖";
       const wishInput=document.getElementById("wishInput");
       if(wishInput){
         wishInput.style.display="";
@@ -2161,6 +2277,10 @@
 
       latestResult={id:topRole.id,name:topRole.name||"",personality:personality};
       const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
+      const wishBtn=document.querySelector("#wishBox .wish-btn");
+      if(wishBtn){wishBtn.disabled=false;wishBtn.classList.remove("is-done");wishBtn.textContent="提交心愿并抽奖";}
+      const wishInputEl=document.getElementById("wishInput");
+      if(wishInputEl)wishInputEl.style.display="";
       document.getElementById("res").classList.add("active");
       window.scrollTo({top:0,behavior:"smooth"});
       return {id:topRole.id,name:topRole.name||"",personality:personality};
@@ -2192,7 +2312,7 @@
       const box=document.getElementById("qrBox");
       if(!box)return;
       box.innerHTML=""; /* 清掉旧内容，避免重复渲染 */
-      const url="https://ardot-quiz-1cuu5ds1xs.edgeone.dev/quiz-h5.html";
+      const url="https://ardot-quiz.edgeone.dev/quiz-h5.html";
       const size=176; /* 实际渲染 176，显示 88，提高扫描清晰度 */
       if(typeof QRCode==="function" && !window.__qrLibFailed){
         try{
@@ -2261,8 +2381,8 @@
         document.body.style.background="#ffffff";
         /* 强制结果区进入"动画完成态"，避免 html2canvas 拍到 opacity<1 的中间帧导致整张发灰 */
         res.classList.add("capturing");
-        /* 截图时隐藏"心愿抽奖/输入框"和叠层等非海报元素，只保留分享海报主体 */
-        const hideSelectors=["#wishBox","#saveOverlay",".save-card",".others-title"];
+        /* 截图时隐藏"心愿抽奖/输入框"、底部按钮、叠层等非海报元素，只保留分享海报主体 */
+        const hideSelectors=["#wishBox","#saveOverlay",".save-card",".others-title",".res-actions"];
         const hiddenEls=[];
         hideSelectors.forEach(sel=>{
           res.querySelectorAll(sel).forEach(el=>{
@@ -2489,12 +2609,8 @@
     }
 
     function getQuizEntryLink(){
-      /* 问卷 H5 入口：当前页面的 URL 去掉 query/hash 作为入口 */
-      try{
-        const u=new URL(location.href);
-        u.search="";u.hash="";
-        return u.toString();
-      }catch(_){return location.origin+location.pathname;}
+      /* 问卷 H5 入口：统一指向稳定域名，避免临时预览域名被扫出 */
+      return "https://ardot-quiz.edgeone.dev/quiz-h5.html";
     }
 
     /* ====== 纯 JS QR Code 生成（Model 2 / ECC L，最小实现，支持中英文短链） ====== */
@@ -2870,7 +2986,7 @@
       if(!host)return;
       const dims=(personality&&personality.radarData)||[];
       if(!dims.length){host.innerHTML="";return;}
-      const SIZE=320,CX=SIZE/2,CY=SIZE/2,R=100;
+      const SIZE=420,CX=SIZE/2,CY=SIZE/2,R=110;
       const n=dims.length;
       /* 轴端点坐标（起点在正上方 -90°） */
       function axisPt(i,rr){
@@ -2978,14 +3094,15 @@
     }
 
     function submitWishAndDraw(){
+      const btn=document.querySelector("#wishBox .wish-btn");
+      if(btn&&(btn.disabled||btn.classList.contains("is-done")))return;
       const resultEl=document.getElementById("wishResult");
       const text=String(A.q12||"").trim();
       if(!text){
-        toast("请先填写你需要的 AI 功能");
+        toast("请先分享你想要的 AI 设计技能");
         return;
       }
-      const pool=["设计效率工具包","高质量提示词模板包","AI 协作流程清单","视觉灵感补给包"];
-      const reward=pool[Math.floor(Math.random()*pool.length)];
+      const reward="何老师说你真棒";
       const role=masters.find((r)=>r.id===latestResult.id) || null;
       const rec={
         wish:text,
@@ -3014,6 +3131,7 @@
       if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
       const input=document.getElementById("wishInput");
       if(input)input.style.display="none";
+      if(btn){btn.disabled=true;btn.classList.add("is-done");btn.textContent="已参与抽奖";}
       toast("心愿提交成功，已完成抽奖");
     }
 
@@ -3031,6 +3149,7 @@
 
     function share(){
       var roleId=(latestResult&&latestResult.id)||"";
+      var isOnResult=!!roleId; // 有 roleId 代表当前已经在结果页
       /* 分享卡片使用问卷调研自身的标题/副标题/首页海报（不带角色结果），吸引朋友进来做测试 */
       var title="《好险，差点就会做设计了》";
       // 题数 & 预计时长（按每题约 20 秒估算，向上取整，最少 1 分钟）
@@ -3038,25 +3157,25 @@
       var estMin=Math.max(1,Math.ceil(qCount*20/60));
       var txt="测一测你是哪位还没下班的设计大师 · 共 "+qCount+" 题 · 预计 "+estMin+" 分钟";
       // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
-      //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=poster-share.jpg
-      //  - 结果页（有 roleId）：指向 share-<roleId>.html 这类专属中转页，每个页面的 <head>
-      //    og:image 写死对应角色图。真实用户打开后被 location.replace 立即跳回 quiz-h5.html，
-      //    朋友进来依然落到问卷首页；微信爬虫只读 head、不跟随跳转，所以卡片缩略图 = 角色图。
+      //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=share-cover.png
+      //  - 结果页（有 roleId）：指向 share-<roleId>.html 专属中转页，<head> og:image=角色图
+      //    微信爬虫只读 head、不跟随跳转，所以微信里的分享卡片缩略图 = 对应角色图
       // v 参数是静态构建号，改版 meta/分享图时递增即可让微信/社交平台重新抓取缓存
       var SHARE_BUILD="20260427";
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
       var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
-      // 分享卡片图：统一使用首页封面 share-cover.png，结果页也不再切换成角色图
-      //  - 统一视觉，避免不同结果卡片缩略图风格不一
-      //  - 避免结果角色图尺寸过大在微信里丢图
+      // 分享卡片"公网可访问图"：
+      //  - 结果页：用角色主题图（对应 share-<roleId>.html 里 og:image）
+      //  - 开头/过程中：用首页封面 share-cover.png
       var posterImg=baseDir+"img/share-cover.png";
-      var rImgEl=document.getElementById("rImg");
-      var shareImg=posterImg;
+      var roleShareImg=roleId?(baseDir+"img/"+roleMetaImgName(roleId)):"";
+      var shareImg=isOnResult&&roleShareImg?roleShareImg:posterImg;
       // 更新分享卡片 meta（社交平台/微信会重读）
       updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
       // ① 微信内置浏览器：Web Share API 被屏蔽，只能用 JSSDK + 引导右上角
+      //    微信 JSSDK 的 imgUrl 只能是公网 URL（不支持 dataURL），所以仍然走 meta/role 图
       if(window.__IS_WX__){
         tryUpdateWxShare({title:title,desc:txt,link:shareLink,imgUrl:shareImg});
         showShareMask();
@@ -3064,17 +3183,52 @@
       }
 
       // ② 非微信：直接调起手机系统原生分享面板（iOS/Android 都支持）
-      //    优先把结果角色图作为文件一并分享；失败或不支持文件分享时退化为仅分享链接+文案
+      //    - 结果页：优先实时截取"当前这份结果"的长图作为分享图
+      //    - 开头/过程中：用首页封面 share-cover.png
       if(navigator.share){
-        tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
-          // 带图失败 → 退化到仅分享链接+文案
-          shareTextOnly(title,txt,shareLink);
-        });
+        if(isOnResult){
+          tryShareWithLiveResultImage(title,txt,shareLink).catch(function(){
+            // 实时截图失败 → 退回角色主题图
+            tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
+              shareTextOnly(title,txt,shareLink);
+            });
+          });
+        }else{
+          tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
+            shareTextOnly(title,txt,shareLink);
+          });
+        }
         return;
       }
 
       // ③ 完全不支持 Web Share：复制链接到剪贴板 + 提示粘贴到微信
       fallbackCopyLink(txt,shareLink);
+    }
+
+    /* 把 roleId 映射成 /img/ 下的角色图文件名（与 share-d*.html 里的 og:image 一致） */
+    function roleMetaImgName(roleId){
+      var map={d1:"picasso.png",d2:"hara.png",d3:"mondrian.png",d4:"kusama.png",d5:"gogh.png",d6:"monet.png"};
+      return map[roleId]||"share-cover.png";
+    }
+
+    /* 原生分享（结果页专用）：实时截一张"当前结果页"的长图，作为分享图 */
+    function tryShareWithLiveResultImage(title,txt,shareLink){
+      return new Promise(function(resolve,reject){
+        if(!navigator.canShare||!navigator.share)return reject(new Error("no web share"));
+        if(typeof captureResult!=="function")return reject(new Error("no captureResult"));
+        var tipToast=typeof toast==="function"?toast("正在准备分享图…"):null;
+        captureResult().then(function(out){
+          var blob=out&&out.blob;
+          if(!blob)throw new Error("capture blob empty");
+          var file=new File([blob],"ai-designer-result.png",{type:blob.type||"image/png"});
+          var payload={files:[file],title:title,text:txt+"\n"+shareLink};
+          if(!navigator.canShare(payload))throw new Error("cannot share files");
+          navigator.share(payload).then(resolve).catch(function(e){
+            if(e&&e.name==="AbortError")return resolve();
+            reject(e);
+          });
+        }).catch(reject);
+      });
     }
 
     /* 原生分享：用传入的 shareImg 作为分享图（优先结果角色图，兜底首页海报） */
@@ -3144,7 +3298,8 @@
       var rImgEl=document.getElementById("rImg");
       var posterImg=baseDir+"img/share-cover.png";
       var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
-      var title="我是「"+(role.name||"设计大师")+"」— 还没下班的设计大师";
+      /* 分享卡片标题：AI时代我是「xxx」（副标题仍使用角色 tagline，保持不变） */
+      var title="AI时代我是「"+(role.name||"设计大师")+"」";
       var desc=role.tagline||"测测你是哪位还没下班的设计大师";
       updateShareMeta({title:title,desc:desc,img:shareImg,link:shareLink});
       /* 微信 JSSDK 能成功时顺带设一次；签名没接也无所谓，反正 og 已经改好了 */
@@ -3260,12 +3415,12 @@
      * ========================================================= */
     (function(){
       var DIMENSIONS=[
-        {id:"D1",name:"灵感发散与筛选",role:"草稿太多的毕加班索"},
-        {id:"D2",name:"图像与素材处理",role:"还在抠图的原研灾"},
-        {id:"D3",name:"版式与结构处理",role:"对不齐的蒙得里不安"},
-        {id:"D4",name:"重复执行与批量操作",role:"复制到崩溃的草间弥死"},
-        {id:"D5",name:"项目上下文管理",role:"风格断片的梵稿"},
-        {id:"D6",name:"工作流衔接",role:"睡莲迁移失败的莫奈何"}
+        {id:"D1",name:"灵感发散",role:"草稿太多的毕加班索"},
+        {id:"D2",name:"图片处理",role:"还在抠图的原研灾"},
+        {id:"D3",name:"结构处理",role:"对不齐的蒙得里不安"},
+        {id:"D4",name:"批量操作",role:"复制到崩溃的草间弥死"},
+        {id:"D5",name:"记忆管理",role:"风格断片的梵稿"},
+        {id:"D6",name:"工作衔接",role:"睡莲迁移失败的莫奈何"}
       ];
       /* Q7 选项 key → 维度 index（0-based，对应 DIMENSIONS）
          同时兼容数字 key（"1".."6"）和字母 key（"A".."F"），方便不同配置源。 */
