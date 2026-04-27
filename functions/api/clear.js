@@ -1,6 +1,6 @@
 // POST /api/clear  Header: X-Admin-Token
-// 清空所有问卷数据（慎用，admin 里二次确认后调用）
-import { json, handleOptions, getKV, needAdmin } from "./_utils.js";
+// 清空所有问卷数据
+import { json, handleOptions, getKV, needAdmin, KEY_PREFIX } from "./_utils.js";
 
 export async function onRequest({ request, env }) {
   if (request.method === "OPTIONS") return handleOptions();
@@ -13,14 +13,18 @@ export async function onRequest({ request, env }) {
     const kv = getKV(env);
     let deleted = 0;
     let cursor;
-    do {
-      const listed = await kv.list({ prefix: "s:", limit: 1000, cursor });
-      const keys = (listed.keys || []).map(k => (typeof k === "string" ? k : k.name));
-      await Promise.all(keys.map(k => kv.delete(k)));
-      deleted += keys.length;
-      cursor = listed.cursor;
-      if (listed.list_complete) break;
-    } while (cursor);
+    let safety = 0;
+    while (safety++ < 50) {
+      const r = await kv.list({ prefix: KEY_PREFIX, limit: 256, cursor });
+      if (!r || !Array.isArray(r.keys) || r.keys.length === 0) break;
+      const names = r.keys.map(k => (typeof k === "string" ? k : (k && (k.key || k.name)))).filter(Boolean);
+      // 串行删除更稳（部分实现并发 delete 会踩限流）
+      for (const n of names) {
+        try { await kv.delete(n); deleted++; } catch (e) {}
+      }
+      if (r.complete || !r.cursor) break;
+      cursor = r.cursor;
+    }
     return json({ ok: true, deleted });
   } catch (e) {
     return json({ ok: false, msg: String(e && e.message || e) }, { status: 500 });

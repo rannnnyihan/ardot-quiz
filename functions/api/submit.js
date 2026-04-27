@@ -1,5 +1,5 @@
 // POST /api/submit
-// 接收 quiz-h5.html 提交的问卷数据，写入 KV
+// 接收 quiz-h5.html 提交的问卷数据，写入 EdgeOne KV
 import { json, handleOptions, getKV, makeKey } from "./_utils.js";
 
 export async function onRequest({ request, env }) {
@@ -17,13 +17,12 @@ export async function onRequest({ request, env }) {
     return json({ ok: false, msg: "empty body" }, { status: 400 });
   }
 
-  // 简单限制 payload 尺寸（防刷）
   const raw = JSON.stringify(body);
+  // EdgeOne KV 单条 value 上限 25MB，这里限制 64KB 防刷
   if (raw.length > 64 * 1024) {
     return json({ ok: false, msg: "payload too large" }, { status: 413 });
   }
 
-  // 补充服务端元数据
   const record = {
     ...body,
     _server_ts: new Date().toISOString(),
