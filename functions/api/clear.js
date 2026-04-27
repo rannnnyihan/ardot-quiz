@@ -12,10 +12,12 @@ export async function onRequest({ request, env }) {
   try {
     const kv = getKV(env);
     let deleted = 0;
-    let cursor;
+    let cursor = null;
     let safety = 0;
     while (safety++ < 50) {
-      const r = await kv.list({ prefix: KEY_PREFIX, limit: 256, cursor });
+      const opts = { prefix: KEY_PREFIX, limit: 256 };
+      if (cursor) opts.cursor = cursor;
+      const r = await kv.list(opts);
       if (!r || !Array.isArray(r.keys) || r.keys.length === 0) break;
       const names = r.keys.map(k => (typeof k === "string" ? k : (k && (k.key || k.name)))).filter(Boolean);
       // 串行删除更稳（部分实现并发 delete 会踩限流）

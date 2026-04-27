@@ -15,11 +15,14 @@ export async function onRequest({ request, env }) {
   try {
     const kv = getKV(env);
     // EdgeOne KV list 单次 limit 上限 256，需要用 cursor 分页遍历。
+    // 注意：EdgeOne 要求 cursor 必须是 string，不能是 undefined，第一次调用不传该字段。
     const allKeys = [];
-    let cursor;
+    let cursor = null;
     let safety = 0;
     while (safety++ < 50) {
-      const r = await kv.list({ prefix: KEY_PREFIX, limit: 256, cursor });
+      const opts = { prefix: KEY_PREFIX, limit: 256 };
+      if (cursor) opts.cursor = cursor;
+      const r = await kv.list(opts);
       if (r && Array.isArray(r.keys)) {
         for (const k of r.keys) {
           const name = typeof k === "string" ? k : (k && (k.key || k.name));
