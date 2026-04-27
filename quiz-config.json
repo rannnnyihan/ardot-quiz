@@ -1,0 +1,513 @@
+{
+  "meta": {
+    "badge": "AI Designer Personality Test",
+    "mainTitle": "《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",
+    "subtitle": "11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。",
+    "note": "11 题 · 约 6 分钟",
+    "feedbackEnabled": true,
+    "questionSchema": "designer_personality_v2",
+    "roleSetVersion": 7,
+    "questionOrder": [
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q6",
+      "q7",
+      "q8",
+      "q9",
+      "q10",
+      "q11",
+      "q12"
+    ]
+  },
+  "roles": [
+    {
+      "id": "d1",
+      "name": "草稿太多的毕加班索",
+      "real": "D1 · 灵感发散与筛选",
+      "img": "img/picasso.png",
+      "desc": "你脑子里永远有想法，AI 一问还能再炸出一百种方向。问题不是没灵感，而是筛不动、收不住——画到最后连自己都忘了最开始想画什么。"
+    },
+    {
+      "id": "d2",
+      "name": "还在抠图的原研灾",
+      "real": "D2 · 图像与素材处理",
+      "img": "img/hara.png",
+      "desc": "你对质感和细节极度敏感，AI 抠图、去背、修边、放大总是差那一口气。不是做不到，是不能接受“差不多”——宁可自己再抠一次。"
+    },
+    {
+      "id": "d3",
+      "name": "对不齐的蒙得里不安",
+      "real": "D3 · 版式与结构处理",
+      "img": "img/mondrian.png",
+      "desc": "你对结构、栅格、规范有近乎强迫症的追求。AI 出的布局总是“像那么回事但就是不对齐”，你不得不亲手一格一格把它掰正。"
+    },
+    {
+      "id": "d4",
+      "name": "复制到崩溃的草间弥死",
+      "real": "D4 · 重复执行与批量操作",
+      "img": "img/kusama.png",
+      "desc": "你最怕的不是创意，而是“把同一个改动复制 83 次”。AI 批量处理要么配置半天、要么改得不一致，最后还是要逐个检查到崩溃。"
+    },
+    {
+      "id": "d5",
+      "name": "风格断片的梵稿",
+      "real": "D5 · 项目上下文管理",
+      "img": "img/gogh.png",
+      "desc": "你希望 AI 真正记得你之前的风格、规范、历史方案。但它每次开新对话都像失忆——你一边讲设计，一边像在写回忆录。"
+    },
+    {
+      "id": "d6",
+      "name": "睡莲迁移失败的莫奈何",
+      "real": "D6 · 工作流衔接",
+      "img": "img/monet.png",
+      "desc": "你最关注的是“稿子能不能顺利交出去”：一键原型、标注、跨软件同步。AI 能做一半，另一半永远要你在不同工具之间来回搬运。"
+    }
+  ],
+  "questions": {
+    "q1": {
+      "type": "single",
+      "title": "老板甩来「多做几个方向看看」，你的操作是？",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 用多个AI工具生成、筛选并落地方向，但工具切换多"
+        },
+        {
+          "key": "B",
+          "label": "B. 用AI做一部分，我再接着自己做一部分"
+        },
+        {
+          "key": "C",
+          "label": "C. AI 一发散就停不下来，最后还是自己重头来"
+        },
+        {
+          "key": "D",
+          "label": "D. 不折腾 AI，直接开网站找案例"
+        }
+      ]
+    },
+    "q2": {
+      "type": "single",
+      "title": "一张素材要抠图、放大、修边、合成，你通常是：",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 大部分交给 AI，结果基本够用"
+        },
+        {
+          "key": "B",
+          "label": "B. AI 先做一轮，毛边、瑕疵我再手动收拾一下"
+        },
+        {
+          "key": "C",
+          "label": "C. 出来的图总是像素、细节有问题，还是我重头修改"
+        },
+        {
+          "key": "D",
+          "label": "D. 不敢让AI碰精修，一开始就自己修"
+        }
+      ]
+    },
+    "q3": {
+      "type": "single",
+      "title": "让 AI 生成一个有规范的页面，结果常常是：",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 按我的规范生成的结构基本能用"
+        },
+        {
+          "key": "B",
+          "label": "B. 骨架 OK，但间距、对齐、组件我需要自己再调一轮"
+        },
+        {
+          "key": "C",
+          "label": "C. 看起来像那么回事，但规范全乱，对不齐是常态"
+        },
+        {
+          "key": "D",
+          "label": "D. 它读不懂设计规范，我直接自己做"
+        }
+      ]
+    },
+    "q4": {
+      "type": "single",
+      "title": "需要把一个改动批量应用到一堆稿子上，你：",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 用AI批处理一把搞定，几乎不用手改"
+        },
+        {
+          "key": "B",
+          "label": "B. 一部分自动、一部分补刀，整体还能接受"
+        },
+        {
+          "key": "C",
+          "label": "C. 自动化总是改得不一致，最后返工反而更多"
+        },
+        {
+          "key": "D",
+          "label": "D. 不敢用批量工具，老老实实一个一个手改到怀疑人生"
+        }
+      ]
+    },
+    "q5": {
+      "type": "single",
+      "title": "新项目想复用过去的设计风格/逻辑，你通常：",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. AI 能把之前的上下文接过来，我几乎不用重讲"
+        },
+        {
+          "key": "B",
+          "label": "B. 把旧稿和说明丢给 AI，它能帮我捋出大半"
+        },
+        {
+          "key": "C",
+          "label": "C. AI 抓不到关键风格和约束，我要反复纠正"
+        },
+        {
+          "key": "D",
+          "label": "D. 只能靠自己翻聊天、翻文件、靠脑子"
+        }
+      ]
+    },
+    "q6": {
+      "type": "single",
+      "title": "稿子定了，需要同步原型/标注/跨软件交付，你：",
+      "desc": "单选",
+      "mapsToRoles": true,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 一键转原型+自动标注，基本顺滑交出"
+        },
+        {
+          "key": "B",
+          "label": "B. 自动能做一部分，剩下的我再补一补"
+        },
+        {
+          "key": "C",
+          "label": "C. 在不同软件之间反复导入导出，光格式就磨半天"
+        },
+        {
+          "key": "D",
+          "label": "D. 从设计稿到原型/标注几乎全手动"
+        }
+      ]
+    },
+    "q7": {
+      "type": "rank",
+      "title": "下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",
+      "desc": "长按拖动排序",
+      "options": [
+        {
+          "key": "A",
+          "label": "一组概念图和 moodboard"
+        },
+        {
+          "key": "B",
+          "label": "该抠的抠、该修的修的图片素材"
+        },
+        {
+          "key": "C",
+          "label": "符合我规范、对得齐的界面版式"
+        },
+        {
+          "key": "D",
+          "label": "在一批稿子里替我批量改好"
+        },
+        {
+          "key": "E",
+          "label": "梳理过去项目的风格与复用建议"
+        },
+        {
+          "key": "F",
+          "label": "同步到原型/标注/其他软件里的交付物"
+        }
+      ],
+      "mapsToRoles": true
+    },
+    "q8": {
+      "type": "multi",
+      "maxSelect": 3,
+      "title": "你最希望 AI 设计工具帮你记住什么？",
+      "desc": "多选（最多 3 项）",
+      "mapsToRoles": false,
+      "options": [
+        {
+          "key": "A",
+          "label": "我的设计风格"
+        },
+        {
+          "key": "B",
+          "label": "我的组件规范"
+        },
+        {
+          "key": "C",
+          "label": "我的项目上下文"
+        },
+        {
+          "key": "D",
+          "label": "我的操作习惯"
+        },
+        {
+          "key": "E",
+          "label": "我的素材库"
+        },
+        {
+          "key": "F",
+          "label": "我的历史方案逻辑"
+        }
+      ]
+    },
+    "q9": {
+      "type": "single",
+      "title": "你目前在使用 AI 辅助设计时，最大的阻碍是什么？",
+      "desc": "单选",
+      "mapsToRoles": false,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. 结果不稳定，需要反复调整"
+        },
+        {
+          "key": "B",
+          "label": "B. 工具太分散，流程不连贯"
+        },
+        {
+          "key": "C",
+          "label": "C. 不理解我的设计规范和项目背景"
+        },
+        {
+          "key": "D",
+          "label": "D. 不适合处理批量修改和重复执行"
+        }
+      ]
+    },
+    "q10": {
+      "type": "single",
+      "title": "你的主要设计类型是？",
+      "desc": "单选",
+      "mapsToRoles": false,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. UI / 产品设计"
+        },
+        {
+          "key": "B",
+          "label": "B. 视觉 / 品牌设计"
+        },
+        {
+          "key": "C",
+          "label": "C. 电商 / 运营设计"
+        },
+        {
+          "key": "D",
+          "label": "D. 平面 / 包装设计"
+        },
+        {
+          "key": "E",
+          "label": "E. 动效 / 视频设计"
+        }
+      ]
+    },
+    "q11": {
+      "type": "multi",
+      "maxSelect": 3,
+      "title": "你目前最常使用的 AI 设计工具是？",
+      "desc": "多选（最多 3 项）",
+      "mapsToRoles": false,
+      "options": [
+        {
+          "key": "A",
+          "label": "A. Midjourney"
+        },
+        {
+          "key": "B",
+          "label": "B. 即梦（Dreamina）"
+        },
+        {
+          "key": "C",
+          "label": "C. Stable Diffusion / ComfyUI"
+        },
+        {
+          "key": "D",
+          "label": "D. Ideogram"
+        },
+        {
+          "key": "E",
+          "label": "E. Recraft"
+        },
+        {
+          "key": "F",
+          "label": "F. ChatGPT / Claude"
+        },
+        {
+          "key": "G",
+          "label": "G. Figma Make"
+        },
+        {
+          "key": "H",
+          "label": "H. Galileo AI"
+        },
+        {
+          "key": "I",
+          "label": "I. Uizard"
+        },
+        {
+          "key": "J",
+          "label": "J. v0（Vercel）"
+        },
+        {
+          "key": "K",
+          "label": "K. Framer AI"
+        },
+        {
+          "key": "L",
+          "label": "L. MasterGo AI"
+        },
+        {
+          "key": "M",
+          "label": "M. Pixso AI"
+        }
+      ]
+    },
+    "q12": {
+      "type": "text",
+      "resultOnly": true,
+      "title": "我希望 AI 有这样的能力（填写后可参与抽奖）",
+      "desc": "填空题（可选）",
+      "placeholder": "例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"
+    }
+  },
+  "mappings": {
+    "single": {
+      "q1": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      },
+      "q2": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      },
+      "q3": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      },
+      "q4": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      },
+      "q5": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      },
+      "q6": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        }
+      }
+    },
+    "rank": {
+      "q7": {
+        "A": {
+          "d1": 0
+        },
+        "B": {
+          "d1": 0
+        },
+        "C": {
+          "d1": 0
+        },
+        "D": {
+          "d1": 0
+        },
+        "E": {
+          "d1": 0
+        },
+        "F": {
+          "d1": 0
+        }
+      }
+    },
+    "multi": {},
+    "score": {},
+    "scale": {}
+  }
+}
