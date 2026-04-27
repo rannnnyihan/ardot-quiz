@@ -45,7 +45,7 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" onerror="window.__qrLibFailed=true"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
     .nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(250,249,247,.92);backdrop-filter:blur(16px);border-bottom:1px solid #e8e5e0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:1000}
     .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:#1a1a2e;font-size:15px;font-weight:600}
     .nav-logo-icon{width:24px;height:24px;background:linear-gradient(135deg,#2b5aed,#5b8def);border-radius:5px;display:flex;align-items:center;justify-content:center}
@@ -79,13 +79,16 @@
     .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
       background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
       margin-bottom:24px;letter-spacing:.02em}
-    /* 底部封面插画：宽度永远贴满容器，高度按原图比例自动变化
-       · 窄屏（手机）：图等比压缩到 ~390 宽，看到整图
-       · 宽屏（电脑）：图等比放大到容器宽度，看到整图
-       · 不固定高度、不裁切、不平铺 */
-    .welcome-poster{position:static;display:block;width:100%;height:auto;
-      max-width:none;margin:12px 0 0;inset:auto;border-radius:0;
-      object-fit:contain;object-position:center bottom;
+    /* 底部封面插画：撑满整个视口宽度，高度固定 390
+       · 用 width:100vw + margin-left:calc(50% - 50vw) 打破外层容器 max-width
+       · object-fit:cover → 铺满不变形；窄屏裁左右，宽屏裁上下 */
+    .welcome-poster{position:relative;display:block;
+      width:100vw;height:390px;max-width:none;
+      margin:12px 0 0;
+      margin-left:calc(50% - 50vw);         /* 从容器中心拉到视口左边 */
+      margin-right:calc(50% - 50vw);
+      inset:auto;border-radius:0;
+      object-fit:cover;object-position:center center;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
@@ -662,7 +665,7 @@
       padding:28px 0 0;
       border-radius:0;
       background:#ffffff;
-      overflow:hidden;
+      overflow:visible;                  /* 关键：让底部插画的 100vw 溢出可见，不被裁 */
       box-shadow:none;
     }
     /* 顶部文字容器 */
@@ -672,19 +675,22 @@
       max-width:560px;
       margin:0 auto;
     }
-    /* 底部插画：宽度贴满容器，高度按原图比例自动变化（不固定高度、不裁切、不平铺） */
+    /* 底部插画：撑满视口宽，高度固定 390（用 margin 公式打破所有 max-width） */
     body:has(#s0.welcome.active) .welcome-poster{
-      position:static;
+      position:relative;
       display:block;
-      width:100%;
-      height:auto;                       /* 高度自适应，按原图比例 */
+      width:100vw;                       /* 撑满整个视口宽 */
+      height:390px;                      /* 固定高度 */
       max-width:none;
-      margin:24px 0 0;                   /* 与文字保持距离，左右贴边 */
+      margin-top:24px;
+      margin-bottom:0;
+      margin-left:calc(50% - 50vw);      /* 从容器中心拉到视口左边 */
+      margin-right:calc(50% - 50vw);     /* 同理拉到视口右边 */
       inset:auto;
       border-radius:0;
       align-self:stretch;
-      object-fit:contain;
-      object-position:center bottom;
+      object-fit:cover;                  /* 铺满不留白，按需裁切 */
+      object-position:center center;
     }
     /* 按钮回归文档流 */
     body:has(#s0.welcome.active) .welcome-cta{
