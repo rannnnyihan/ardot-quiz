@@ -1757,15 +1757,57 @@
       return true;
     }
 
-    function saveAll(){
+    /* ===== 问卷配置·服务端同步 =====
+       GET  /api/config → 公开读取
+       POST /api/config → 需 X-Admin-Token
+       保存后，所有设备打开 quiz-h5.html 都会拉到最新配置。 */
+    async function pushConfigToServer(){
+      const token=currentAdminToken();
+      if(!token){
+        return {ok:false,msg:"未填写 Admin Token，已只保存到本地；其他设备不会同步。"};
+      }
+      try{
+        const resp=await fetch("/api/config",{
+          method:"POST",
+          headers:{"Content-Type":"application/json","X-Admin-Token":token},
+          body:JSON.stringify(cfg)
+        });
+        const j=await resp.json().catch(()=>({ok:false,msg:"HTTP "+resp.status}));
+        if(!resp.ok||!j.ok)return {ok:false,msg:j.msg||("HTTP "+resp.status)};
+        return {ok:true,updatedAt:j.updatedAt||""};
+      }catch(e){
+        return {ok:false,msg:String(e&&e.message||e)};
+      }
+    }
+    async function pullConfigFromServer(){
+      try{
+        const resp=await fetch("/api/config?t="+Date.now(),{method:"GET"});
+        if(!resp.ok)return {ok:false,msg:"HTTP "+resp.status};
+        const j=await resp.json();
+        if(!j.ok)return {ok:false,msg:j.msg||"failed"};
+        return {ok:true,data:j.data};
+      }catch(e){
+        return {ok:false,msg:String(e&&e.message||e)};
+      }
+    }
+
+    async function saveAll(){
       try{
         if(!flushCfgToLocalStorage({refreshUI:true,silent:true,alertStorageError:true})){
           alert("映射配置有误，请修正后再保存（打分/量表题需为合法 JSON）；或角色信息不完整。");
           return;
         }
-        const el=document.getElementById("autoSaveHint");
-        if(el)el.textContent="已保存 · "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-        alert("已保存到本地配置（键名 ardot_quiz_config_v2，与 quiz 共用）。请刷新 quiz。\n注意：admin 与 quiz 须在同一来源打开（同为本地文件，或同一 http(s) 地址），否则 localStorage 不互通。");
+        const hint=document.getElementById("autoSaveHint");
+        if(hint)hint.textContent="正在同步到服务端…";
+        const res=await pushConfigToServer();
+        const ts=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+        if(res.ok){
+          if(hint)hint.textContent="已保存并同步到服务端 · "+ts;
+          alert("已保存并同步到服务端 ✅\n所有设备下次打开 quiz-h5 都会拉到最新配置（建议通知用户刷新页面）。");
+        }else{
+          if(hint)hint.textContent="已保存到本地，服务端同步失败 · "+ts;
+          alert("已保存到本地 ⚠️ 但服务端同步失败：\n"+res.msg+"\n\n其他设备仍会使用旧配置。请检查 Admin Token 是否正确、以及 EdgeOne 是否已绑定 KV（变量名 SURVEY_KV）。");
+        }
       }catch(e){
         console.error(e);
         alert("保存失败："+(e&&e.message?e.message:String(e)));
@@ -1857,8 +1899,8 @@
       URL.revokeObjectURL(url);
     }
 
-    function resetDefault(){
-      if(!confirm("确认恢复默认问卷配置？"))return;
+    async function resetDefault(){
+      if(!confirm("确认恢复默认问卷配置？\n将同时把服务端配置也恢复为默认，影响所有设备。"))return;
       cfg=defaultConfig();
       localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
       activeQid="q1";
@@ -1871,7 +1913,12 @@
       renderRoleSelect();
       renderStats();
       setStatsMode(statsMode);
-      alert("已恢复默认配置");
+      const res=await pushConfigToServer();
+      if(res.ok){
+        alert("已恢复默认配置并同步到服务端 ✅");
+      }else{
+        alert("已恢复本地默认配置，但服务端同步失败：\n"+res.msg+"\n其他设备仍会使用旧配置。");
+      }
     }
 
     renderQList();
@@ -1888,6 +1935,35 @@
     bindConfigAutoSave();
     switchTab("manage");
     switchManageSubTab("question");
+
+    /* 打开 admin 时，尝试把服务端最新问卷配置拉下来覆盖本地缓存，
+       避免管理员看到的是本机上一次保存、但其他人已在别的设备上更新过的版本。
+       失败（比如离线 / KV 未绑定）就静默退回本地缓存。 */
+    (async function syncConfigFromServerOnBoot(){
+      const hint=document.getElementById("autoSaveHint");
+      if(hint)hint.textContent="正在从服务端拉取最新配置…";
+      const res=await pullConfigFromServer();
+      if(!res.ok||!res.data||typeof res.data!=="object"||!Array.isArray(res.data.questions)){
+        if(hint)hint.textContent=res.ok?"服务端暂无配置，使用本地缓存":"服务端拉取失败，使用本地缓存";
+        return;
+      }
+      // 服务端有值 → 覆盖本地缓存 & 重新加载到 UI
+      try{
+        localStorage.setItem(CFG_KEY, JSON.stringify(res.data));
+        cfg=loadCfg(); // 走一次 merge/migrate，保证结构和默认对齐
+        activeQid="q1";
+        activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
+        renderQList();
+        fillMetaEditor();
+        fillEditor();
+        renderRoleSelect();
+        const ts=(res.data.meta&&res.data.meta.serverUpdatedAt)||"";
+        if(hint)hint.textContent="已加载服务端最新配置"+(ts?(" · "+new Date(ts).toLocaleString("zh-CN")):"");
+      }catch(e){
+        console.error(e);
+        if(hint)hint.textContent="服务端配置解析失败，使用本地缓存";
+      }
+    })();
   </script>
 </body>
 </html>

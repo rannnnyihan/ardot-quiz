@@ -1561,6 +1561,32 @@
         });
       }catch(e){return base}
     }
+
+    /* 启动前：尝试从服务端拉取最新问卷配置并写入 localStorage。
+       - 用同步 XHR，让紧接其后的 loadConfig() 能读到最新值，避免重构整个 CFG 数据流。
+       - 带 1500ms 超时兜底；网络失败 / 跨域 / KV 未绑定时安全退回本地或默认。
+       - 只在 http(s) 环境下尝试（file:// 打开时 fetch 自身会失败）。*/
+    (function syncConfigFromServerBeforeBoot(){
+      try{
+        if(!/^https?:$/.test(location.protocol))return;
+        const xhr=new XMLHttpRequest();
+        xhr.open("GET","/api/config?t="+Date.now(),false); // 同步
+        xhr.timeout=1500;
+        try{xhr.send(null);}catch(e){return;}
+        if(xhr.status<200||xhr.status>=300)return;
+        const j=JSON.parse(xhr.responseText||"{}");
+        if(!j||!j.ok||!j.data||typeof j.data!=="object")return;
+        if(!Array.isArray(j.data.questions)||!Array.isArray(j.data.roles))return;
+        /* 与本地缓存对比，内容一致就不写，避免无谓的 localStorage 写入 */
+        const nextStr=JSON.stringify(j.data);
+        let prevStr="";
+        try{prevStr=localStorage.getItem(QUIZ_CFG_KEY)||"";}catch(e){}
+        if(prevStr!==nextStr){
+          try{localStorage.setItem(QUIZ_CFG_KEY,nextStr);}catch(e){}
+        }
+      }catch(e){/* 静默：降级到本地/默认 */}
+    })();
+
     const CFG=loadConfig();
     const FEEDBACK_ENABLED=!CFG.meta || CFG.meta.feedbackEnabled!==false;
     const DEFAULT_ORDER=["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10","q11"];
