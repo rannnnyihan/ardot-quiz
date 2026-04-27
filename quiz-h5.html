@@ -79,16 +79,16 @@
     .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
       background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
       margin-bottom:24px;letter-spacing:.02em}
-    /* 底部封面插画：撑满整个视口宽度，高度按原图比例自适应
-       · 用 width:100vw + margin-left:calc(50% - 50vw) 打破外层容器 max-width
-       · object-fit:contain → 完整显示整张图，不裁切 */
+    /* 底部封面插画：原图 1280×392，手机上不缩小整张图，而是居中裁出 402px 宽视窗
+       · 视窗宽 = min(402px, 100vw)；居中
+       · 高度锁 392px，图按原像素展示（object-fit:none + object-position:center），
+         自动把左右两侧多余部分裁掉，只露中间的人物群 */
     .welcome-poster{position:relative;display:block;
-      width:100vw;height:auto;max-width:none;
-      margin:0;
-      margin-left:calc(50% - 50vw);         /* 从容器中心拉到视口左边 */
-      margin-right:calc(50% - 50vw);
-      inset:auto;border-radius:0;
-      object-fit:contain;object-position:bottom center;
+      width:100%;max-width:402px;height:392px;
+      margin:0 auto;                         /* 居中 */
+      border-radius:0;
+      object-fit:none;                       /* 不缩放，按原像素 */
+      object-position:center center;         /* 居中裁剪 */
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
