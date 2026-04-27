@@ -79,15 +79,13 @@
     .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
       background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
       margin-bottom:24px;letter-spacing:.02em}
-    /* 底部封面插画条带：高度固定 392px，背景图居中 + 横向平铺
-       - 窄屏（手机）：只露图中间一段
-       - 宽屏（电脑）：横向自动 repeat 接上第二、三遍 */
-    .welcome-poster{position:static;display:block;width:100%;height:392px;
-      margin:12px 0 0;inset:auto;border-radius:0;
-      background-image:url("img/image 23.png?v=20260427");
-      background-repeat:repeat-x;
-      background-position:center bottom;
-      background-size:auto 392px;              /* 按原比例缩放到高度 392 */
+    /* 底部封面插画：宽度永远贴满容器，高度按原图比例自动变化
+       · 窄屏（手机）：图等比压缩到 ~390 宽，看到整图
+       · 宽屏（电脑）：图等比放大到容器宽度，看到整图
+       · 不固定高度、不裁切、不平铺 */
+    .welcome-poster{position:static;display:block;width:100%;height:auto;
+      max-width:none;margin:12px 0 0;inset:auto;border-radius:0;
+      object-fit:contain;object-position:center bottom;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
@@ -674,21 +672,19 @@
       max-width:560px;
       margin:0 auto;
     }
-    /* 底部插画条带：高度固定 392，窄屏只看中间，宽屏横向平铺 */
+    /* 底部插画：宽度贴满容器，高度按原图比例自动变化（不固定高度、不裁切、不平铺） */
     body:has(#s0.welcome.active) .welcome-poster{
       position:static;
       display:block;
       width:100%;
-      height:392px;                      /* 固定高度 */
+      height:auto;                       /* 高度自适应，按原图比例 */
       max-width:none;
       margin:24px 0 0;                   /* 与文字保持距离，左右贴边 */
       inset:auto;
       border-radius:0;
       align-self:stretch;
-      background-image:url("img/image 23.png?v=20260427");
-      background-repeat:repeat-x;        /* 宽屏不够就横向接上 */
-      background-position:center bottom; /* 窄屏保留图中心部分 */
-      background-size:auto 392px;        /* 按原比例缩放到 392 高 */
+      object-fit:contain;
+      object-position:center bottom;
     }
     /* 按钮回归文档流 */
     body:has(#s0.welcome.active) .welcome-cta{
@@ -956,7 +952,7 @@
            · 固定高度 392px
            · 居中显示，窄屏只露中间一段，宽屏不够则横向 repeat 接上
            · 用 div + background 而不是 <img>，才能实现平铺 -->
-      <div class="welcome-poster" role="img" aria-label="还没下班的设计大师"></div>
+      <img class="welcome-poster" src="img/image 23.png?v=20260427" alt="还没下班的设计大师" />
     </div>
 
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
