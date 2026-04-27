@@ -2038,8 +2038,46 @@
       arr.push(d);
       latestSurveyIndex=arr.length-1;
       localStorage.setItem("ardot_survey",JSON.stringify(arr));
-      try{fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).catch(()=>{})}catch(e){}
+      /* 同步上报到 EdgeOne Functions。失败时写入待重试队列，下次打开页面时自动重发。 */
+      postSurveyWithRetry(d);
     }
+
+    /* ===== 问卷数据上报与重试 ===== */
+    const PENDING_KEY="ardot_survey_pending";
+    function readPending(){try{return JSON.parse(localStorage.getItem(PENDING_KEY)||"[]")}catch(e){return []}}
+    function writePending(list){try{localStorage.setItem(PENDING_KEY,JSON.stringify(list||[]))}catch(e){}}
+    function queuePending(d){const q=readPending();q.push(d);if(q.length>50)q.splice(0,q.length-50);writePending(q)}
+    function postSurveyOnce(d){
+      return fetch("/api/submit",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(d),
+        keepalive:true
+      }).then((resp)=>{
+        if(!resp||!resp.ok)throw new Error("bad status "+(resp&&resp.status));
+        return resp.json().catch(()=>({ok:true}));
+      });
+    }
+    function postSurveyWithRetry(d){
+      try{
+        postSurveyOnce(d).catch(()=>{queuePending(d)});
+      }catch(e){queuePending(d)}
+    }
+    function flushPendingSurveys(){
+      const q=readPending();
+      if(!q.length)return;
+      writePending([]);
+      const remain=[];
+      let i=0;
+      const next=()=>{
+        if(i>=q.length){if(remain.length)writePending(remain);return}
+        const item=q[i++];
+        postSurveyOnce(item).then(next).catch(()=>{remain.push(item);next()});
+      };
+      next();
+    }
+    /* 页面加载时异步补发 */
+    setTimeout(()=>{try{flushPendingSurveys()}catch(e){}},1500);
 
     /* 通过计算模块返回的 finalRole 名匹配 CFG.roles 里的 role 对象 */
     function roleByPersonalityName(name){
@@ -2967,6 +3005,11 @@
         surveyArr[idx].q12_ai_wish=text;
         surveyArr[idx].wish=text;
         localStorage.setItem("ardot_survey",JSON.stringify(surveyArr));
+        /* 心愿补报：带标记 _wish_update=true，服务端按 role+时间近似识别更新 */
+        try{
+          const updated=Object.assign({},surveyArr[idx],{_wish_update:true,_updated_ts:new Date().toISOString()});
+          postSurveyWithRetry(updated);
+        }catch(e){}
       }
       if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
       const input=document.getElementById("wishInput");

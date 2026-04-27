@@ -88,8 +88,17 @@
   <div class="header">
     <h1>问卷后台管理</h1>
     <div class="actions">
+      <label style="font-size:12px;color:#666;display:inline-flex;align-items:center;gap:6px;margin-right:4px;">
+        数据源：
+        <select id="dataSourceSel" onchange="onDataSourceChange()" style="padding:4px 6px;border:1px solid #ccc;border-radius:4px;">
+          <option value="server">服务端（EdgeOne KV）</option>
+          <option value="local">本机 localStorage</option>
+        </select>
+      </label>
+      <input id="adminTokenInput" type="password" placeholder="Admin Token" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:140px;font-size:12px;" />
+      <button class="btn" onclick="saveAdminToken()">保存Token</button>
       <button class="btn" onclick="window.open('quiz-h5.html','_blank','noopener')">打开问卷</button>
-      <button class="btn" onclick="renderStats()">刷新统计</button>
+      <button class="btn" onclick="refreshData()">刷新统计</button>
       <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
       <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
       <button class="btn" onclick="resetDefault()">恢复默认</button>
@@ -503,7 +512,71 @@
       const n=Math.round(Number(v));
       return Number.isFinite(n)&&n>0?n:fallback;
     }
-    function getSurveyData(){return JSON.parse(localStorage.getItem("ardot_survey")||"[]")}
+    function getSurveyData(){
+      if(currentDataSource()==="server"){
+        /* 服务端模式：返回最近一次 fetch 的缓存（启动时/点击刷新时会拉取） */
+        return Array.isArray(window.__serverSurveyCache)?window.__serverSurveyCache.slice():[];
+      }
+      return JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+    }
+
+    /* ===== 数据源与服务端拉取 ===== */
+    const DATA_SOURCE_KEY="ardot_admin_data_source";
+    const ADMIN_TOKEN_KEY="ardot_admin_token";
+    function currentDataSource(){return localStorage.getItem(DATA_SOURCE_KEY)||"server"}
+    function currentAdminToken(){return localStorage.getItem(ADMIN_TOKEN_KEY)||""}
+    function onDataSourceChange(){
+      const v=document.getElementById("dataSourceSel").value;
+      localStorage.setItem(DATA_SOURCE_KEY,v);
+      refreshData();
+    }
+    function saveAdminToken(){
+      const el=document.getElementById("adminTokenInput");
+      const v=(el&&el.value||"").trim();
+      localStorage.setItem(ADMIN_TOKEN_KEY,v);
+      alert(v?"Token 已保存到本地。":"Token 已清空。");
+      refreshData();
+    }
+    function hydrateDataSourceUI(){
+      const sel=document.getElementById("dataSourceSel");
+      if(sel)sel.value=currentDataSource();
+      const tokenEl=document.getElementById("adminTokenInput");
+      if(tokenEl)tokenEl.value=currentAdminToken();
+    }
+    async function fetchServerData(){
+      const token=currentAdminToken();
+      if(!token){throw new Error("请先在顶部输入 Admin Token 并保存")}
+      const resp=await fetch("/api/list?limit=5000",{headers:{"X-Admin-Token":token}});
+      if(resp.status===401)throw new Error("Token 错误或未配置（服务端 ADMIN_TOKEN）");
+      if(!resp.ok)throw new Error("服务端返回 "+resp.status);
+      const j=await resp.json();
+      if(!j||!j.ok)throw new Error(j&&j.msg||"拉取失败");
+      return Array.isArray(j.data)?j.data:[];
+    }
+    async function refreshData(){
+      if(currentDataSource()==="server"){
+        try{
+          const list=await fetchServerData();
+          /* 简单去重：同一份 record 心愿补报时会再发一次，这里以 timestamp + role + answers.q1 当指纹 */
+          const seen=new Map();
+          list.forEach((d)=>{
+            const sig=(d.timestamp||"")+"|"+(d.result_role_id||"")+"|"+((d.answers&&d.answers.q1)||"");
+            const prev=seen.get(sig);
+            /* 有心愿更新的优先（_wish_update=true 的记录替换掉之前无心愿的） */
+            if(!prev||((d._wish_update||d.q12_ai_wish)&&!(prev._wish_update||prev.q12_ai_wish))){
+              seen.set(sig,d);
+            }
+          });
+          window.__serverSurveyCache=Array.from(seen.values());
+        }catch(e){
+          window.__serverSurveyCache=[];
+          alert("拉取服务端数据失败："+(e&&e.message||e));
+        }
+      }
+      try{renderStats()}catch(e){}
+      try{renderDistribution()}catch(e){}
+      try{renderChart()}catch(e){}
+    }
     function fillMetaEditor(){
       if(!cfg.meta)cfg.meta={};
       document.getElementById("metaMainTitle").value=cfg.meta.mainTitle||"";
@@ -1674,13 +1747,29 @@
       }
     }
 
-    function clearSurveyData(){
-      if(!confirm("确认要清空所有已收集的问卷数据吗？此操作不可撤销。"))return;
-      localStorage.removeItem("ardot_survey");
+    async function clearSurveyData(){
+      if(currentDataSource()==="server"){
+        if(!confirm("⚠️ 将清空【服务端 KV】所有问卷数据，全部用户数据不可恢复。确认？"))return;
+        try{
+          const token=currentAdminToken();
+          if(!token)throw new Error("请先保存 Admin Token");
+          const resp=await fetch("/api/clear",{method:"POST",headers:{"X-Admin-Token":token}});
+          if(!resp.ok)throw new Error("HTTP "+resp.status);
+          const j=await resp.json();
+          if(!j.ok)throw new Error(j.msg||"清空失败");
+          alert("已清空服务端数据，共删除 "+j.deleted+" 条");
+          window.__serverSurveyCache=[];
+        }catch(e){
+          alert("清空失败："+(e&&e.message||e));
+          return;
+        }
+      }else{
+        if(!confirm("确认要清空【本机】已收集的问卷数据吗？此操作不可撤销。"))return;
+        localStorage.removeItem("ardot_survey");
+      }
       renderStats();
       renderDistribution();
       renderChart();
-      alert("已清空所有收集到的数据");
     }
 
     function csvEscape(v){
@@ -1768,6 +1857,9 @@
     renderRoleSelect();
     renderStats();
     setStatsMode(statsMode);
+    hydrateDataSourceUI();
+    /* 初次加载：服务端模式自动拉取一次 */
+    if(currentDataSource()==="server"&&currentAdminToken()){refreshData()}
     bindConfigAutoSave();
     switchTab("manage");
     switchManageSubTab("question");
