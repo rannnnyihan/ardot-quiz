@@ -547,9 +547,10 @@
       const token=currentAdminToken();
       if(!token){throw new Error("请先在顶部输入 Admin Token 并保存")}
       const resp=await fetch("/api/list?limit=5000",{headers:{"X-Admin-Token":token}});
-      if(resp.status===401)throw new Error("Token 错误或未配置（服务端 ADMIN_TOKEN）");
-      if(!resp.ok)throw new Error("服务端返回 "+resp.status);
-      const j=await resp.json();
+      let j=null;
+      try{j=await resp.json()}catch(e){}
+      if(resp.status===401)throw new Error("Token 错误："+((j&&j.msg)||"unauthorized"));
+      if(!resp.ok)throw new Error("服务端 "+resp.status+"："+((j&&j.msg)||"未知错误"));
       if(!j||!j.ok)throw new Error(j&&j.msg||"拉取失败");
       return Array.isArray(j.data)?j.data:[];
     }
