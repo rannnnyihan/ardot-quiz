@@ -97,11 +97,9 @@
       </label>
       <input id="adminTokenInput" type="password" placeholder="Admin Token" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:140px;font-size:12px;" />
       <button class="btn" onclick="saveAdminToken()">保存Token</button>
-      <button class="btn" onclick="window.open('quiz-h5.html','_blank','noopener')">打开问卷</button>
       <button class="btn" onclick="refreshData()">刷新统计</button>
       <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
       <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
-      <button class="btn" onclick="resetDefault()">恢复默认</button>
       <button class="btn primary" onclick="saveAll()">保存配置</button>
       <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），也可手动点保存配置"></span>
     </div>
