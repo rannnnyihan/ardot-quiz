@@ -462,9 +462,13 @@
 
     function clone(v){return JSON.parse(JSON.stringify(v))}
     function mergeQuestionsDeep(baseQ,parsedQ){
-      const out={...baseQ};
-      Object.keys(parsedQ||{}).forEach((id)=>{
-        out[id]={...(baseQ&&baseQ[id]||{}),...(parsedQ[id]||{})};
+      /* 关键：以 parsedQ 的 key 集合为准——用户删掉的题不能被默认模板"复活"。
+         只对 parsedQ 里还在的题，用 baseQ 同名题的字段做缺失兜底（老版本新字段升级用）。 */
+      const parsed=parsedQ||{};
+      const out={};
+      Object.keys(parsed).forEach((id)=>{
+        const baseItem=(baseQ&&baseQ[id])||{};
+        out[id]={...baseItem,...(parsed[id]||{})};
       });
       return out;
     }
