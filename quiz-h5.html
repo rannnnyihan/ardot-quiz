@@ -79,16 +79,16 @@
     .welcome-note{display:inline-block;font-size:12.5px;color:#8a7658;
       background:#f7efe0;border:1px solid #ece4d2;padding:6px 14px;border-radius:999px;
       margin-bottom:24px;letter-spacing:.02em}
-    /* 底部封面插画：撑满整个视口宽度，高度固定 390
+    /* 底部封面插画：撑满整个视口宽度，高度按原图比例自适应
        · 用 width:100vw + margin-left:calc(50% - 50vw) 打破外层容器 max-width
-       · object-fit:cover → 铺满不变形；窄屏裁左右，宽屏裁上下 */
+       · object-fit:contain → 完整显示整张图，不裁切 */
     .welcome-poster{position:relative;display:block;
-      width:100vw;height:390px;max-width:none;
+      width:100vw;height:auto;max-width:none;
       margin:0;
       margin-left:calc(50% - 50vw);         /* 从容器中心拉到视口左边 */
       margin-right:calc(50% - 50vw);
       inset:auto;border-radius:0;
-      object-fit:cover;object-position:center center;
+      object-fit:contain;object-position:bottom center;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
     .welcome-cover,
@@ -675,12 +675,12 @@
       max-width:560px;
       margin:0 auto;
     }
-    /* 底部插画：撑满视口宽，高度固定 390（用 margin 公式打破所有 max-width） */
+    /* 底部插画：撑满视口宽，高度按原图比例自适应，完整显示整张（原图 1280×392） */
     body:has(#s0.welcome.active) .welcome-poster{
       position:relative;
       display:block;
       width:100vw;                       /* 撑满整个视口宽 */
-      height:390px;                      /* 固定高度 */
+      height:auto;                       /* 按原图比例自动算高度，保证完整显示 */
       max-width:none;
       margin-top:auto;                   /* 把插画推到 flex 容器最底 */
       margin-bottom:0;                   /* 紧贴 .welcome 底边 */
@@ -689,8 +689,8 @@
       inset:auto;
       border-radius:0;
       align-self:stretch;
-      object-fit:cover;                  /* 铺满不留白，按需裁切 */
-      object-position:center center;
+      object-fit:contain;                /* 不裁切，完整展示 */
+      object-position:bottom center;
     }
     /* 按钮回归文档流 */
     body:has(#s0.welcome.active) .welcome-cta{
