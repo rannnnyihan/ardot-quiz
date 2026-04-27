@@ -219,11 +219,17 @@
           <div id="qPriorityWeightRankOnly" class="note" style="display:none;line-height:1.55;margin-bottom:10px"></div>
           <label id="qPriorityWeightCbWrap" style="display:none;align-items:flex-start;gap:10px;font-size:13px;color:#444;font-weight:600;line-height:1.45">
             <input type="checkbox" id="qMapsToRoles" style="margin-top:3px;flex-shrink:0">
-            <span>参与角色映射与得分：按下方映射把选项分记到角色上，并乘以排序题按名次（1、0.75、0.5、0.25）折算出的角色权重。取消勾选则本题不参与角色得分映射。</span>
+            <span>参与角色映射与得分：勾选后本题计入角色维度分。具体计分规则由前端固定逻辑决定（见下方「计分规则」说明），不可在此编辑。</span>
           </label>
         </div>
 
-        <div id="roleMappingSection">
+        <div id="scoringRuleInfo" style="display:none;margin:12px 0;padding:12px 14px;background:#fffaf0;border:1px solid #f0d9a8;border-radius:10px;font-size:13px;color:#6b4a1a;line-height:1.6">
+          <div style="font-weight:700;margin-bottom:6px;color:#8a5a14">计分规则（只读）</div>
+          <div id="scoringRuleBody">-</div>
+          <div style="margin-top:8px;font-size:11px;color:#a88650">说明：计分规则已固化在前端 <code>computeDesignerPersonality</code> 中，修改需同步调整 quiz-h5.html 计算逻辑。</div>
+        </div>
+
+        <div id="roleMappingSection" style="display:none">
         <label id="mappingLabel">映射规则</label>
         <div id="singleMappingEditor" class="single-map"></div>
         <div id="scaleMappingEditor" style="display:none">
@@ -860,22 +866,37 @@
 
     function syncRoleMappingSection(){
       const sec=document.getElementById("roleMappingSection");
-      if(!sec)return;
+      if(sec)sec.style.display="none";
+      const info=document.getElementById("scoringRuleInfo");
+      if(!info)return;
       const q=cfg.questions[activeQid];
       if(!q||q.type==="text"){
-        sec.style.display="none";
-        return;
-      }
-      if(q.type==="rank"&&activeQid==="q1"){
-        sec.style.display="";
+        info.style.display="none";
         return;
       }
       const mappedTypes=["single","multi","rank","score","scale"];
       if(!mappedTypes.includes(q.type)){
-        sec.style.display="none";
+        info.style.display="none";
         return;
       }
-      sec.style.display=q.mapsToRoles===false?"none":"";
+      if(q.mapsToRoles===false){
+        info.style.display="none";
+        return;
+      }
+      info.style.display="";
+      const body=document.getElementById("scoringRuleBody");
+      if(body){
+        if(q.type==="single"&&/^q[1-6]$/.test(activeQid)){
+          const dimIdx=Number(activeQid.slice(1));
+          body.innerHTML=`此题计分对应维度 <b>D${dimIdx}</b>：选项 <b>A=1 分，B=2 分，C=3 分，D=4 分</b>，累加到该维度的 PainScore。`;
+        }else if(q.type==="rank"&&activeQid==="q7"){
+          body.innerHTML=`排序题按点击顺序给所选维度分配权重：第 1 位 <b>6/21</b>，第 2 位 <b>5/21</b>，依次 <b>4/21, 3/21, 2/21, 1/21</b>。<br>
+            用户可以只点选最在意的几项（无需全选）：<b>已选项按点选顺序从 6/21 往下拿权重；未选中的维度按 D1→D6 顺序补到末尾，拿剩余较低权重</b>。<br>
+            最终分 <code>FinalScore[D] = PainScore[D] × Q7Weight[D]</code>，最高者即为角色。`;
+        }else{
+          body.innerHTML="此题不参与角色计分（仅用于数据收集）。";
+        }
+      }
     }
     function adminMapsToRolesChange(){
       const q=cfg.questions[activeQid];
@@ -1597,7 +1618,7 @@
       statsChart=new Chart(ctx,{
         type:chartType,
         data:{labels,datasets:[{label:chartType==="bar"?"数值":"占比",data:values,backgroundColor:palette(labels.length)}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true}}:{}}
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true,ticks:{precision:0,callback:function(v){return Number.isInteger(v)?v:null}}}}:{}}
       });
     }
 
