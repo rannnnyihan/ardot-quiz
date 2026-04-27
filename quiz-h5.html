@@ -1571,9 +1571,17 @@
        仅在 http(s) 环境下尝试（file:// 打开时 fetch 自身会失败，保持原行为）。*/
     (function syncConfigFromServerBeforeBoot(){
       if(!/^https?:$/.test(location.protocol))return;
+      /* 手动硬刷新入口：访问 quiz-h5.html?reset=1 时，先清掉本地缓存再继续。
+         用于手机端缓存顽固时救急，用户操作路径：在浏览器地址栏末尾加 ?reset=1 回车。 */
+      try{
+        if(/[?&]reset=1(?:&|$)/.test(location.search)){
+          try{localStorage.removeItem(QUIZ_CFG_KEY);}catch(e){}
+          try{sessionStorage.clear();}catch(e){}
+        }
+      }catch(e){}
       const url="/api/config?t="+Date.now();
       /* —— 尝试 1：同步 XHR —— */
-      let synced=false;
+      let syncedVer="";
       try{
         const xhr=new XMLHttpRequest();
         xhr.open("GET",url,false);
@@ -1587,31 +1595,36 @@
             const nextStr=JSON.stringify(j.data);
             let prevStr="";try{prevStr=localStorage.getItem(QUIZ_CFG_KEY)||"";}catch(e){}
             if(prevStr!==nextStr){try{localStorage.setItem(QUIZ_CFG_KEY,nextStr);}catch(e){}}
-            synced=true;
+            syncedVer=(j.data.meta&&j.data.meta.serverUpdatedAt)||"synced";
           }
         }
       }catch(e){/* 同步 XHR 被拒，走异步兜底 */}
-      if(synced)return;
-      /* —— 尝试 2：异步 fetch + 必要时自动 reload —— */
+      if(syncedVer)return;
+      /* —— 尝试 2：异步 fetch + 按 serverUpdatedAt 对比，必要时自动 reload —— */
       try{
-        const RELOAD_FLAG="quiz_cfg_reloaded_once";
+        const RELOAD_FLAG="quiz_cfg_reload_uat"; // 用服务端版本号做幂等 key
         fetch(url,{method:"GET",cache:"no-store"}).then((r)=>r.ok?r.json():null).then((j)=>{
           if(!j||!j.ok||!j.data||typeof j.data!=="object")return;
           if(!j.data.questions||typeof j.data.questions!=="object"||Array.isArray(j.data.questions))return;
           if(!Array.isArray(j.data.roles))return;
-          const nextStr=JSON.stringify(j.data);
-          let prevStr="";try{prevStr=localStorage.getItem(QUIZ_CFG_KEY)||"";}catch(e){}
-          if(prevStr===nextStr)return; // 本地已是最新
-          try{localStorage.setItem(QUIZ_CFG_KEY,nextStr);}catch(e){return;}
-          // 若用户已经开始答题（stepIdx>0）就不打断；回到首页或下次刷新生效
+          const serverUat=(j.data.meta&&j.data.meta.serverUpdatedAt)||"";
+          /* 不管本地缓存是否等于服务端 JSON（本地可能被 loadConfig 改写过），
+             只要本地记录的"上次已见服务端版本"不等于当前 serverUpdatedAt，就算有更新。 */
+          let seenUat="";
+          try{seenUat=localStorage.getItem(QUIZ_CFG_KEY+":uat")||"";}catch(e){}
+          /* 无论如何都把服务端 payload 写入本地缓存（下一次启动会被 loadConfig 读到） */
+          try{localStorage.setItem(QUIZ_CFG_KEY,JSON.stringify(j.data));}catch(e){return;}
+          if(!serverUat||seenUat===serverUat)return; // 本次已经是最新，无需 reload
+          try{localStorage.setItem(QUIZ_CFG_KEY+":uat",serverUat);}catch(e){}
+          // 若用户已经开始答题（stepIdx>0）就不打断
           try{
             const inProgress=(typeof stepIdx==="number"&&stepIdx>0);
             if(inProgress)return;
           }catch(e){}
-          // 防止 reload 死循环：同一次 session 内最多只 reload 一次
+          // 防止 reload 死循环：同一次 session 内同一个 serverUat 最多只 reload 一次
           try{
-            if(sessionStorage.getItem(RELOAD_FLAG))return;
-            sessionStorage.setItem(RELOAD_FLAG,"1");
+            if(sessionStorage.getItem(RELOAD_FLAG)===serverUat)return;
+            sessionStorage.setItem(RELOAD_FLAG,serverUat);
           }catch(e){}
           location.reload();
         }).catch(()=>{});
