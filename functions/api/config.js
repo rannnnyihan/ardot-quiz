@@ -26,8 +26,10 @@ export async function onRequest({ request, env }) {
         status: 200,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          // 允许短时间缓存，减少 KV 读压力；admin 保存后会带 ?t= 打破缓存
-          "Cache-Control": "public, max-age=30",
+          // 禁缓存：配置更新后，任何设备刷新都要能立刻拿到最新，不能被 CDN / 浏览器 hold 住
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
           ...CORS_HEADERS
         }
       });
