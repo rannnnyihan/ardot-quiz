@@ -144,6 +144,10 @@
         <label>副标题</label>
         <input id="metaSubtitle" type="text">
       </div>
+      <div class="mt">
+        <label>首页气泡小字（欢迎页那枚米色胶囊里的文字）</label>
+        <input id="metaNote" type="text" placeholder="例如：11 题 · 约 6 分钟">
+      </div>
     </div>
     <div class="layout">
       <div class="card" id="questionSidebarCard">
@@ -656,6 +660,8 @@
       if(!cfg.meta)cfg.meta={};
       document.getElementById("metaMainTitle").value=cfg.meta.mainTitle||"";
       document.getElementById("metaSubtitle").value=cfg.meta.subtitle||"";
+      const noteEl=document.getElementById("metaNote");
+      if(noteEl)noteEl.value=cfg.meta.note||"";
     }
     function collectMetaEditorToConfig(){
       if(!cfg.meta)cfg.meta={};
@@ -663,6 +669,8 @@
       const st=document.getElementById("metaSubtitle");
       if(mt)cfg.meta.mainTitle=mt.value.trim();
       if(st)cfg.meta.subtitle=st.value.trim();
+      const noteEl=document.getElementById("metaNote");
+      if(noteEl)cfg.meta.note=noteEl.value.trim();
       const toggle=document.getElementById("feedbackEnabledToggle");
       if(toggle)cfg.meta.feedbackEnabled=!!toggle.checked;
       return true;
