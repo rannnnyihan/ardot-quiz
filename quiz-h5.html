@@ -84,7 +84,7 @@
        · object-fit:cover → 铺满不变形；窄屏裁左右，宽屏裁上下 */
     .welcome-poster{position:relative;display:block;
       width:100vw;height:390px;max-width:none;
-      margin:12px 0 0;
+      margin:0;
       margin-left:calc(50% - 50vw);         /* 从容器中心拉到视口左边 */
       margin-right:calc(50% - 50vw);
       inset:auto;border-radius:0;
@@ -682,8 +682,8 @@
       width:100vw;                       /* 撑满整个视口宽 */
       height:390px;                      /* 固定高度 */
       max-width:none;
-      margin-top:24px;
-      margin-bottom:0;
+      margin-top:auto;                   /* 把插画推到 flex 容器最底 */
+      margin-bottom:0;                   /* 紧贴 .welcome 底边 */
       margin-left:calc(50% - 50vw);      /* 从容器中心拉到视口左边 */
       margin-right:calc(50% - 50vw);     /* 同理拉到视口右边 */
       inset:auto;
@@ -942,8 +942,8 @@
       <!-- 顶部：标题 / 副标题 / 预计时间 / 开始按钮（正常文档流，从上到下排列） -->
       <div class="welcome-head">
         <div class="welcome-badge">AI Designer Personality Test</div>
-        <h1 class="welcome-title">《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》</h1>
-        <p class="welcome-sub">11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。</p>
+        <h1 class="welcome-title">《好险，<br><em>差点就会设计了</em>》</h1>
+        <p class="welcome-sub">测测你是还缺什么工具的设计大师</p>
         <div class="welcome-note">11 题 · 约 6 分钟</div>
         <div class="welcome-cta">
           <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
@@ -1144,8 +1144,8 @@
       return {
         meta:{
           badge:"AI Designer Personality Test",
-          mainTitle:"《做设计哪有不疯的，<br><em>只是硬撑罢了</em>》",
-          subtitle:"11 道题，测测你在 AI 时代最像哪位被逼疯的艺术大师，并告诉我们你需要怎样的 AI。",
+          mainTitle:"《好险，<br><em>差点就会设计了</em>》",
+          subtitle:"测测你是还缺什么工具的设计大师",
           note:"11 题 · 约 6 分钟",
           feedbackEnabled:true,
           questionSchema:"designer_personality_v2",
