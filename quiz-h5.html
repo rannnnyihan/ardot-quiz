@@ -18,23 +18,23 @@
   <meta property="og:title" content="好险，差点就做完了">
   <meta property="og:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
   <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
-  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
-  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
-  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png">
+  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/share-cover.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="好险，差点就做完了 — 你是哪位还没下班的设计大师">
   <!-- Twitter Card（部分抓取引擎 fallback） -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="好险，差点就做完了">
   <meta name="twitter:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
-  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png">
   <!-- Schema.org（部分场景 fallback） -->
   <meta itemprop="name" content="好险，差点就做完了">
   <meta itemprop="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
-  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png">
   <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
-  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/share-cover.png">
   <!-- 微信 / QQ 专属 thumbnail 提示（非官方但部分版本有效） -->
-  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/poster-share.jpg">
+  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/share-cover.png">
   <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
   <meta name="application-name" content="Ardot · 艺术家测试">
 
@@ -3001,16 +3001,16 @@
       //    og:image 写死对应角色图。真实用户打开后被 location.replace 立即跳回 quiz-h5.html，
       //    朋友进来依然落到问卷首页；微信爬虫只读 head、不跟随跳转，所以卡片缩略图 = 角色图。
       // v 参数是静态构建号，改版 meta/分享图时递增即可让微信/社交平台重新抓取缓存
-      var SHARE_BUILD="20260426b";
+      var SHARE_BUILD="20260427";
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
       var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
-      // 分享卡片图（供 H5 原生面板 / 朋友圈 JSSDK 即时使用；微信右上角会读 URL 对应 html 的 <head>）：
-      //  - 已到结果页（有 roleId）：用当前结果角色图（rImg）
-      //  - 还没到结果页（封面/答题中）：用首页海报压缩版 poster-share.jpg（<300K，避免微信丢图）
-      var posterImg=baseDir+"img/poster-share.jpg";
+      // 分享卡片图：统一使用首页封面 share-cover.png，结果页也不再切换成角色图
+      //  - 统一视觉，避免不同结果卡片缩略图风格不一
+      //  - 避免结果角色图尺寸过大在微信里丢图
+      var posterImg=baseDir+"img/share-cover.png";
       var rImgEl=document.getElementById("rImg");
-      var shareImg=(roleId&&rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
+      var shareImg=posterImg;
       // 更新分享卡片 meta（社交平台/微信会重读）
       updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
@@ -3039,7 +3039,7 @@
     function tryShareWithImage(title,txt,shareLink,shareImg){
       return new Promise(function(resolve,reject){
         if(!navigator.canShare||!navigator.share)return reject();
-        var imgUrl=shareImg||"img/poster-share.jpg";
+        var imgUrl=shareImg||"img/share-cover.png";
         var tipToast=typeof toast==="function"?toast("正在准备分享…"):null;
         // 拉取分享图作为文件（同源 public 资源，fetch 无跨域问题）
         fetch(imgUrl,{cache:"force-cache"}).then(function(r){
@@ -3096,11 +3096,11 @@
        这样用户进结果页就**直接点右上角 …** 分享，卡片图也是角色图。 */
     function presetShareForResult(){
       var role=latestResult;if(!role||!role.id)return;
-      var SHARE_BUILD="20260426b";
+      var SHARE_BUILD="20260427";
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var shareLink=baseDir+"share-"+encodeURIComponent(role.id)+".html?v="+SHARE_BUILD;
       var rImgEl=document.getElementById("rImg");
-      var posterImg=baseDir+"img/poster-share.jpg";
+      var posterImg=baseDir+"img/share-cover.png";
       var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
       var title="我是「"+(role.name||"设计大师")+"」— 还没下班的设计大师";
       var desc=role.tagline||"测测你是哪位还没下班的设计大师";
