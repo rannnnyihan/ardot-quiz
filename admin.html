@@ -81,6 +81,24 @@
     th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #f0f0f4;font-size:13px}
     th{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.04em}
     .auto-save-hint{font-size:12px;color:#2d6a4a;margin-left:12px;font-weight:500}
+    /* 保存前弹窗 */
+    .modal-mask{position:fixed;inset:0;background:rgba(10,10,20,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-card{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+    .modal-title{font-size:16px;font-weight:800;margin-bottom:6px}
+    .modal-sub{font-size:13px;color:#666;line-height:1.6;margin-bottom:14px}
+    .modal-diff{background:#fff7ec;border:1px solid #f0d9a8;border-radius:8px;padding:10px 12px;font-size:12px;color:#6b4a1a;line-height:1.6;margin-bottom:14px;max-height:160px;overflow:auto}
+    .modal-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+    .modal-row input[type=text]{flex:1}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+    .modal-actions .btn{height:36px;padding:0 16px;font-size:13px}
+    .btn.danger{background:#d4531b;border-color:#d4531b;color:#fff}
+    .btn.danger:hover{background:#b8421a;border-color:#b8421a}
+    .btn.keep{background:#2d6a4a;border-color:#2d6a4a;color:#fff}
+    .btn.keep:hover{background:#1f5538;border-color:#1f5538}
+    .stats-range-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;background:#fff;border:1px solid #ececf2;border-radius:12px;padding:10px 14px}
+    .stats-range-bar label{margin:0;font-weight:700;color:#444;font-size:12px}
+    .stats-range-bar select{min-width:260px;max-width:100%;width:auto}
+    .stats-range-bar .meta{font-size:12px;color:#888}
     @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}}
   </style>
 </head>
@@ -295,6 +313,15 @@
   </div>
 
   <div class="panel hidden" id="statsTab">
+    <div class="stats-range-bar">
+      <label>数据范围：</label>
+      <select id="snapshotRangeSel" onchange="onSnapshotRangeChange()">
+        <option value="__current__">当前收集中的数据（最新配置）</option>
+      </select>
+      <span class="meta" id="snapshotRangeMeta"></span>
+      <button class="btn" type="button" onclick="refreshSnapshotList()" style="margin-left:auto">刷新快照列表</button>
+      <button class="btn danger" type="button" id="deleteSnapshotBtn" onclick="deleteCurrentSnapshot()" style="display:none">删除此快照</button>
+    </div>
     <div class="stats">
       <div class="stat"><div class="stat-k">总提交数</div><div class="stat-v" id="stTotal">0</div></div>
       <div class="stat"><div class="stat-k">今日提交</div><div class="stat-v" id="stToday">0</div></div>
@@ -512,16 +539,54 @@
     let activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
     let dragQid="";
     let dropQid="";
+
+    /* ===== 配置指纹：用来判断「题目/映射/角色」是否发生变化，从而决定保存时是否弹快照窗 =====
+       改 meta 文案（如主标题、副标题）不会触发弹窗。 */
+    function configFingerprint(c){
+      try{
+        return JSON.stringify({
+          questions:c&&c.questions||{},
+          mappings:c&&c.mappings||{},
+          roles:(c&&c.roles||[]).map((r)=>({id:r.id,name:r.name,real:r.real,img:r.img,desc:r.desc})),
+          questionOrder:(c&&c.meta&&c.meta.questionOrder)||null,
+          feedbackEnabled:(c&&c.meta&&c.meta.feedbackEnabled)!==false
+        });
+      }catch(e){return String(Math.random())}
+    }
+    /* 基线：admin 打开时 / 保存成功后重置，代表「跟服务端当前收集口径一致的配置」 */
+    let savedConfigFingerprint=configFingerprint(cfg);
+
+    /* ===== 数据源切换：当前 = server/local 原始数据；查看历史快照时改为从 window.__snapshotViewingData 读取 ===== */
+    let viewingSnapshotId=""; /* "" 表示查看当前数据，非空表示当前选中快照 id */
+    let viewingSnapshotCfg=null; /* 查看快照时临时代替 cfg 的冻结配置（只用于统计渲染） */
+    let viewingSnapshotAnswers=null; /* 查看快照时的作答数组 */
+    let snapshotListCache=[]; /* GET /api/snapshot 的 meta 列表 */
     function safePositiveInt(v,fallback){
       const n=Math.round(Number(v));
       return Number.isFinite(n)&&n>0?n:fallback;
     }
     function getSurveyData(){
+      if(viewingSnapshotId){
+        return Array.isArray(viewingSnapshotAnswers)?viewingSnapshotAnswers.slice():[];
+      }
       if(currentDataSource()==="server"){
         /* 服务端模式：返回最近一次 fetch 的缓存（启动时/点击刷新时会拉取） */
         return Array.isArray(window.__serverSurveyCache)?window.__serverSurveyCache.slice():[];
       }
       return JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+    }
+    /* 统计相关渲染用的 cfg：查看历史快照时用冻结 cfg，否则用当前 cfg */
+    function viewingCfg(){
+      return viewingSnapshotId&&viewingSnapshotCfg?viewingSnapshotCfg:cfg;
+    }
+    function viewingQuestions(){return viewingCfg().questions||{}}
+    function viewingQuestionIds(){
+      const c=viewingCfg();
+      const ids=Object.keys(c.questions||{});
+      const ordered=Array.isArray(c.meta&&c.meta.questionOrder)?c.meta.questionOrder:[];
+      const base=ordered.filter((id)=>ids.includes(id));
+      ids.forEach((id)=>{if(!base.includes(id))base.push(id)});
+      return base;
     }
 
     /* ===== 数据源与服务端拉取 ===== */
@@ -540,6 +605,7 @@
       localStorage.setItem(ADMIN_TOKEN_KEY,v);
       alert(v?"Token 已保存到本地。":"Token 已清空。");
       refreshData();
+      refreshSnapshotList();
     }
     function hydrateDataSourceUI(){
       const sel=document.getElementById("dataSourceSel");
@@ -1289,9 +1355,10 @@
       }
     }
 
-    function getScaleStemStats(qid){
+    function getScaleStemStats(qid, cfgSrc){
       const data=getSurveyData();
-      const q=cfg.questions[qid];
+      const src=cfgSrc||cfg;
+      const q=src.questions&&src.questions[qid];
       const stems=(q&&q.stems)||[];
       const keyMap={q4:"q4_breakdown",q5:"q5_expectation",q6:"q6_prompt_relation"};
       return stems.map((stem,stemIdx)=>{
@@ -1318,9 +1385,10 @@
       });
     }
 
-    function getQuestionStats(qid, stemIndex){
+    function getQuestionStats(qid, stemIndex, cfgSrc){
       const data=getSurveyData();
-      const q=cfg.questions[qid];
+      const src=cfgSrc||cfg;
+      const q=src.questions&&src.questions[qid];
       if(!q)return {type:"single",labels:[],shortLabels:[],values:[],valid:0,total:data.length};
       if(q.type==="single"){
         const cnt={};(q.options||[]).forEach(o=>cnt[o.key]=0);
@@ -1420,7 +1488,7 @@
         const mean=valid?Number((sum/valid).toFixed(2)):0;
         return {type:"score",labels,shortLabels:labels,values:counts,valid,total:data.length,mean};
       }
-      const stems=getScaleStemStats(qid);
+      const stems=getScaleStemStats(qid,src);
       const idx=Math.max(0,Math.min(stems.length-1,Number(stemIndex)||0));
       const s=stems[idx]||{labels:["1 分","2 分","3 分","4 分","5 分","6 分","7 分"],values:new Array(7).fill(0),scoreCount:0,mean:0,label:""};
       return {
@@ -1460,9 +1528,16 @@
         return;
       }
       sel.classList.remove("hidden");
-      const current=sel.value||activeQid||questionIds()[0];
-      sel.innerHTML=questionIds().map((qid)=>`<option value="${qid}">${displayQid(qid).toUpperCase()} · ${cfg.questions[qid].title}</option>`).join("");
-      sel.value=questionIds().includes(current)?current:questionIds()[0];
+      const vc=viewingCfg();
+      const ids=viewingQuestionIds();
+      const current=sel.value||(ids.includes(activeQid)?activeQid:ids[0]);
+      sel.innerHTML=ids.map((qid)=>{
+        const q=vc.questions[qid]||{};
+        const idxInCurrent=Object.keys(cfg.questions||{}).includes(qid)?questionIds().indexOf(qid):-1;
+        const label=idxInCurrent>=0?("Q"+(idxInCurrent+1)):qid.toUpperCase();
+        return `<option value="${qid}">${label} · ${q.title||qid}</option>`;
+      }).join("");
+      sel.value=ids.includes(current)?current:ids[0];
       sel.onchange=()=>{
         renderChartStemSelect();
         renderChart();
@@ -1478,7 +1553,8 @@
         return;
       }
       const qid=document.getElementById("chartQuestionSelect").value;
-      const q=cfg.questions[qid];
+      const vc=viewingCfg();
+      const q=vc.questions[qid];
       const stemSel=document.getElementById("chartStemSelect");
       if(!stemSel||!q||(q.type!=="scale"&&q.type!=="rank")){
         if(stemSel)stemSel.classList.add("hidden");
@@ -1487,7 +1563,7 @@
       stemSel.classList.remove("hidden");
       const current=Number(stemSel.value||0);
       if(q.type==="scale"){
-        const stats=getScaleStemStats(qid);
+        const stats=getScaleStemStats(qid,vc);
         stemSel.innerHTML=stats.map((s)=>`<option value="${s.stemIndex}">分项 ${s.stemIndex+1} · ${s.label}</option>`).join("");
         stemSel.value=Number.isFinite(current)&&stats[current]?String(current):"0";
       }else{
@@ -1504,7 +1580,8 @@
       const data=getSurveyData();
       const roleCounts={};
       const roleNameById={};
-      (cfg.roles||[]).forEach((r)=>{roleNameById[r.id]=r.name;roleCounts[r.id]=0;});
+      const vc=viewingCfg();
+      (vc.roles||[]).forEach((r)=>{roleNameById[r.id]=r.name;roleCounts[r.id]=0;});
       let valid=0;
       data.forEach((d)=>{
         const rid=(d&&d.result_role_id)||"";
@@ -1579,6 +1656,7 @@
     function renderChart(){
       const sel=document.getElementById("chartQuestionSelect");
       if(!sel)return;
+      const vc=viewingCfg();
       let ds=null;
       let labels=[];
       if(statsMode==="result"){
@@ -1586,10 +1664,10 @@
         labels=ds.labels;
       }else{
         const qid=sel.value;
-        const q=cfg.questions[qid];
+        const q=vc.questions[qid];
         const stemSel=document.getElementById("chartStemSelect");
         const stemIndex=(q&&(q.type==="scale"||q.type==="rank")&&stemSel&&!stemSel.classList.contains("hidden"))?Number(stemSel.value||0):0;
-        ds=getQuestionStats(qid, stemIndex);
+        ds=getQuestionStats(qid, stemIndex, vc);
         labels=(ds.type==="single"||ds.type==="rank"||ds.type==="multi")?ds.labels:ds.shortLabels;
       }
       const values=ds.values;
@@ -1797,20 +1875,178 @@
           alert("映射配置有误，请修正后再保存（打分/量表题需为合法 JSON）；或角色信息不完整。");
           return;
         }
-        const hint=document.getElementById("autoSaveHint");
-        if(hint)hint.textContent="正在同步到服务端…";
-        const res=await pushConfigToServer();
-        const ts=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-        if(res.ok){
-          if(hint)hint.textContent="已保存并同步到服务端 · "+ts;
-          alert("已保存并同步到服务端 ✅\n所有设备下次打开 quiz-h5 都会拉到最新配置（建议通知用户刷新页面）。");
-        }else{
-          if(hint)hint.textContent="已保存到本地，服务端同步失败 · "+ts;
-          alert("已保存到本地 ⚠️ 但服务端同步失败：\n"+res.msg+"\n\n其他设备仍会使用旧配置。请检查 Admin Token 是否正确、以及 EdgeOne 是否已绑定 KV（变量名 SURVEY_KV）。");
+        /* 指纹对比：如果题目/映射/角色结构变了，需要先决定「保留历史 or 直接清除」 */
+        const nextFp=configFingerprint(cfg);
+        if(nextFp!==savedConfigFingerprint){
+          /* 弹窗异步决策：用户选完才真正 push 到服务端 */
+          openSnapshotPromptAndSave(nextFp);
+          return;
         }
+        await doSaveConfigToServer(nextFp, "配置已同步（无题目结构变化）");
       }catch(e){
         console.error(e);
         alert("保存失败："+(e&&e.message?e.message:String(e)));
+      }
+    }
+
+    /* 真正把 cfg 推到服务端；成功后刷新指纹基线 + 给点视觉反馈 */
+    async function doSaveConfigToServer(nextFp, okHint){
+      const hint=document.getElementById("autoSaveHint");
+      if(hint)hint.textContent="正在同步到服务端…";
+      const res=await pushConfigToServer();
+      const ts=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+      if(res.ok){
+        savedConfigFingerprint=nextFp||configFingerprint(cfg);
+        if(hint)hint.textContent=(okHint||"已保存并同步到服务端")+" · "+ts;
+        return {ok:true};
+      }
+      if(hint)hint.textContent="已保存到本地，服务端同步失败 · "+ts;
+      return {ok:false,msg:res.msg};
+    }
+
+    /* 弹「保存 or 清除历史」选择框，等用户决定完再 push 配置 */
+    function openSnapshotPromptAndSave(nextFp){
+      /* 先探一下当前服务端大致有多少条作答（从缓存里看） */
+      let currentCount=0;
+      try{
+        if(currentDataSource()==="server"&&Array.isArray(window.__serverSurveyCache)){
+          currentCount=window.__serverSurveyCache.length;
+        }else{
+          currentCount=(JSON.parse(localStorage.getItem("ardot_survey")||"[]")||[]).length;
+        }
+      }catch(e){}
+      const diffText=describeConfigDiff();
+      const mask=document.createElement("div");
+      mask.className="modal-mask";
+      mask.innerHTML=`
+        <div class="modal-card">
+          <div class="modal-title">⚠️ 题目/映射/角色 有变化</div>
+          <div class="modal-sub">
+            保存之后，新题目结构将覆盖服务端配置；当前已收集的 <b>${currentCount}</b> 条作答
+            是基于<b>旧题目</b>收集的，直接和新题目混在一起会对不上号。<br>
+            你打算怎么处理已有数据？
+          </div>
+          <div class="modal-diff" id="snapDiffBox">${diffText}</div>
+          <div class="modal-row">
+            <label style="min-width:72px;font-size:12px;color:#555;font-weight:600">备注：</label>
+            <input id="snapLabelInput" type="text" placeholder="例如：2026-04-27 修改 Q3 选项前" maxlength="120">
+          </div>
+          <div class="modal-actions">
+            <button class="btn" id="snapCancelBtn">取消（不保存）</button>
+            <button class="btn danger" id="snapClearBtn">不要了，直接清除</button>
+            <button class="btn keep" id="snapKeepBtn">📦 保留为历史快照</button>
+          </div>
+        </div>`;
+      document.body.appendChild(mask);
+      const close=()=>{try{document.body.removeChild(mask)}catch(e){}};
+      document.getElementById("snapCancelBtn").onclick=close;
+      document.getElementById("snapKeepBtn").onclick=async ()=>{
+        const label=(document.getElementById("snapLabelInput").value||"").trim();
+        close();
+        await doSnapshotThenSave(nextFp, {archive:true,label,clearAfter:true});
+      };
+      document.getElementById("snapClearBtn").onclick=async ()=>{
+        if(!confirm("确认不保存历史、直接清除这 "+currentCount+" 条已收集数据吗？此操作不可撤销。"))return;
+        close();
+        await doSnapshotThenSave(nextFp, {archive:false,clearAfter:true});
+      };
+    }
+
+    /* 归档 (可选) → 清空（可选）→ 推新配置。顺序重要：先把"旧配置 + 旧数据"冻进快照，再 push 新配置。 */
+    async function doSnapshotThenSave(nextFp, opts){
+      const token=currentAdminToken();
+      if(!token){
+        alert("需要先保存 Admin Token 才能归档快照/清空服务端数据。");
+        return;
+      }
+      const hint=document.getElementById("autoSaveHint");
+      try{
+        /* ① 构建 "归档时刻的 cfg"：必须是用户上次保存后那一版，即服务端现在那一版。
+           最稳妥的做法是直接拉 /api/config，拿到服务端当前 cfg 作为冻结值。
+           失败就退而求其次用 savedConfigFingerprint 反解——但指纹是字符串没法反解，所以直接用当前 cfg 的"旧结构"也不对。
+           这里决定：必须拿到服务端当前 cfg 才允许 archive=true。 */
+        let frozenCfg=null;
+        if(opts.archive){
+          if(hint)hint.textContent="正在拉取旧配置用于归档…";
+          const pull=await pullConfigFromServer();
+          if(pull.ok&&pull.data&&pull.data.questions){
+            frozenCfg=pull.data;
+          }else{
+            /* 服务端还没有配置（第一次保存）→ 没必要 archive，直接视为 clear-only */
+            alert("服务端暂无上一版配置（可能是首次保存），无需归档。将直接保存新配置。");
+            opts.archive=false;
+          }
+        }
+        /* ② 归档 */
+        if(opts.archive){
+          if(hint)hint.textContent="正在把旧数据打包为历史快照…";
+          const resp=await fetch("/api/snapshot",{
+            method:"POST",
+            headers:{"Content-Type":"application/json","X-Admin-Token":token},
+            body:JSON.stringify({label:opts.label||"",cfg:frozenCfg,clearAfter:!!opts.clearAfter})
+          });
+          const j=await resp.json().catch(()=>({ok:false,msg:"HTTP "+resp.status}));
+          if(!resp.ok||!j.ok){
+            alert("快照归档失败："+(j&&j.msg||("HTTP "+resp.status))+"\n\n原配置未修改，请稍后重试。");
+            if(hint)hint.textContent="快照归档失败，未保存新配置";
+            return;
+          }
+          /* 清 local 里的 ardot_survey，避免新旧混在一起 */
+          try{localStorage.removeItem("ardot_survey")}catch(e){}
+          window.__serverSurveyCache=[];
+        }else if(opts.clearAfter){
+          /* ②' 仅清空，不归档 */
+          if(hint)hint.textContent="正在清空旧收集数据…";
+          const resp=await fetch("/api/clear",{method:"POST",headers:{"X-Admin-Token":token}});
+          const j=await resp.json().catch(()=>({ok:false,msg:"HTTP "+resp.status}));
+          if(!resp.ok||!j.ok){
+            alert("清空服务端旧数据失败："+(j&&j.msg||("HTTP "+resp.status))+"\n\n原配置未修改，请稍后重试。");
+            if(hint)hint.textContent="清空旧数据失败，未保存新配置";
+            return;
+          }
+          try{localStorage.removeItem("ardot_survey")}catch(e){}
+          window.__serverSurveyCache=[];
+        }
+        /* ③ 真正 push 新配置 */
+        const save=await doSaveConfigToServer(nextFp);
+        if(save.ok){
+          alert(opts.archive
+            ?"✅ 已归档旧数据并保存新配置。\n在「查看结果数据统计」页顶部「数据范围」下拉里能随时切回历史快照查看与导出。"
+            :"✅ 已清空旧数据并保存新配置。");
+          await refreshSnapshotList();
+          try{refreshData()}catch(e){}
+        }else{
+          alert("⚠️ 已归档/清空旧数据，但服务端保存新配置失败：\n"+save.msg+"\n\n你可以稍后在 admin 里重新点击「保存配置」重试。本地 cfg 已是最新。");
+        }
+      }catch(e){
+        console.error(e);
+        alert("保存流程出错："+(e&&e.message||e));
+      }
+    }
+
+    /* 粗略列出"当前 cfg vs 上次保存时"主要的差异点，给弹窗展示一下，不是严格 diff，只挑题目列表对比 */
+    function describeConfigDiff(){
+      try{
+        const saved=JSON.parse(savedConfigFingerprint||"{}");
+        const prevQs=(saved&&saved.questions)||{};
+        const currQs=cfg.questions||{};
+        const prevIds=Object.keys(prevQs);
+        const currIds=Object.keys(currQs);
+        const added=currIds.filter((x)=>!prevIds.includes(x));
+        const removed=prevIds.filter((x)=>!currIds.includes(x));
+        const modified=currIds.filter((x)=>prevIds.includes(x)&&JSON.stringify(prevQs[x])!==JSON.stringify(currQs[x]));
+        const parts=[];
+        parts.push(`题目数量：${prevIds.length} → ${currIds.length}`);
+        if(added.length)parts.push(`新增：${added.map((id)=>{const q=currQs[id];return `${id.toUpperCase()}「${(q&&q.title||"").slice(0,30)}」`;}).join("、")}`);
+        if(removed.length)parts.push(`删除：${removed.map((id)=>{const q=prevQs[id];return `${id.toUpperCase()}「${(q&&q.title||"").slice(0,30)}」`;}).join("、")}`);
+        if(modified.length)parts.push(`改动：${modified.map((id)=>{const q=currQs[id];return `${id.toUpperCase()}「${(q&&q.title||"").slice(0,20)}」`;}).join("、")}`);
+        /* 映射变化 */
+        const prevMap=JSON.stringify(saved.mappings||{});
+        const currMap=JSON.stringify(cfg.mappings||{});
+        if(prevMap!==currMap)parts.push("角色映射规则有调整");
+        return parts.join("<br>")||"配置有变化（未详列）";
+      }catch(e){
+        return "配置有变化。";
       }
     }
 
@@ -1844,8 +2080,9 @@
       if(/[",\n]/.test(s))return `"${s.replace(/"/g,'""')}"`;
       return s;
     }
-    function rawAnswerToCsvCell(qid,item){
-      const q=cfg.questions[qid]||{};
+    function rawAnswerToCsvCell(qid,item,cfgSrc){
+      const src=cfgSrc||cfg;
+      const q=src.questions&&src.questions[qid]||{};
       const direct=q.type==="text"
         ? normalizeSurveyValue(item,qid)
         :(item&&item.answers&&item.answers[qid]!==undefined ? item.answers[qid] : normalizeSurveyValue(item,qid));
@@ -1867,22 +2104,26 @@
         alert("暂无数据可导出");
         return;
       }
-      const ids=questionIds();
+      const vc=viewingCfg();
+      const ids=viewingSnapshotId?Object.keys(vc.questions||{}):questionIds();
       const headers=[
         "序号",
         "提交时间",
         "结果角色ID",
         "结果角色名称",
-        ...ids.map((qid)=>`${displayQid(qid).toUpperCase()}_${qid}_原始作答`)
+        ...ids.map((qid,idx)=>{
+          const tag=viewingSnapshotId?("Q"+(idx+1)):displayQid(qid).toUpperCase();
+          return `${tag}_${qid}_原始作答`;
+        })
       ];
       const lines=[headers.map(csvEscape).join(",")];
       rows.forEach((item,idx)=>{
         const row=[
           idx+1,
-          item&&item.timestamp?item.timestamp:"",
+          item&&item.timestamp?item.timestamp:(item&&item._server_ts?item._server_ts:""),
           item&&item.result_role_id?item.result_role_id:"",
           item&&item.result_role_name?item.result_role_name:"",
-          ...ids.map((qid)=>rawAnswerToCsvCell(qid,item))
+          ...ids.map((qid)=>rawAnswerToCsvCell(qid,item,vc))
         ];
         lines.push(row.map(csvEscape).join(","));
       });
@@ -1892,7 +2133,8 @@
       const a=document.createElement("a");
       const ts=new Date().toISOString().replace(/[:T]/g,"-").slice(0,19);
       a.href=url;
-      a.download=`ardot_raw_answers_${ts}.csv`;
+      const suffix=viewingSnapshotId?("_snapshot_"+viewingSnapshotId):"";
+      a.download=`ardot_raw_answers${suffix}_${ts}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1915,9 +2157,127 @@
       setStatsMode(statsMode);
       const res=await pushConfigToServer();
       if(res.ok){
+        savedConfigFingerprint=configFingerprint(cfg);
         alert("已恢复默认配置并同步到服务端 ✅");
       }else{
         alert("已恢复本地默认配置，但服务端同步失败：\n"+res.msg+"\n其他设备仍会使用旧配置。");
+      }
+    }
+
+    /* ===== 历史快照：列表/切换查看/删除 ===== */
+    async function refreshSnapshotList(){
+      const token=currentAdminToken();
+      if(!token){
+        snapshotListCache=[];
+        renderSnapshotRangeSelect();
+        return;
+      }
+      try{
+        const resp=await fetch("/api/snapshot?list=1",{headers:{"X-Admin-Token":token}});
+        const j=await resp.json().catch(()=>({ok:false}));
+        if(resp.ok&&j.ok&&Array.isArray(j.data)){
+          snapshotListCache=j.data;
+        }else{
+          snapshotListCache=[];
+        }
+      }catch(e){
+        snapshotListCache=[];
+      }
+      renderSnapshotRangeSelect();
+    }
+    function renderSnapshotRangeSelect(){
+      const sel=document.getElementById("snapshotRangeSel");
+      if(!sel)return;
+      const prev=sel.value||"__current__";
+      const opts=[`<option value="__current__">当前收集中的数据（最新配置）</option>`];
+      snapshotListCache.forEach((s)=>{
+        const t=s.createdAt?new Date(s.createdAt).toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}):"-";
+        const tail=s.label?` · ${s.label}`:"";
+        opts.push(`<option value="${s.id}">📦 ${t} · ${s.meta&&s.meta.questionCount||"-"} 题 · ${s.count} 份${tail}</option>`);
+      });
+      sel.innerHTML=opts.join("");
+      sel.value=snapshotListCache.some((s)=>s.id===prev)||prev==="__current__"?prev:"__current__";
+      updateSnapshotRangeMeta();
+    }
+    function updateSnapshotRangeMeta(){
+      const meta=document.getElementById("snapshotRangeMeta");
+      const delBtn=document.getElementById("deleteSnapshotBtn");
+      if(!meta)return;
+      if(!viewingSnapshotId){
+        meta.textContent="";
+        if(delBtn)delBtn.style.display="none";
+        return;
+      }
+      const s=snapshotListCache.find((x)=>x.id===viewingSnapshotId);
+      if(s){
+        const t=s.createdAt?new Date(s.createdAt).toLocaleString("zh-CN"):"-";
+        meta.textContent=`查看快照：${t} · ${s.meta&&s.meta.questionCount||"-"} 题 · 共 ${s.count} 份${s.label?(" · "+s.label):""}`;
+      }else{
+        meta.textContent="查看快照（meta 缺失）";
+      }
+      if(delBtn)delBtn.style.display="";
+    }
+    async function onSnapshotRangeChange(){
+      const sel=document.getElementById("snapshotRangeSel");
+      const val=sel.value;
+      if(val==="__current__"){
+        viewingSnapshotId="";
+        viewingSnapshotCfg=null;
+        viewingSnapshotAnswers=null;
+        updateSnapshotRangeMeta();
+        renderStats();
+        renderChartQuestionSelect();
+        return;
+      }
+      /* 切到快照：拉完整数据 */
+      const token=currentAdminToken();
+      if(!token){alert("请先保存 Admin Token 再查看快照");sel.value="__current__";return;}
+      const meta=document.getElementById("snapshotRangeMeta");
+      if(meta)meta.textContent="正在加载快照…";
+      try{
+        const resp=await fetch("/api/snapshot?id="+encodeURIComponent(val),{headers:{"X-Admin-Token":token}});
+        const j=await resp.json().catch(()=>({ok:false}));
+        if(!resp.ok||!j.ok||!j.data){
+          alert("加载快照失败："+(j&&j.msg||("HTTP "+resp.status)));
+          sel.value="__current__";
+          viewingSnapshotId="";viewingSnapshotCfg=null;viewingSnapshotAnswers=null;
+          updateSnapshotRangeMeta();
+          return;
+        }
+        viewingSnapshotId=val;
+        viewingSnapshotCfg=j.data.cfg||null;
+        viewingSnapshotAnswers=Array.isArray(j.data.answers)?j.data.answers:[];
+        updateSnapshotRangeMeta();
+        renderStats();
+        renderChartQuestionSelect();
+      }catch(e){
+        alert("加载快照失败："+(e&&e.message||e));
+        sel.value="__current__";
+        viewingSnapshotId="";viewingSnapshotCfg=null;viewingSnapshotAnswers=null;
+        updateSnapshotRangeMeta();
+      }
+    }
+    async function deleteCurrentSnapshot(){
+      if(!viewingSnapshotId)return;
+      const s=snapshotListCache.find((x)=>x.id===viewingSnapshotId);
+      const label=s?(s.label||new Date(s.createdAt||Date.now()).toLocaleString("zh-CN")):viewingSnapshotId;
+      if(!confirm("确认删除快照：\n"+label+"\n\n快照里的原始作答将不可恢复。"))return;
+      const token=currentAdminToken();
+      if(!token){alert("请先保存 Admin Token");return;}
+      try{
+        const resp=await fetch("/api/snapshot?id="+encodeURIComponent(viewingSnapshotId),{method:"DELETE",headers:{"X-Admin-Token":token}});
+        const j=await resp.json().catch(()=>({ok:false}));
+        if(!resp.ok||!j.ok){alert("删除失败："+(j&&j.msg||("HTTP "+resp.status)));return;}
+        viewingSnapshotId="";viewingSnapshotCfg=null;viewingSnapshotAnswers=null;
+        await refreshSnapshotList();
+        const sel=document.getElementById("snapshotRangeSel");
+        if(sel)sel.value="__current__";
+        updateSnapshotRangeMeta();
+        renderStats();
+        renderChartQuestionSelect();
+        alert("快照已删除。");
+      }catch(e){
+        alert("删除失败："+(e&&e.message||e));
       }
     }
 
@@ -1932,6 +2292,8 @@
     hydrateDataSourceUI();
     /* 初次加载：服务端模式自动拉取一次 */
     if(currentDataSource()==="server"&&currentAdminToken()){refreshData()}
+    /* 初次加载：拉快照列表填充下拉 */
+    if(currentAdminToken()){refreshSnapshotList()}
     bindConfigAutoSave();
     switchTab("manage");
     switchManageSubTab("question");
@@ -1951,6 +2313,7 @@
       try{
         localStorage.setItem(CFG_KEY, JSON.stringify(res.data));
         cfg=loadCfg(); // 走一次 merge/migrate，保证结构和默认对齐
+        savedConfigFingerprint=configFingerprint(cfg); // 以服务端当前版为"已保存基线"
         activeQid="q1";
         activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
         renderQList();
