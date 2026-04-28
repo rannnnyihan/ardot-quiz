@@ -1684,6 +1684,36 @@
       return scene;
     }
 
+    /* 把 admin 里配的主标题（可能带 <br>/<em>）剥成纯文本，用于浏览器 tab、分享卡片标题等
+       只接受文本场景的地方。保留首页 welcome 的 innerHTML 渲染（那里要保留富文本）。 */
+    function plainTextFromHtml(s){
+      if(!s)return"";
+      try{
+        const tmp=document.createElement("div");
+        tmp.innerHTML=String(s);
+        // <br> 在富文本里是换行，纯文本里直接视为空格，避免"A<br>B"变"AB"粘在一起
+        tmp.querySelectorAll("br").forEach(br=>br.replaceWith(" "));
+        return (tmp.textContent||tmp.innerText||"").replace(/\s+/g," ").trim();
+      }catch(e){return String(s).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();}
+    }
+    /* admin 里的主/副标题要同步到：① 浏览器 tab ② 微信/社交平台抓取的 head meta。
+       这样管理员改完 admin 主副标题、推送到服务端后，所有地方的标题都会跟着变。
+       注意：share-d1~d6.html 是"结果页角色专属"中转（标题是角色名，语义不同），不在此处统一。*/
+    function syncDocMetaFromConfig(){
+      try{
+        const title=plainTextFromHtml((CFG&&CFG.meta&&CFG.meta.mainTitle)||"");
+        const desc=plainTextFromHtml((CFG&&CFG.meta&&CFG.meta.subtitle)||"");
+        if(!title&&!desc)return;
+        /* 复用 updateShareMeta 统一改所有 head meta（og/twitter/itemprop/description 都覆盖） */
+        updateShareMeta({title:title||undefined,desc:desc||undefined});
+        /* og:image:alt 语义是"标题 + 场景描述"，单独补一下 */
+        if(title){
+          const altEl=document.querySelector('meta[property="og:image:alt"]');
+          if(altEl)altEl.setAttribute("content",title+" — "+(desc||"AI 设计师人格测试"));
+        }
+      }catch(e){/* 出错静默，不影响页面功能 */}
+    }
+
     function applyConfigToPage(){
       const welcome=document.getElementById("s0");
       if(welcome){
@@ -1694,6 +1724,9 @@
         const chips=welcome.querySelector(".master-preview");
         if(chips)chips.innerHTML=masters.map(m=>`<span class="chip">${m.name}</span>`).join("");
       }
+      /* 同步 tab 标题 & 分享 meta —— 必须在 welcome 渲染之后调用，
+         这样微信/社交平台抓首页 quiz-h5.html 时拿到的是最新主副标题。*/
+      syncDocMetaFromConfig();
       QUESTION_ORDER.forEach((qid,idx)=>{
         const scene=ensureScene(idx+1);if(!scene)return;
         scene.style.display="";
@@ -3244,11 +3277,17 @@
       var roleId=(latestResult&&latestResult.id)||"";
       var isOnResult=!!roleId; // 有 roleId 代表当前已经在结果页
       /* 分享卡片使用问卷调研自身的标题/副标题/首页海报（不带角色结果），吸引朋友进来做测试 */
-      var title="《好险，差点就会做设计了》";
+      /* 标题/描述从 admin 配置的 CFG.meta.mainTitle / subtitle 读，admin 改完推送服务端后，
+         这里的分享卡片标题也会跟着变。主标题里的 <br>/<em> 要剥成纯文本（分享卡片不认富文本）。
+         读不到配置时回退到历史默认文案，确保老缓存/首次加载也能分享。*/
+      var cfgMeta=(typeof CFG!=="undefined"&&CFG&&CFG.meta)||{};
+      var title=plainTextFromHtml(cfgMeta.mainTitle||"")||"《好险，差点就会做设计了》";
       // 题数 & 预计时长（按每题约 20 秒估算，向上取整，最少 1 分钟）
       var qCount=(typeof T==="number"&&T>0)?T:((typeof QUESTION_ORDER!=="undefined"&&QUESTION_ORDER&&QUESTION_ORDER.length)||11);
       var estMin=Math.max(1,Math.ceil(qCount*20/60));
-      var txt="测一测你是哪位还没下班的设计大师 · 共 "+qCount+" 题 · 预计 "+estMin+" 分钟";
+      /* 描述优先用 admin 配的副标题；若为空则拼一条带题数/时长的兜底。*/
+      var subtitlePlain=plainTextFromHtml(cfgMeta.subtitle||"");
+      var txt=subtitlePlain||("测一测你是哪位还没下班的设计大师 · 共 "+qCount+" 题 · 预计 "+estMin+" 分钟");
       // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
       //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=share-cover.png
       //  - 结果页（有 roleId）：指向 share-<roleId>.html 专属中转页，<head> og:image=角色图
