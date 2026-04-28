@@ -1213,8 +1213,9 @@
           subtitle:"11 道题，测测你是被什么工作困住的设计大师",
           note:"11 题 · 约 6 分钟",
           feedbackEnabled:true,
-          questionSchema:"designer_personality_v3",
-          roleSetVersion:7
+          /* 保持与 admin.html defaultConfig 同步，避免 schemaOutdated 把服务端配置的题目改动（新增/删除/改文案/改顺序）整个回退成默认模板 */
+          questionSchema:"designer_personality_v4",
+          roleSetVersion:8
         },
         roles:[
           {
@@ -1497,8 +1498,9 @@
             {key:"L",label:"MasterGo AI"},
             {key:"M",label:"Pixso AI"},
             {key:"N",label:"Lovart"}
-          ]},
-          q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"}
+          ]}
+          /* 注：结果页的"填写心愿参与抽奖"功能在代码里直接用 A.q12 收集，不依赖 questions.q12 配置，因此这里默认模板不再列 q12；
+             admin 里删除 q12 时服务端会返回没有 q12 的 questions，前端渲染就不会再出现这道题。 */
         },
         mappings:{single:{},rank:{},multi:{},score:{},scale:{}}
       };
