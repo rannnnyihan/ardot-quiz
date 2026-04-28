@@ -829,6 +829,9 @@
       cfg.meta.questionOrder=order;
       renderQList();
       onQuestionDragEnd(ev);
+      /* 结构性改动（拖拽排序）不会触发卡片内 input/change 事件，必须手动调一下 auto save，
+         否则刷新 admin 页面顺序会回滚到 localStorage 里的旧值，用户会以为排序没生效。 */
+      scheduleConfigAutoSave();
     }
     function onQuestionDragEnd(ev){
       dragQid="";
@@ -872,6 +875,9 @@
       fillEditor();
       renderDistribution();
       renderChartQuestionSelect();
+      /* 新增题目属于结构性改动，不会触发 input/change 事件，必须手动 auto save，
+         否则刷新 admin 页面新题就消失了。*/
+      scheduleConfigAutoSave();
     }
     function removeQuestionMappings(qid){
       if(cfg.mappings&&cfg.mappings.single)delete cfg.mappings.single[qid];
@@ -900,6 +906,9 @@
       fillEditor();
       renderDistribution();
       renderChartQuestionSelect();
+      /* 删题属于结构性改动，不会触发 input/change 事件，必须手动 auto save，
+         否则刷新 admin 页面被删的题又回来了（localStorage 里还是旧快照）。*/
+      scheduleConfigAutoSave();
     }
 
     function selectQ(qid){
