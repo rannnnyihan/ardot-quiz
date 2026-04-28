@@ -158,6 +158,12 @@
     .chip-counter.full .chip-counter-txt b,.chip-counter.ok .chip-counter-txt b{color:#a05b16}
     .chip-counter.full .chip-counter-hint,.chip-counter.ok .chip-counter-hint{color:#a46d30}
     .chip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    /* 纵向单列形态（q1~q6 这种文字长的多选题用） */
+    .chip-grid.chip-grid-v{grid-template-columns:1fr;gap:10px}
+    .chip-grid.chip-grid-v .chip{min-height:52px;padding:14px 44px 14px 16px;justify-content:flex-start;text-align:left}
+    .chip-grid.chip-grid-v .chip-name{font-size:14px;line-height:1.45;text-align:left;width:100%}
+    .chip-grid.chip-grid-v .chip-check{top:50%;right:12px;transform:translateY(-50%) scale(.5)}
+    .chip-grid.chip-grid-v .chip.sel .chip-check{transform:translateY(-50%) scale(1)}
     .chip{position:relative;display:flex;align-items:center;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;border:1.5px solid #e8e5e0;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .15s cubic-bezier(.2,.7,.3,1),border-color .18s,background .18s,box-shadow .18s,color .18s;text-align:center}
     .chip:hover{border-color:#d5cfc5;background:#fdfcfa;transform:translateY(-1px)}
     .chip:active{transform:translateY(0) scale(.97)}
@@ -292,6 +298,9 @@
       .opt:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,26,46,.06)}
       .opt-t{font-size:15px}
       .chip-grid{grid-template-columns:repeat(4,1fr);gap:12px}
+      .chip-grid.chip-grid-v{grid-template-columns:1fr;gap:12px}
+      .chip-grid.chip-grid-v .chip{min-height:58px;padding:16px 48px 16px 18px}
+      .chip-grid.chip-grid-v .chip-name{font-size:15px}
       .chip{min-height:66px;padding:12px 14px;border-radius:14px}
       .chip-name{font-size:15px}
       body.quiz-on-q .wrap{padding-top:32px;padding-bottom:80px}
@@ -1749,10 +1758,14 @@
         wrap.appendChild(counter);
         const grid=document.createElement("div");
         grid.className="chip-grid";
+        /* q1~q6 文字较长，用纵向单列布局；其它 multi（q8/q11）保持原网格 */
+        const isVerticalMulti=/^q[1-6]$/.test(String(qid));
+        if(isVerticalMulti)grid.classList.add("chip-grid-v");
         grid.innerHTML=(q.options||[]).map((opt)=>{
           const active=selected.includes(opt.key)?" sel":"";
-          /* 把 "A. Figma" 这种前缀去掉，只留工具名 */
-          const name=String(opt.label||"").replace(/^[A-Za-z]\.\s*/,"");
+          /* 纵向长文案题保留 "A. xxx" 原文；其它（q8/q11 工具名）剥掉字母前缀 */
+          const raw=String(opt.label||"");
+          const name=isVerticalMulti?raw:raw.replace(/^[A-Za-z]\.\s*/,"");
           return `<div class="chip${active}" data-v="${opt.key}" onclick="pkMulti(this)"><span class="chip-name">${name}</span><span class="chip-check" aria-hidden="true">✓</span></div>`;
         }).join("");
         wrap.appendChild(grid);
