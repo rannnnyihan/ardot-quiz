@@ -1409,51 +1409,51 @@
           }
         ],
         questions:{
-          q1:{type:"single",title:"老板甩来「多做几个方向看看」，你的操作是？",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. 用多个AI工具生成、筛选并落地方向，但工具切换多"},
-            {key:"B",label:"B. 用AI做一部分，我再接着自己做一部分"},
-            {key:"C",label:"C. AI 一发散就停不下来，最后还是自己重头来"},
-            {key:"D",label:"D. 不折腾 AI，直接开网站找案例"}
+          q1:{type:"multi",minSelect:1,title:"老板临时说\u201C下午给我 3 个方向\u201D，你打开 AI 找灵感，但最常遇到的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d1",options:[
+            {key:"A",label:"A. 输出内容太空洞，缺少新意"},
+            {key:"B",label:"B. 方向太多，没有收敛"},
+            {key:"C",label:"C. 不理解我告诉他的品牌、用户或场景限制"},
+            {key:"D",label:"D. 看起来效果不错，但实际用不了"}
           ]},
-          q2:{type:"single",title:"一张素材要抠图、放大、修边、合成，你通常是：",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. 大部分交给 AI，结果基本够用"},
-            {key:"B",label:"B. AI 先做一轮，毛边、瑕疵我再手动收拾一下"},
-            {key:"C",label:"C. 出来的图总是像素、细节有问题，还是我重头修改"},
-            {key:"D",label:"D. 不敢让AI碰精修，一开始就自己修"}
+          q2:{type:"multi",minSelect:1,title:"方案方向有了，你让 AI 出图或改图，就害怕它？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d2",options:[
+            {key:"A",label:"A. 细节总出错，比如手、文字、产品结构"},
+            {key:"B",label:"B. 总不按我要求的范围进行局部修改"},
+            {key:"C",label:"C. 多张图之间风格、主体或质感不一致"},
+            {key:"D",label:"D. 图清晰度、质感或商用品质不够"}
           ]},
-          q3:{type:"single",title:"让 AI 生成一个有规范的页面，结果常常是：",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. 按我的规范生成的结构基本能用"},
-            {key:"B",label:"B. 骨架 OK，但间距、对齐、组件我需要自己再调一轮"},
-            {key:"C",label:"C. 看起来像那么回事，但规范全乱，对不齐是常态"},
-            {key:"D",label:"D. 它读不懂设计规范，我直接自己做"}
+          q3:{type:"multi",minSelect:1,title:"你把文案、规范和需求给 AI，希望它先排一版，但最常出现的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d3",options:[
+            {key:"A",label:"A. 信息层级不清楚"},
+            {key:"B",label:"B. 对齐、间距、比例还需要手动调整"},
+            {key:"C",label:"C. 不能按照我的描述生成排版"},
+            {key:"D",label:"D. 生成结果模板感强，难以直接使用"}
           ]},
-          q4:{type:"single",title:"需要把一个改动批量应用到一堆稿子上，你：",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. 用AI批处理一把搞定，几乎不用手改"},
-            {key:"B",label:"B. 一部分自动、一部分补刀，整体还能接受"},
-            {key:"C",label:"C. 自动化总是改得不一致，最后返工反而更多"},
-            {key:"D",label:"D. 不敢用批量工具，老老实实一个一个手改到怀疑人生"}
+          q4:{type:"multi",minSelect:1,title:"设计过程中，十几张物料要改尺寸、换文案，AI让你头疼的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d4",options:[
+            {key:"A",label:"A. 画布比例变了，但文字、图片、按钮位置挤在一起"},
+            {key:"B",label:"B. 换内容时出错"},
+            {key:"C",label:"C. 同一批素材改后，字号、间距或层级不一致"},
+            {key:"D",label:"D. 同时给AI多个修改规则时，它稳定性会降低"}
           ]},
-          q5:{type:"single",title:"新项目想复用过去的设计风格/逻辑，你通常：",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. AI 能把之前的上下文接过来，我几乎不用重讲"},
-            {key:"B",label:"B. 把旧稿和说明丢给 AI，它能帮我捋出大半"},
-            {key:"C",label:"C. AI 抓不到关键风格和约束，我要反复纠正"},
-            {key:"D",label:"D. 只能靠自己翻聊天、翻文件、靠脑子"}
+          q5:{type:"multi",minSelect:1,title:"之前做过一个类似项目，这次你想让 AI 直接复用经验，但？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d5",options:[
+            {key:"A",label:"A. 草稿、废案、定稿混在一起，AI 分不清真正可参考的内容"},
+            {key:"B",label:"B. AI不能整理出可复用的版式、素材或文案"},
+            {key:"C",label:"C. AI不能吸收上次被改、被否、被认可的原因"},
+            {key:"D",label:"D. 换了目标、人群、渠道或尺寸后，AI 容易照搬旧方案"}
           ]},
-          q6:{type:"single",title:"稿子定了，需要同步原型/标注/跨软件交付，你：",desc:"单选",mapsToRoles:true,options:[
-            {key:"A",label:"A. 一键转原型+自动标注，基本顺滑交出"},
-            {key:"B",label:"B. 自动能做一部分，剩下的我再补一补"},
-            {key:"C",label:"C. 在不同软件之间反复导入导出，光格式就磨半天"},
-            {key:"D",label:"D. 从设计稿到原型/标注几乎全手动"}
+          q6:{type:"multi",minSelect:1,title:"你把设计稿交给 AI，希望它直接变成可演示原型或开发稿，但它会？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d6",options:[
+            {key:"A",label:"A. 只复原了界面视觉，没有复原交互逻辑"},
+            {key:"B",label:"B. 间距、字号、颜色、组件样式和原稿不一致"},
+            {key:"C",label:"C. 设计稿改了之后，原型或开发稿不能自动跟着更新"},
+            {key:"D",label:"D. 不能正确匹配现有组件库、设计系统或前端规范"}
           ]},
-          q7:{type:"rank",ui:"pickOrdered",title:"下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"按你最希望的顺序依次点选（可只选最在意的几项）",mapsToRoles:true,options:[
-            {key:"A",label:"一组概念图和 moodboard"},
-            {key:"B",label:"该抠的抠、该修的修的图片素材"},
-            {key:"C",label:"符合我规范、对得齐的界面版式"},
-            {key:"D",label:"在一批稿子里替我批量改好"},
-            {key:"E",label:"梳理过去项目的风格与复用建议"},
-            {key:"F",label:"同步到原型/标注/其他软件里的交付物"}
+          q7:{type:"rank",ui:"pickOrdered",title:"下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"按你最希望的顺序依次点选（可只选最在意的几项）",mapsToRoles:true,scoreKind:"rankWeights",options:[
+            {key:"A",label:"一组概念图和 moodboard",scoreRole:"d1"},
+            {key:"B",label:"该抠的抠、该修的修的图片素材",scoreRole:"d2"},
+            {key:"C",label:"符合我规范、对得齐的界面版式",scoreRole:"d3"},
+            {key:"D",label:"在一批稿子里替我批量改好",scoreRole:"d4"},
+            {key:"E",label:"梳理过去项目的风格与复用建议",scoreRole:"d5"},
+            {key:"F",label:"同步到原型/标注/其他软件里的交付物",scoreRole:"d6"}
           ]},
-          q8:{type:"multi",minSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
+          q8:{type:"multi",minSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
             {key:"A",label:"我的设计风格"},
             {key:"B",label:"我的组件规范"},
             {key:"C",label:"我的项目上下文"},
@@ -1468,26 +1468,26 @@
             {key:"D",label:"D. 不适合处理批量修改和重复执行"}
           ]},
           q10:{type:"single",title:"你的主要设计类型是？",desc:"单选",mapsToRoles:false,options:[
-            {key:"A",label:"A. UI / 产品设计"},
-            {key:"B",label:"B. 视觉 / 品牌设计"},
-            {key:"C",label:"C. 电商 / 运营设计"},
-            {key:"D",label:"D. 平面 / 包装设计"},
-            {key:"E",label:"E. 动效 / 视频设计"}
+            {key:"A",label:"UI / 交互设计"},
+            {key:"B",label:"视觉 / 品牌设计"},
+            {key:"C",label:"电商 / 运营设计"},
+            {key:"D",label:"平面 / 动效设计"}
           ]},
-          q11:{type:"multi",minSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（至少 3 项）",mapsToRoles:false,options:[
-            {key:"A",label:"A. Midjourney"},
-            {key:"B",label:"B. 即梦（Dreamina）"},
-            {key:"C",label:"C. Stable Diffusion / ComfyUI"},
-            {key:"D",label:"D. Ideogram"},
-            {key:"E",label:"E. Recraft"},
-            {key:"F",label:"F. ChatGPT / Claude"},
-            {key:"G",label:"G. Figma Make"},
-            {key:"H",label:"H. Galileo AI"},
-            {key:"I",label:"I. Uizard"},
-            {key:"J",label:"J. v0（Vercel）"},
+          q11:{type:"multi",minSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
+            {key:"A",label:"Midjourney"},
+            {key:"B",label:"即梦（Dreamina）"},
+            {key:"C",label:"Stable Diffusion / ComfyUI"},
+            {key:"D",label:"Ideogram"},
+            {key:"E",label:"Recraft"},
+            {key:"F",label:"ChatGPT / Claude"},
+            {key:"G",label:"Figma Make"},
+            {key:"H",label:"Galileo AI"},
+            {key:"I",label:"Uizard"},
+            {key:"J",label:"v0（Vercel）"},
             {key:"K",label:"K. Framer AI"},
-            {key:"L",label:"L. MasterGo AI"},
-            {key:"M",label:"M. Pixso AI"}
+            {key:"L",label:"MasterGo AI"},
+            {key:"M",label:"Pixso AI"},
+            {key:"N",label:"Lovart"}
           ]},
           q12:{type:"text",resultOnly:true,title:"我希望 AI 有这样的能力（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"}
         },
@@ -1636,6 +1636,8 @@
     })();
 
     const CFG=loadConfig();
+    /* 把当前题库挂到 window，供 computeDesignerPersonality 读 scoreRole / scoreKind */
+    try{window.__QUIZ_QUESTIONS__=CFG.questions||{};}catch(e){}
     const FEEDBACK_ENABLED=!CFG.meta || CFG.meta.feedbackEnabled!==false;
     const DEFAULT_ORDER=["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10","q11"];
     function normalizeQuestionOrder(){
@@ -2191,19 +2193,21 @@
     }
 
     /* 旧的 4 角色加权/priority 逻辑已整段移除。
-       新的 6 维 × 6 角色计分统一交给 window.computeDesignerPersonality（文件底部定义）。 */
+       新的 6 维 × 6 角色计分统一交给 window.computeDesignerPersonality（文件底部定义）。
+       算法按题目的 scoreRole / scoreKind 字段驱动，与题号/题型解耦。 */
     function calcPersonalityResult(){
       const answers={};
-      /* q1..q6：把选项 key 直接带上；q7：rank 顺序 */
-      ["q1","q2","q3","q4","q5","q6"].forEach((qid)=>{
+      /* 遍历题库里所有参与计算的题，原样带上用户答案（单选:string，多选/排序:array）。 */
+      const questions=(CFG&&CFG.questions)||{};
+      Object.keys(questions).forEach((qid)=>{
         const v=A[qid];
-        answers[qid]=Array.isArray(v)?v[0]:v;
+        if(v===undefined||v===null)return;
+        answers[qid]=Array.isArray(v)?v.slice():v;
       });
-      answers.q7=Array.isArray(A.q7)?A.q7.slice():[];
       if(typeof window.computeDesignerPersonality!=="function"){
         return {finalRole:"",finalDimension:"",scores:[],radarData:[]};
       }
-      return window.computeDesignerPersonality(answers);
+      return window.computeDesignerPersonality(answers,{questions:questions});
     }
 
     function submit(result,personality){
@@ -3481,94 +3485,161 @@
     })();
 
     /* =========================================================
-     * AI 设计人格测试：6 维 × 6 角色 结果计算
-     * - Q1–Q6：ABCD=1/2/3/4 → PainScore[D1–D6]
-     * - Q7   ：六选项完整排序 → 权重 6/21,5/21,4/21,3/21,2/21,1/21
-     * - FinalScore[D] = PainScore[D] × Q7Weight[D]
-     * - FinalRole    = FinalScore 最高的维度
-     *   并列规则：1) Q7 排名更靠前  2) PainScore 更高  3) D1→D6 顺序
-     * - RadarValue[D] = FinalScore[D] / Max(FinalScore) × 100
-     * 入参 answers 格式：
-     *   {
-     *     q1:"A"|"B"|"C"|"D", ..., q6:"A".."D",
-     *     q7:[Q7选项key数组，顺序=排名]  // key 可以是 1..6 / "1".."6" / "A".."F"
-     *   }
-     * 返回结构见用户需求的 JSON。
+     * AI 设计人格测试：6 维 × 6 角色 结果计算（v4：按 scoreRole 驱动）
+     *
+     * 计算关系不再绑在 qid / 题号上，而是绑在题目的 scoreRole / scoreKind 字段上：
+     *   - 普通题（single / multi）：question.scoreRole = "d1".."d6"
+     *       该题的 base 分累加到对应维度。
+     *       base 公式：勾选数 / 选项总数。单选勾 1 个；多选勾几个就几个。
+     *       *例外*：兼容旧单选题 ABCD 为痛点 4 档（A 最轻…D 最重）——
+     *       当单选题没有 painScaleDisabled 标记时，视 A→1, B→2, C→3, D→4（再 / 选项数）。
+     *       结果都落在 [1/n, 1.0]，可无缝切换题型。
+     *   - 排序题（rank）：question.scoreKind = "rankWeights" 且每个 option.scoreRole = "dX"
+     *       用户把某选项排在第 r 名（1..6）→ 其对应维度获得 weight[r] 的权重：
+     *         1st=1.5, 2nd=1.25, 3rd=1.0, 4th=0.85, 5th=0.7, 6th=0.6
+     *       未排名的维度权重默认 = 0.6（第 6 档）。
+     *   - 其它题（mapsToRoles=false 或没打 scoreRole）：不参与计算。
+     *
+     * 最终：
+     *   score[d] = base[d] × weight[d]           // 范围 [0.25*0.6, 1.0*1.5] = [0.15, 1.5]
+     *   finalRole = argmax(score[d])
+     *     并列破法：q7 排名靠前 > base 更高 > 维度 id 字典序（d1 优先）
+     *   radarValue[d] = clamp(round(score[d] / 1.5 × 100), 0, 100)   // 满分 100
+     *
+     * 入参 answers：{ q1:"A"|["A","B"], ..., qN: ..., q7:[key1,key2,...] }
+     *   qid 对应的题目会从 window.__QUIZ_QUESTIONS__ 或第二参数 opts.questions 里查。
      * ========================================================= */
     (function(){
       var DIMENSIONS=[
-        {id:"D1",name:"灵感发散",role:"草稿太多的毕加班索"},
-        {id:"D2",name:"图片处理",role:"还在抠图的原研灾"},
-        {id:"D3",name:"结构处理",role:"对不齐的蒙得里不安"},
-        {id:"D4",name:"批量操作",role:"复制到崩溃的草间弥死"},
-        {id:"D5",name:"记忆管理",role:"风格断片的梵稿"},
-        {id:"D6",name:"工作衔接",role:"睡莲迁移失败的莫奈何"}
+        {id:"d1",name:"灵感发散",role:"草稿太多的毕加班索"},
+        {id:"d2",name:"图片处理",role:"还在抠图的原研灾"},
+        {id:"d3",name:"结构处理",role:"对不齐的蒙得里不安"},
+        {id:"d4",name:"批量操作",role:"复制到崩溃的草间弥死"},
+        {id:"d5",name:"记忆管理",role:"风格断片的梵稿"},
+        {id:"d6",name:"工作衔接",role:"睡莲迁移失败的莫奈何"}
       ];
-      /* Q7 选项 key → 维度 index（0-based，对应 DIMENSIONS）
-         同时兼容数字 key（"1".."6"）和字母 key（"A".."F"），方便不同配置源。 */
-      var Q7_KEY_TO_DIM_INDEX={
-        "1":0,"2":1,"3":2,"4":3,"5":4,"6":5,
-        "A":0,"B":1,"C":2,"D":3,"E":4,"F":5
-      };
-      var Q7_WEIGHTS=[6/21,5/21,4/21,3/21,2/21,1/21];
-      var PAIN_OPTION_SCORE={A:1,B:2,C:3,D:4};
+      var DIM_ID_TO_INDEX={};
+      DIMENSIONS.forEach(function(d,i){DIM_ID_TO_INDEX[d.id]=i;});
 
-      function painScoreOf(val){
-        /* 兼容 "A"/"a"/1/"1" 多种写法 */
-        if(val==null)return 0;
-        var s=String(val).trim().toUpperCase();
-        if(PAIN_OPTION_SCORE[s]!=null)return PAIN_OPTION_SCORE[s];
-        var n=Number(s);
-        if(Number.isFinite(n)&&n>=1&&n<=4)return n;
-        return 0;
-      }
-      function normalizeQ7(order){
-        /* 把用户提交的排序归一成"长度为 6、每个元素是维度 index(0..5)"的数组。
-           未出现的维度按 D1→D6 的顺序补到末尾，保证总长为 6。 */
-        var out=[];
-        var seen={};
-        (Array.isArray(order)?order:[]).forEach(function(k){
-          var idx=Q7_KEY_TO_DIM_INDEX[String(k).trim().toUpperCase()];
-          if(idx==null||seen[idx])return;
-          seen[idx]=true;
-          out.push(idx);
-        });
-        for(var i=0;i<6;i++){if(!seen[i]){seen[i]=true;out.push(i);}}
-        return out;
+      var RANK_WEIGHTS=[1.5, 1.25, 1.0, 0.85, 0.7, 0.6];
+      var DEFAULT_UNRANKED_WEIGHT=0.6;  // 未出现在 q7 排序里的维度按第 6 档兜底
+      var MAX_SCORE=1.5;                // 单维度理论满分：base=1.0 × weight=1.5
+      /* 兼容旧 ABCD 单选作为"痛点 4 档量表"：选 A=1/4, B=2/4, C=3/4, D=4/4
+         如果题目配置 painScaleDisabled:true 则关闭此兼容，回到纯"勾选/总数"。 */
+      var LEGACY_PAIN_LEVEL={A:1,B:2,C:3,D:4};
+
+      function toArray(v){
+        if(v==null)return [];
+        if(Array.isArray(v))return v.map(function(x){return String(x).trim().toUpperCase();}).filter(Boolean);
+        return [String(v).trim().toUpperCase()].filter(Boolean);
       }
       function round3(n){return Math.round(n*1000)/1000;}
+      function resolveDimIndex(id){
+        if(id==null)return -1;
+        var k=String(id).trim().toLowerCase();
+        return DIM_ID_TO_INDEX[k]==null?-1:DIM_ID_TO_INDEX[k];
+      }
+      function getQuestions(opts){
+        if(opts&&opts.questions)return opts.questions;
+        if(typeof window!=="undefined"&&window.__QUIZ_QUESTIONS__)return window.__QUIZ_QUESTIONS__;
+        return {};
+      }
 
-      function computeDesignerPersonality(answers){
-        answers=answers||{};
-        var painByDim=[0,0,0,0,0,0];
-        for(var i=1;i<=6;i++){
-          painByDim[i-1]=painScoreOf(answers["q"+i]);
+      /* 普通题（single / multi）→ 该题所绑维度的 base 贡献 */
+      function baseForQuestion(q,ans){
+        if(!q||!q.options||!q.options.length)return 0;
+        var total=q.options.length;
+        var selected=toArray(ans);
+        if(!selected.length)return 0;
+        /* 单选 + 未关闭旧痛点兼容：按 A/B/C/D 级别换算 */
+        if(q.type==="single"&&!q.painScaleDisabled&&selected.length===1){
+          var lv=LEGACY_PAIN_LEVEL[selected[0]];
+          if(lv!=null)return lv/total;
         }
-        var q7Order=normalizeQ7(answers.q7);
-        /* 维度 → Q7 排名(1..6) 与 权重 */
-        var q7RankByDim=[0,0,0,0,0,0];
-        var q7WeightByDim=[0,0,0,0,0,0];
-        q7Order.forEach(function(dimIdx,rankIdx){
-          q7RankByDim[dimIdx]=rankIdx+1;
-          q7WeightByDim[dimIdx]=Q7_WEIGHTS[rankIdx];
-        });
-        /* FinalScore */
-        var finalByDim=painByDim.map(function(p,i){return p*q7WeightByDim[i];});
+        /* 默认：勾选数 / 选项总数 */
+        var validKeys={};
+        (q.options||[]).forEach(function(o){if(o&&o.key!=null)validKeys[String(o.key).toUpperCase()]=true;});
+        var hit=0;
+        selected.forEach(function(k){if(validKeys[k])hit++;});
+        return total>0?hit/total:0;
+      }
 
-        /* 选最终维度：按 finalScore desc；并列时按 Q7 排名 asc；再并列按 painScore desc；再并列按 D1→D6 */
+      /* 排序题 → 返回 { dimIdx: weight }，以及排名表 dimIdx -> rank(1..6) */
+      function extractRankWeights(q,ans){
+        var weights={};
+        var ranks={};
+        if(!q||!q.options)return {weights:weights,ranks:ranks};
+        var optMap={};  /* key(upper) -> scoreRole */
+        q.options.forEach(function(o){
+          if(!o||o.key==null)return;
+          optMap[String(o.key).trim().toUpperCase()]=o.scoreRole||null;
+        });
+        var order=toArray(ans);
+        var used={};
+        order.forEach(function(k,rankIdx){
+          var role=optMap[k];
+          var di=resolveDimIndex(role);
+          if(di<0||used[di])return;
+          used[di]=true;
+          var w=RANK_WEIGHTS[rankIdx]!=null?RANK_WEIGHTS[rankIdx]:DEFAULT_UNRANKED_WEIGHT;
+          weights[di]=w;
+          ranks[di]=rankIdx+1;
+        });
+        return {weights:weights,ranks:ranks};
+      }
+
+      function computeDesignerPersonality(answers,opts){
+        answers=answers||{};
+        var questions=getQuestions(opts);
+
+        var baseByDim=[0,0,0,0,0,0];
+        var baseFromQid=[null,null,null,null,null,null];  /* 记录每维度 base 来自哪道题，便于调试 */
+        var weightByDim=[DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT];
+        var rankByDim=[0,0,0,0,0,0];
+
+        Object.keys(questions).forEach(function(qid){
+          var q=questions[qid];
+          if(!q)return;
+          if(q.mapsToRoles===false)return;  /* 明确声明不参与 */
+          /* 排序题 */
+          if(q.type==="rank"&&(q.scoreKind==="rankWeights"||q.mapsToRoles)){
+            var r=extractRankWeights(q,answers[qid]);
+            Object.keys(r.weights).forEach(function(di){
+              di=Number(di);
+              weightByDim[di]=r.weights[di];
+              rankByDim[di]=r.ranks[di]||0;
+            });
+            return;
+          }
+          /* 普通题：必须有 scoreRole */
+          var di=resolveDimIndex(q.scoreRole);
+          if(di<0)return;
+          var b=baseForQuestion(q,answers[qid]);
+          /* 同一维度被多题打分时，取最大（避免 double count；多余题目做兜底/覆盖） */
+          if(b>baseByDim[di]){
+            baseByDim[di]=b;
+            baseFromQid[di]=qid;
+          }
+        });
+
+        var finalByDim=baseByDim.map(function(b,i){return b*weightByDim[i];});
+
+        /* 选最终维度：finalScore desc；并列时 q7 排名 asc；再并列 base desc；再并列 d1→d6 */
         var order=DIMENSIONS.map(function(_,i){return i;});
         order.sort(function(a,b){
           if(finalByDim[b]!==finalByDim[a])return finalByDim[b]-finalByDim[a];
-          if(q7RankByDim[a]!==q7RankByDim[b])return q7RankByDim[a]-q7RankByDim[b];
-          if(painByDim[b]!==painByDim[a])return painByDim[b]-painByDim[a];
+          var ra=rankByDim[a]||99, rb=rankByDim[b]||99;
+          if(ra!==rb)return ra-rb;
+          if(baseByDim[b]!==baseByDim[a])return baseByDim[b]-baseByDim[a];
           return a-b;
         });
         var winnerIdx=order[0];
 
-        var maxFinal=Math.max.apply(null,finalByDim);
         var radarByDim=finalByDim.map(function(v){
-          if(maxFinal<=0)return 0;
-          return Math.round(v/maxFinal*100);
+          var r=Math.round(v/MAX_SCORE*100);
+          if(!isFinite(r)||r<0)return 0;
+          if(r>100)return 100;
+          return r;
         });
 
         var scores=DIMENSIONS.map(function(dim,i){
@@ -3576,9 +3647,10 @@
             dimensionId:dim.id,
             dimensionName:dim.name,
             role:dim.role,
-            painScore:painByDim[i],
-            q7Rank:q7RankByDim[i],
-            q7Weight:round3(q7WeightByDim[i]),
+            baseScore:round3(baseByDim[i]),
+            fromQid:baseFromQid[i]||"",
+            q7Rank:rankByDim[i]||0,
+            q7Weight:round3(weightByDim[i]),
             finalScore:round3(finalByDim[i]),
             radarValue:radarByDim[i]
           };
@@ -3589,6 +3661,7 @@
 
         return {
           finalRole:DIMENSIONS[winnerIdx].role,
+          finalRoleId:DIMENSIONS[winnerIdx].id,
           finalDimension:DIMENSIONS[winnerIdx].name,
           scores:scores,
           radarData:radarData
@@ -3598,6 +3671,8 @@
       /* 暴露到全局，方便在页面脚本或控制台调用 */
       window.computeDesignerPersonality=computeDesignerPersonality;
       window.AI_DESIGN_PERSONALITY_DIMENSIONS=DIMENSIONS;
+      window.AI_DESIGN_RANK_WEIGHTS=RANK_WEIGHTS.slice();
+      window.AI_DESIGN_MAX_SCORE=MAX_SCORE;
     })();
 
     /* 默认（进入即可分享）微信分享配置：首次加载时就让用户点右上角能分享出"邀请测试"的卡片 */
