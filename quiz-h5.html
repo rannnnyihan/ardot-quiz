@@ -7,6 +7,45 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>《好险，差点就会做设计了》</title>
+  <script>
+  /* 极早同步：从本地缓存里捞 admin 配的主标题/副标题，第一时间把浏览器 tab 标题和 head meta
+     改掉。之前是等 applyConfigToPage() 跑完（脚本末尾）才改，中间窗口里 tab 一直显示静态 title，
+     而且某些 iOS/微信 WebView 对"后写"的 document.title 反应迟钝甚至忽略。所以放到这里，
+     在 body 解析前就先把 tab 标题和 og/twitter/itemprop meta 全刷新一遍。 */
+  (function earlySyncTitleFromCache(){
+    try{
+      var raw=localStorage.getItem("ardot_quiz_config_v2");
+      if(!raw)return;
+      var cfg=JSON.parse(raw);
+      var meta=(cfg&&cfg.meta)||{};
+      /* 剥掉主标题里的 <br>/<em> 等 HTML 标签 —— 这里还没 DOM，手工正则剥 */
+      function plain(s){
+        if(!s)return"";
+        return String(s).replace(/<br\s*\/?>/gi," ").replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim();
+      }
+      var title=plain(meta.mainTitle||"");
+      var desc =plain(meta.subtitle ||"");
+      if(title){
+        document.title=title;
+        /* 同步 head 里已有的所有"标题类"meta；社交平台抓页面时读的是这些 */
+        var titleSel=['meta[property="og:title"]','meta[name="twitter:title"]','meta[itemprop="name"]'];
+        for(var i=0;i<titleSel.length;i++){
+          var el=document.querySelector(titleSel[i]);
+          if(el)el.setAttribute("content",title);
+        }
+      }
+      if(desc){
+        var descSel=['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]','meta[itemprop="description"]'];
+        for(var k=0;k<descSel.length;k++){
+          var e2=document.querySelector(descSel[k]);
+          if(e2)e2.setAttribute("content",desc);
+        }
+      }
+      /* 暴露给后续 syncDocMetaFromConfig() 做 iOS/WeChat tab 刷新 hack 用 */
+      window.__earlyTitle=title||"";
+    }catch(e){/* 缓存损坏就算了，后面 applyConfigToPage 还会再刷一次 */}
+  })();
+  </script>
   <link rel="icon" type="image/png" href="https://ardot-quiz.edgeone.dev/img/image%2023.png?v=4">
   <link rel="apple-touch-icon" href="https://ardot-quiz.edgeone.dev/img/image%2023.png?v=4">
 
@@ -1711,7 +1750,35 @@
           const altEl=document.querySelector('meta[property="og:image:alt"]');
           if(altEl)altEl.setAttribute("content",title+" — "+(desc||"AI 设计师人格测试"));
         }
+        /* iOS Safari / 微信内置 WebView 的坑：首次加载后直接赋值 document.title
+           有时不会刷新浏览器 tab / 微信顶部条。解决办法是"插一个空 iframe 再移除"，
+           强制 WebView 重读当前页 title。做两次（立即 + 延迟 250ms），覆盖懒刷新场景。*/
+        if(title){
+          forceRefreshTabTitle(title);
+          setTimeout(function(){forceRefreshTabTitle(title);},250);
+        }
       }catch(e){/* 出错静默，不影响页面功能 */}
+    }
+    /* 强制让 iOS Safari / 微信 WebView 重新读取 <title>。
+       机制：创建一个不可见 iframe，指向一个 no-op URL（about:blank 在部分 WebView 里被忽略，
+       改用 data: URL 更稳），触发一次导航后移除。此时 WebView 会重新取当前 document 的 title。*/
+    function forceRefreshTabTitle(title){
+      try{
+        if(document.title!==title)document.title=title; // 再赋一次，防中途被覆盖
+        const ifr=document.createElement("iframe");
+        ifr.style.cssText="display:none;width:0;height:0;border:0;position:absolute;left:-9999px";
+        ifr.setAttribute("aria-hidden","true");
+        /* 用一个最小的 data URI，避免触发真实网络请求 */
+        ifr.src="data:text/html;charset=utf-8,%3Ctitle%3E%3C/title%3E";
+        ifr.onload=function(){
+          /* iframe 加载完就移除 + 再次写一遍 title，让 WebView 刷新顶部条 */
+          setTimeout(function(){
+            try{ifr.parentNode&&ifr.parentNode.removeChild(ifr);}catch(e){}
+            try{document.title=title;}catch(e){}
+          },0);
+        };
+        document.body?document.body.appendChild(ifr):document.documentElement.appendChild(ifr);
+      }catch(e){/* WebView 不支持 data iframe 就算了，tab 标题至少已经被上面 document.title 赋过 */}
     }
 
     function applyConfigToPage(){
