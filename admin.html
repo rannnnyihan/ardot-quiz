@@ -866,10 +866,13 @@
         A:fallbackRole?{[fallbackRole]:0}:{},
         B:fallbackRole?{[fallbackRole]:0}:{}
       };
-      const order=questionIds().slice();
-      order.push(qid);
+      /* 注意：不要手动再 push 一次 qid。
+         questionIds() → ensureQuestionOrder() 会自动把 cfg.questions 里
+         新出现但尚未登记到 questionOrder 的 id 补进数组末尾。
+         如果这里再 push 一次，会导致同一 qid 在 questionOrder 中出现两次，
+         从而让题目列表和问卷里都出现两道一模一样、改一个另一个同步变的题。 */
       if(!cfg.meta)cfg.meta={};
-      cfg.meta.questionOrder=order;
+      questionIds();
       activeQid=qid;
       renderQList();
       fillEditor();
