@@ -541,7 +541,7 @@
             .replace(/1\s*=\s*完全不像/g,"1 = 完全同意")
             .replace(/5\s*=\s*就是我/g,"7 = 完全不同意");
         });
-        return {
+        const merged={
           ...d,
           ...parsed,
           meta:{...d.meta,...pm,...(!useParsedRoles?{roleSetVersion:d.meta.roleSetVersion}:{}),questionSchema:d.meta.questionSchema},
@@ -557,6 +557,9 @@
                 scale:{...d.mappings.scale,...((parsed.mappings&&parsed.mappings.scale)||{})}
               }
         };
+        /* 统一规整：加载后一律把 id 连续化，admin 里看到的 Q 号 === 真实 id */
+        canonicalizeQuestionIds(merged);
+        return merged;
       }catch(e){return defaultConfig()}
     }
 
@@ -827,7 +830,11 @@
       order.splice(from,1);
       order.splice(to,0,dragQid);
       cfg.meta.questionOrder=order;
+      /* canonicalize 会基于新 order 把 questions/mappings 的 key 全重写成 q1~qN，
+         并同步修正 activeQid（如果它正好被重命名了）。*/
+      canonicalizeQuestionIds(cfg);
       renderQList();
+      fillEditor();
       onQuestionDragEnd(ev);
       /* 结构性改动（拖拽排序）不会触发卡片内 input/change 事件，必须手动调一下 auto save，
          否则刷新 admin 页面顺序会回滚到 localStorage 里的旧值，用户会以为排序没生效。 */
@@ -842,10 +849,60 @@
       });
     }
     function createQuestionId(){
-      const ids=Object.keys(cfg.questions||{});
-      let n=1;
-      while(ids.includes("q"+n))n++;
-      return "q"+n;
+      /* 连续化策略下：新题直接挂在末尾，id = 当前题数 + 1。
+         canonicalizeQuestionIds() 之后 id 永远是 q1~qN 连续，所以 N+1 不会冲突。 */
+      const n=Object.keys(cfg.questions||{}).length;
+      return "q"+(n+1);
+    }
+
+    /* ===== 题目 id 连续化（q1 ~ qN）=====
+       目标：让 admin 侧栏看到的 Q1~QN 与底层真实 id 完全一致；
+       无论是新增、删除还是拖拽改顺序，保存前都把 questions / questionOrder / mappings 的 key 同步重命名。
+       这是纯前端操作，改完 cfg 再 push 到服务端即可。 */
+    function canonicalizeQuestionIds(c){
+      if(!c||!c.questions)return c;
+      const order=(c.meta&&Array.isArray(c.meta.questionOrder))?c.meta.questionOrder.slice():[];
+      const existIds=Object.keys(c.questions);
+      /* 补齐 questionOrder 里漏掉的 id（例如手动编辑 JSON 造成的） */
+      existIds.forEach((id)=>{if(!order.includes(id))order.push(id)});
+      /* 过滤 questionOrder 里已不存在的 id */
+      const liveOrder=order.filter((id)=>existIds.includes(id));
+      /* 建映射：老 id → 新 id（q1, q2, q3...） */
+      const renameMap={};
+      const needRename=liveOrder.some((id,i)=>id!=="q"+(i+1));
+      liveOrder.forEach((id,i)=>{renameMap[id]="q"+(i+1)});
+      if(!needRename){
+        /* 已经连续 + 顺序一致，只同步一下 questionOrder 防止有脏数据 */
+        if(!c.meta)c.meta={};
+        c.meta.questionOrder=liveOrder;
+        return c;
+      }
+      /* 1) 重命名 questions 对象的 key */
+      const newQuestions={};
+      liveOrder.forEach((oldId)=>{
+        const newId=renameMap[oldId];
+        newQuestions[newId]=c.questions[oldId];
+      });
+      c.questions=newQuestions;
+      /* 2) 更新 questionOrder */
+      if(!c.meta)c.meta={};
+      c.meta.questionOrder=liveOrder.map((id)=>renameMap[id]);
+      /* 3) 同步重写 mappings 各分类里的 key */
+      ["single","multi","rank","score","scale"].forEach((kind)=>{
+        if(!c.mappings||!c.mappings[kind])return;
+        const src=c.mappings[kind];
+        const dst={};
+        Object.keys(src).forEach((oldId)=>{
+          const newId=renameMap[oldId]||oldId; /* 已不存在的题 id 直接丢弃（由 existIds 过滤） */
+          if(renameMap[oldId])dst[newId]=src[oldId];
+        });
+        c.mappings[kind]=dst;
+      });
+      /* 4) 同步 activeQid（全局变量，仅当 canonicalize 的是当前 cfg 时才改） */
+      if(c===cfg&&typeof activeQid==="string"&&renameMap[activeQid]){
+        activeQid=renameMap[activeQid];
+      }
+      return c;
     }
     function addQuestion(){
       const qid=createQuestionId();
@@ -873,6 +930,7 @@
          从而让题目列表和问卷里都出现两道一模一样、改一个另一个同步变的题。 */
       if(!cfg.meta)cfg.meta={};
       questionIds();
+      canonicalizeQuestionIds(cfg);
       activeQid=qid;
       renderQList();
       fillEditor();
@@ -904,7 +962,11 @@
       const nextOrder=ids.filter((id)=>id!==qid);
       if(!cfg.meta)cfg.meta={};
       cfg.meta.questionOrder=nextOrder;
-      activeQid=nextOrder[Math.max(0,idx-1)]||nextOrder[0];
+      /* 先挑出下一个焦点（按删除前的位置就近取），再交给 canonicalize 统一重编号。
+         canonicalize 会把 questions/questionOrder/mappings 的 key 全部改成 q1~qN 连续，
+         并用 renameMap 同步修正 activeQid，防止编辑面板指向已被重命名的老 id。*/
+      activeQid=nextOrder[Math.max(0,idx-1)]||nextOrder[0]||"";
+      canonicalizeQuestionIds(cfg);
       renderQList();
       fillEditor();
       renderDistribution();
@@ -1967,6 +2029,19 @@
       if(!token){
         return {ok:false,msg:"未填写 Admin Token，已只保存到本地；其他设备不会同步。"};
       }
+      /* 保存前兜底：确保推到服务端的一定是 q1~qN 连续 id。
+         就算中间有什么异常路径漏了调用 canonicalize，这里也能拦住。
+         canonicalize 内部会顺带把 activeQid 改成新 id，所以 push 之前要把
+         本地 UI 也重绘一次，不然会出现"云端已连续、admin 列表还是跳号"的错觉，
+         刷新才生效。同时把连续化后的 cfg 立刻 flush 到 localStorage，防止 push
+         失败下次打开 admin 又从旧缓存里读出跳号 id。*/
+      const idsBefore=Object.keys(cfg.questions||{}).join(",");
+      canonicalizeQuestionIds(cfg);
+      const idsAfter=Object.keys(cfg.questions||{}).join(",");
+      if(idsBefore!==idsAfter){
+        try{localStorage.setItem(CFG_KEY, JSON.stringify(cfg));}catch(e){}
+        try{renderQList();fillEditor();}catch(e){}
+      }
       try{
         const resp=await fetch("/api/config",{
           method:"POST",
@@ -2019,7 +2094,9 @@
       const res=await pushConfigToServer();
       const ts=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
       if(res.ok){
-        savedConfigFingerprint=nextFp||configFingerprint(cfg);
+        /* 注意：pushConfigToServer 内部可能 canonicalize 改了 cfg 的 id，
+           因此指纹要以"真正推上去的 cfg"为准重新算一次，不能直接信传进来的 nextFp。*/
+        savedConfigFingerprint=configFingerprint(cfg);
         if(hint)hint.textContent=(okHint||"已保存并同步到服务端")+" · "+ts;
         return {ok:true};
       }
@@ -2434,8 +2511,16 @@
       }
       // 服务端有值 → 覆盖本地缓存 & 重新加载到 UI
       try{
+        /* 先检查云端原始数据的 id 是否已连续（q1~qN）。
+           如果不是（历史数据可能是 q1/q2/q4/q5/q8/q6/q10/q11/q7/q12 这种跳号），
+           loadCfg() 里的 canonicalizeQuestionIds 会自动重命名成连续 id，
+           但那只改了本地 cfg，云端还是旧的——需要显式提示用户一键保存完成迁移。*/
+        const raw=res.data;
+        const rawOrder=(raw.meta&&Array.isArray(raw.meta.questionOrder))?raw.meta.questionOrder:Object.keys(raw.questions||{});
+        const rawIsCanonical=rawOrder.every((id,i)=>id==="q"+(i+1))&&Object.keys(raw.questions||{}).length===rawOrder.length;
+
         localStorage.setItem(CFG_KEY, JSON.stringify(res.data));
-        cfg=loadCfg(); // 走一次 merge/migrate，保证结构和默认对齐
+        cfg=loadCfg(); // 走一次 merge/migrate + canonicalize，本地 cfg 一定是连续 id
         savedConfigFingerprint=configFingerprint(cfg); // 以服务端当前版为"已保存基线"
         activeQid="q1";
         activeRoleId=(cfg.roles&&cfg.roles[0]&&cfg.roles[0].id)||"";
@@ -2445,6 +2530,19 @@
         renderRoleSelect();
         const ts=(res.data.meta&&res.data.meta.serverUpdatedAt)||"";
         if(hint)hint.textContent="已加载服务端最新配置"+(ts?(" · "+new Date(ts).toLocaleString("zh-CN")):"");
+
+        /* 云端还是跳号 id → 推一次让云端也变成连续 id。
+           静默推送（不弹窗、不建快照），因为这只是 id 重命名不影响题目内容和已有答卷。*/
+        if(!rawIsCanonical){
+          if(hint)hint.textContent="检测到云端题目 id 不连续，正在自动规整为 q1~qN…";
+          const pushRes=await pushConfigToServer();
+          if(pushRes.ok){
+            savedConfigFingerprint=configFingerprint(cfg);
+            if(hint)hint.textContent="题目 id 已自动规整为 q1~qN ✅ 后续新增/删除/拖拽都会保持连续";
+          }else{
+            if(hint)hint.textContent="题目 id 规整失败（"+(pushRes.msg||"")+"），本地已连续但云端未同步";
+          }
+        }
       }catch(e){
         console.error(e);
         if(hint)hint.textContent="服务端配置解析失败，使用本地缓存";
