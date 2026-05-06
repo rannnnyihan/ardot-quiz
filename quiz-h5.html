@@ -277,11 +277,11 @@
     /* 截图瞬时类：强制结果区处于"完成态"，避免 html2canvas 拍到动画中态（全局发灰） */
     #res.capturing,#res.capturing *{animation:none!important;transition:none!important;opacity:1!important;filter:none!important}
     .res-card{border-radius:0;border:0;background:transparent;overflow:visible;margin-bottom:0;box-shadow:none}
-    .res-top{padding:28px 24px 12px;text-align:center}
-    /* 头像上方小字 */
-    .res-kicker{font-size:13px;color:#111;letter-spacing:.08em;margin:0 0 10px;font-weight:500;text-align:left}
-    /* 头像外框（参考图：细边框圆角相框） */
-    .res-avatar-frame{width:100%;aspect-ratio:1/1;margin:0 0 18px;border:0;border-radius:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:none;overflow:visible;perspective:1200px;position:relative}
+    .res-top{position:relative;padding:34px 20px 72px;text-align:center;overflow:visible;min-height:520px}
+    /* 结果页英雄标题：文字与图片层叠 */
+    .res-kicker{font-size:clamp(34px,9.2vw,54px);color:#111;letter-spacing:-.04em;margin:0 auto 16px;font-weight:1000;text-align:center;line-height:1.05}
+    /* 头像外框：无边框，图片整体缩小 */
+    .res-avatar-frame{width:min(72vw,430px);aspect-ratio:1/1;margin:-20px auto 18px;border:0;border-radius:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:none;overflow:visible;perspective:1200px;position:relative;z-index:1}
     .res-avatar-flip{appearance:none;border:0;background:transparent;width:100%;height:100%;padding:0;margin:0;display:block;position:relative;cursor:default;outline:none}
     .res-avatar-flip:focus-visible{box-shadow:0 0 0 3px rgba(0,236,0,.32) inset;border-radius:18px}
     .res-avatar-flip-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.2,.8,.2,1);animation:resultAvatarAutoFlip 5s cubic-bezier(.2,.8,.2,1) infinite}
@@ -291,9 +291,13 @@
     .res-avatar-face.back{transform:rotateY(180deg)}
     .res-avatar{width:100%;height:100%;border-radius:0;object-fit:contain;display:block;background:transparent}
     .res-avatar-hint{display:none}
-    /* 类型名：整行不换行，字号随容器宽度自适应，任何屏幕都能单行显示 */
-    .res-name{font-size:clamp(20px,7.2vw,44px);font-weight:900;color:#1a1a2e;margin-bottom:6px;letter-spacing:.02em;font-family:Georgia,"Times New Roman",serif;white-space:nowrap;overflow:visible;line-height:1.15}
+    /* 角色名黑底大字块，压在图片上方 */
+    .res-name{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;width:min(86vw,680px);min-height:76px;padding:10px 18px;margin:0 auto 0;background:#111;color:#fff;font-size:clamp(26px,7.2vw,56px);font-weight:1000;letter-spacing:-.045em;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;white-space:nowrap;overflow:hidden;line-height:1;text-align:center;box-sizing:border-box}
     .res-real{font-size:13px;color:#8a7658;margin-bottom:0;font-weight:500;letter-spacing:.04em}
+    .res-insight-overlay{position:absolute;right:18px;bottom:34px;z-index:4;width:min(58%,310px);text-align:left}
+    .res-insight-overlay .res-section-title{display:none}
+    .res-insight-overlay .insight-box{border-radius:0;padding:12px 14px;background:rgba(17,17,17,.92);border:0;color:#fff;font-size:12.5px;line-height:1.55;font-weight:700;box-shadow:0 10px 24px rgba(0,0,0,.12)}
+    .res-insight-overlay .insight-box::before{display:none}
     .res-desc{font-size:14px;color:#888;line-height:1.7;max-width:460px;margin:0 auto;padding-bottom:24px}
     .match-bar{margin-bottom:12px}
     .match-bar:last-child{margin-bottom:0}
@@ -354,7 +358,7 @@
     .company-modal-btn:not(:disabled):active{transform:scale(.98)}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
-    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:20px;padding-right:20px}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
+    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:500px}.res-avatar-frame{width:78vw}.res-insight-overlay{right:6px;bottom:30px;width:62%}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
     /* ====== 桌面/平板响应式增强（≥768px 启用桌面布局） ====== */
     @media(min-width:768px){
       .wrap{max-width:780px;padding:40px 32px 96px}
@@ -391,7 +395,9 @@
       .btn-b{padding:0 22px}
       .btn-n{padding:0 28px}
       .res-card{border-radius:0}
-      .res-top{padding:36px 40px 16px}
+      .res-top{padding:44px 40px 88px;min-height:620px}
+      .res-avatar-frame{width:min(58vw,500px)}
+      .res-insight-overlay{right:42px;bottom:48px;width:min(42%,330px)}
       .res-desc{font-size:15px;max-width:520px}
       .wish-box{margin:0 40px 28px;padding:20px}
       .others-title{padding:0 40px}
@@ -973,12 +979,24 @@
     body:has(#res.active) .nav-back{color:#6b7280!important}
     body:has(#res.active) .nav-back:hover{color:#00EC00!important}
 
+    /* 答题区 / 结果区：浅色小网格底纹 */
+    body.quiz-on-q,
+    body:has(#res.active){
+      background-color:#fff!important;
+      background-image:
+        linear-gradient(rgba(17,17,17,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17,17,17,.035) 1px, transparent 1px)!important;
+      background-size:32px 32px!important;
+      background-position:center top!important;
+      background-attachment:fixed!important;
+    }
+
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
     #res .res-avatar-frame{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
     #res .res-avatar{background:transparent!important;object-fit:contain!important}
-    #res .res-kicker{color:#111!important;text-align:left!important}  /* 头像上方小字：黑色左对齐 */
-    #res .res-name{color:#111!important}                   /* 角色名：主黑 */
+    #res .res-kicker{color:#111!important;text-align:center!important}
+    #res .res-name{color:#fff!important;background:#111!important}
     #res .res-real{color:#6b7280!important}                /* 副标题：次灰 */
     #res .res-desc{color:#6b7280!important}
 
@@ -995,6 +1013,9 @@
     /* 暗格解读 insight-box：黑底白字 + 绿引号 */
     #res .insight-box{background:#111!important;border:1px solid #111!important;color:#ffffff!important}
     #res .insight-box::before{color:#00EC00!important}
+    #res .res-insight-overlay .res-section-title{display:none!important}
+    #res .res-insight-overlay .insight-box{border:0!important;border-radius:0!important;padding:12px 14px!important;font-size:12.5px!important;line-height:1.55!important;box-shadow:0 10px 24px rgba(0,0,0,.12)!important}
+    #res .res-insight-overlay .insight-box::before{display:none!important}
 
     /* 选择解读 reading-box */
     #res .reading-box{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
@@ -1120,7 +1141,8 @@
     <div class="res" id="res">
       <div class="res-card">
         <div class="res-top">
-          <div class="res-kicker">AI设计时代你是：</div>
+          <div class="res-kicker">AI设计时代你是</div>
+          <div class="res-name" id="rName">「草稿太多的毕加班索」</div>
           <div class="res-avatar-frame">
             <button class="res-avatar-flip" id="rFlip" type="button" aria-label="点击翻看另一面">
               <span class="res-avatar-flip-inner">
@@ -1130,14 +1152,11 @@
               <span class="res-avatar-hint" id="rFlipHint">点击翻面</span>
             </button>
           </div>
-          <div class="res-name" id="rName">草稿太多的毕加班索</div>
+          <div class="res-insight-overlay">
+            <div class="res-section-title">暗格解读</div>
+            <div class="insight-box" id="rComment"></div>
+          </div>
           <div class="res-real" id="rReal" style="display:none">D1 · 灵感发散与筛选</div>
-        </div>
-
-        <!-- 暗格解读（大师点评） -->
-        <div class="res-section">
-          <div class="res-section-title">暗格解读</div>
-          <div class="insight-box" id="rComment"></div>
         </div>
 
         <!-- 下班困局来自（雷达，整行） -->
@@ -2536,7 +2555,7 @@
       latestResult={id:topRole.id,name:topRole.name||"",tagline:rc.shareLine||rc.tagline||topRole.desc||"",personality:personality};
       /* 顶部 */
       setupResultFlip(topRole);
-      document.getElementById("rName").textContent=topRole.name;
+      document.getElementById("rName").textContent=`「${topRole.name}」`;
       document.getElementById("rReal").textContent=topRole.real||personality.finalDimension||"";
 
       /* 暗格解读（大师点评） */
