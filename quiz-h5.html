@@ -809,13 +809,21 @@
     /* 调色板：白 #ffffff / 选中黑框 #111 / 次灰 #f5f6f5 / 边框灰 #e5e7e5
               文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 绿点缀 #00EC00 */
 
-    /* 页面底色与进度条 */
-    body.quiz-on-q{background:#ffffff!important;color:#1a1d1a!important}
+    /* 页面底色与进度条（与 loading 页统一：F3F3F3 底 + 底部 C8F0DA→0 渐变） */
+    body.quiz-on-q{background:#F3F3F3!important;color:#1a1d1a!important}
     body.quiz-on-q .bar{background:#eef0ee!important}
     body.quiz-on-q .bar-fill{background:#00EC00!important}
+    /* 答题页底部绿色渐变（与加载页同款） */
+    body.quiz-on-q::before{
+      content:"";
+      position:fixed;left:0;right:0;bottom:0;height:42vh;
+      background:linear-gradient(to top,#C8F0DA 0%,rgba(200,240,218,0) 100%);
+      pointer-events:none;z-index:0;
+    }
+    body.quiz-on-q .wrap{position:relative;z-index:1}
 
-    /* 顶部 nav 保持白底 */
-    body.quiz-on-q .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
+    /* 顶部 nav 跟随底色 */
+    body.quiz-on-q .nav{background:rgba(243,243,243,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
     body.quiz-on-q .nav-logo{color:#1a1d1a!important}
     body.quiz-on-q .nav-logo-icon{background:#111!important}
     body.quiz-on-q .nav-logo-icon svg path{fill:#fff!important}
