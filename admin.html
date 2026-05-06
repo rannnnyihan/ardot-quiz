@@ -100,17 +100,19 @@
     .stats-range-bar select{min-width:260px;max-width:100%;width:auto}
     .stats-range-bar .meta{font-size:12px;color:#888}
     /* 公司维度 2 个饼图卡片左右并排 */
-    .company-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+    .company-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;align-items:start}
     .company-grid .chart-card{margin:0;display:flex;flex-direction:column;min-width:0}
+    /* 第三列：高度由 JS 同步成饼图卡片高度，超出滚动而不是撑长 */
+    .company-grid .chart-card#companyTierMgrCard{box-sizing:border-box}
     .company-pie-wrap{position:relative;width:100%;height:280px}
     .company-pie-legend{margin-top:10px;display:grid;gap:6px;font-size:12px;color:#444;max-height:160px;overflow:auto}
     .company-pie-legend .lg-row{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center}
     .company-pie-legend .lg-dot{width:10px;height:10px;border-radius:50%}
     .company-pie-legend .lg-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .company-pie-legend .lg-val{color:#888;font-variant-numeric:tabular-nums}
-    /* 分类列表管理：3 段，总高对齐饼图卡片，每段独立滚动 */
-    .tier-mgr{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
-    .tier-mgr-section{display:flex;flex-direction:column;min-height:0;border:1px solid #eee7dc;border-radius:8px;background:#fffdfa;overflow:hidden}
+    /* 分类列表管理：3 段平均分高度，超出独立滚动 */
+    .tier-mgr{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0;overflow:hidden}
+    .tier-mgr-section{display:flex;flex-direction:column;flex:1 1 0;min-height:64px;border:1px solid #eee7dc;border-radius:8px;background:#fffdfa;overflow:hidden}
     .tier-mgr-section>.tier-mgr-head{padding:8px 10px;font-size:12px;font-weight:700;color:#444;background:#faf6ee;border-bottom:1px solid #eee7dc;display:flex;align-items:center;justify-content:space-between;gap:8px}
     .tier-mgr-section>.tier-mgr-head .tier-mgr-count{font-weight:500;color:#888;font-size:11px}
     .tier-mgr-body{padding:8px 10px;overflow:auto;flex:1;min-height:0}
@@ -125,6 +127,8 @@
     .tier-row .tier-btn.add:hover{background:#ffedd5}
     .tier-row .tier-btn.remove{border:1px solid #dc2626;background:#fef2f2;color:#b91c1c}
     .tier-row .tier-btn.remove:hover{background:#fee2e2}
+    .tier-row .tier-btn.restore{border:1px solid #2563eb;background:#eff6ff;color:#1d4ed8}
+    .tier-row .tier-btn.restore:hover{background:#dbeafe}
     .tier-row .tier-tag{font-size:11px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 8px;border-radius:4px}
     @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}.company-grid{grid-template-columns:1fr}}
   </style>
@@ -390,7 +394,7 @@
 
       <div class="chart-card" id="companyTierMgrCard">
         <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">分类列表管理</h2>
-        <div class="help" id="companyTierMgrMeta">把误判的「中小厂」一键加入大厂；或从自定义白名单移除。内置 20 家不可改。</div>
+        <div class="help" id="companyTierMgrMeta">把误判的「中小厂」一键加入大厂；自定义白名单和内置大厂都能移除（内置可恢复）。</div>
         <div class="tier-mgr">
           <div class="tier-mgr-section is-warn">
             <div class="tier-mgr-head"><span>未归入的「中小厂」</span><span class="tier-mgr-count" id="tierMgrUnclassifiedCount">0</span></div>
@@ -401,7 +405,7 @@
             <div class="tier-mgr-body" id="companyExtraBigTechBox"></div>
           </div>
           <div class="tier-mgr-section">
-            <div class="tier-mgr-head"><span>内置大厂（不可移除）</span><span class="tier-mgr-count" id="tierMgrBuiltinCount">20</span></div>
+            <div class="tier-mgr-head"><span>内置大厂（可移除 / 可恢复）</span><span class="tier-mgr-count" id="tierMgrBuiltinCount">20/20</span></div>
             <div class="tier-mgr-body" id="companyBuiltinBigTechBox"></div>
           </div>
         </div>
@@ -1815,15 +1819,21 @@
       }).join("");
     }
 
-    /* 内置大厂清单（不可移除） */
+    /* 内置大厂清单（默认可移除；移除后行变灰 + 显示"恢复"按钮） */
     function renderBuiltinBigTechList(box){
       if(!box)return;
       const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
       const cnt=document.getElementById("tierMgrBuiltinCount");
-      if(cnt)cnt.textContent=String(builtinDisplay.length);
+      const removed=getRemovedBuiltinSet();
+      const activeNum=builtinDisplay.filter(n=>!removed.has(n.toLowerCase())).length;
+      if(cnt)cnt.textContent=`${activeNum}/${builtinDisplay.length}`;
       box.innerHTML=builtinDisplay.map((name)=>{
         const safe=escapeHtml(name);
-        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag">内置</span></div>`;
+        const isRemoved=removed.has(name.toLowerCase());
+        if(isRemoved){
+          return `<div class="tier-row" style="opacity:.55"><span class="tier-name" title="${safe}" style="text-decoration:line-through">${safe}</span><span class="tier-tag" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca">已停用</span><button type="button" class="tier-btn restore" data-action="restore-builtin" data-name="${safe}">恢复</button></div>`;
+        }
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag">内置</span><button type="button" class="tier-btn remove" data-action="remove-builtin" data-name="${safe}">移除</button></div>`;
       }).join("");
     }
 
@@ -1859,6 +1869,12 @@
       }else if(action==="remove-bigtech"){
         changed=removeExtraBigTech(name);
         msg=changed?`已从大厂白名单移除：${name}`:`${name} 不在自定义白名单`;
+      }else if(action==="remove-builtin"){
+        changed=removeBuiltinBigTech(name);
+        msg=changed?`已停用内置大厂：${name}（可在内置段恢复）`:`${name} 已停用`;
+      }else if(action==="restore-builtin"){
+        changed=restoreBuiltinBigTech(name);
+        msg=changed?`已恢复内置大厂：${name}`:`${name} 未停用`;
       }
       if(changed){
         scheduleConfigAutoSave();
@@ -1893,6 +1909,30 @@
       if(!card||card.dataset.bound==="1")return;
       card.addEventListener("click",handleCompanyTierCardClick);
       card.dataset.bound="1";
+      ensureTierMgrHeightSync();
+    }
+
+    /* 把第三列卡片高度锁成左侧两张饼图卡片里更高的那张 → 内容多就滚动而不是撑长 */
+    function ensureTierMgrHeightSync(){
+      const tgt=document.getElementById("companyTierMgrCard");
+      const a=document.getElementById("companyDistCard");
+      const b=document.getElementById("companyTierCard");
+      if(!tgt||!a||!b)return;
+      const sync=()=>{
+        /* 小屏（单列）取消锁定 */
+        if(window.matchMedia("(max-width:980px)").matches){
+          tgt.style.height="";tgt.style.maxHeight="";return;
+        }
+        const h=Math.max(a.getBoundingClientRect().height,b.getBoundingClientRect().height);
+        if(h>0){tgt.style.height=h+"px";tgt.style.maxHeight=h+"px";}
+      };
+      if(typeof ResizeObserver!=="undefined"){
+        const ro=new ResizeObserver(()=>sync());
+        ro.observe(a);ro.observe(b);
+      }
+      window.addEventListener("resize",sync,{passive:true});
+      /* 首屏 + 字体/图表后异步对齐 */
+      sync();setTimeout(sync,0);setTimeout(sync,300);
     }
 
     /* ===== 公司分类（4 档：大厂 / 中小厂 / 创业团队 / 独立设计师） =====
@@ -1944,22 +1984,39 @@
     const STARTUP_KEYS=["工作室","studio","创业","初创","startup","start-up","小团队"];
 
     /* ===== 用户在 admin UI 自定义的大厂白名单（持久化在 cfg.companyClassify.bigTechExtra） =====
-       与 hardcode 的 BIG_TECH 合并使用；自定义项可在 admin 里随时移除，互不影响。 */
+       与 hardcode 的 BIG_TECH 合并使用；自定义项可在 admin 里随时移除，互不影响。
+       另外支持把内置大厂"软删除"到 cfg.companyClassify.bigTechRemoved（黑名单），可恢复。 */
     function getExtraBigTechSet(){
       const arr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
         ?cfg.companyClassify.bigTechExtra:[];
       return new Set(arr.map(s=>String(s||"").toLowerCase()).filter(Boolean));
     }
+    function getRemovedBuiltinSet(){
+      const arr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechRemoved))
+        ?cfg.companyClassify.bigTechRemoved:[];
+      return new Set(arr.map(s=>String(s||"").toLowerCase()).filter(Boolean));
+    }
     function isInBigTech(keyLower){
-      if(BIG_TECH.has(keyLower))return true;
-      return getExtraBigTechSet().has(keyLower);
+      const k=String(keyLower||"").toLowerCase();
+      if(getRemovedBuiltinSet().has(k))return false; /* 被软删除 */
+      if(BIG_TECH.has(k))return true;
+      return getExtraBigTechSet().has(k);
     }
     function addExtraBigTech(rawNormalized){
       const k=String(rawNormalized||"").trim();
       if(!k)return false;
       const lower=k.toLowerCase();
-      if(BIG_TECH.has(lower))return false; /* hardcode 里已有，无需重复加 */
       if(!cfg.companyClassify)cfg.companyClassify={};
+      /* 如果它在「被移除的内置大厂」黑名单里，加入就当作"恢复" */
+      if(BIG_TECH.has(lower)){
+        if(Array.isArray(cfg.companyClassify.bigTechRemoved)){
+          const before=cfg.companyClassify.bigTechRemoved.length;
+          cfg.companyClassify.bigTechRemoved=cfg.companyClassify.bigTechRemoved
+            .filter(s=>String(s||"").toLowerCase()!==lower);
+          return cfg.companyClassify.bigTechRemoved.length!==before;
+        }
+        return false; /* hardcode 里已有 + 没被移除 → 无需重复加 */
+      }
       if(!Array.isArray(cfg.companyClassify.bigTechExtra))cfg.companyClassify.bigTechExtra=[];
       const existsIdx=cfg.companyClassify.bigTechExtra.findIndex(s=>String(s||"").toLowerCase()===lower);
       if(existsIdx>=0)return false;
@@ -1975,6 +2032,27 @@
       const before=arr.length;
       cfg.companyClassify.bigTechExtra=arr.filter(s=>String(s||"").toLowerCase()!==lower);
       return cfg.companyClassify.bigTechExtra.length!==before;
+    }
+    function removeBuiltinBigTech(rawNormalized){
+      const k=String(rawNormalized||"").trim();
+      if(!k)return false;
+      const lower=k.toLowerCase();
+      if(!BIG_TECH.has(lower))return false;
+      if(!cfg.companyClassify)cfg.companyClassify={};
+      if(!Array.isArray(cfg.companyClassify.bigTechRemoved))cfg.companyClassify.bigTechRemoved=[];
+      if(cfg.companyClassify.bigTechRemoved.some(s=>String(s||"").toLowerCase()===lower))return false;
+      cfg.companyClassify.bigTechRemoved.push(k);
+      return true;
+    }
+    function restoreBuiltinBigTech(rawNormalized){
+      const lower=String(rawNormalized||"").trim().toLowerCase();
+      if(!lower)return false;
+      const arr=cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechRemoved)
+        ?cfg.companyClassify.bigTechRemoved:null;
+      if(!arr)return false;
+      const before=arr.length;
+      cfg.companyClassify.bigTechRemoved=arr.filter(s=>String(s||"").toLowerCase()!==lower);
+      return cfg.companyClassify.bigTechRemoved.length!==before;
     }
 
     function normalizeCompany(raw){
