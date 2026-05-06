@@ -372,6 +372,10 @@
           <summary class="help" style="cursor:pointer">查看未归入大厂白名单的「中小厂」清单（可补名单）</summary>
           <div id="companyUnclassifiedBox" style="margin-top:8px"></div>
         </details>
+        <details id="companyExtraBigTechDetails" style="margin-top:6px">
+          <summary class="help" style="cursor:pointer">已加入大厂白名单（自定义，可移除）</summary>
+          <div id="companyExtraBigTechBox" style="margin-top:8px"></div>
+        </details>
       </div>
     </div>
 
@@ -1725,14 +1729,17 @@
 
     /* 公司分类：固定 4 档颜色，未命中白名单的「中小厂」清单仍然给出（折叠在 details 里） */
     function renderCompanyTier(companies){
+      ensureCompanyTierCardBound();
       const meta=document.getElementById("companyTierMeta");
       const legend=document.getElementById("companyTierLegend");
       const unBox=document.getElementById("companyUnclassifiedBox");
+      const extraBox=document.getElementById("companyExtraBigTechBox");
       companyTierChart=destroyChartIfAny(companyTierChart);
       if(!companies||!companies.length){
         if(meta)meta.textContent="尚无填写公司的提交记录。";
         if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
         if(unBox)unBox.innerHTML="";
+        if(extraBox)renderExtraBigTechList(extraBox);
         return;
       }
       const tierCount={big:0,small:0,startup:0,indie:0};
@@ -1743,7 +1750,7 @@
         tierCount[tier]=(tierCount[tier]||0)+1;
         if(tier==="small"){
           const k=norm.toLowerCase();
-          if(!BIG_TECH.has(k)){
+          if(!isInBigTech(k)){
             if(!unknownMap.has(k))unknownMap.set(k,{label:norm,val:0});
             unknownMap.get(k).val+=1;
           }
@@ -1753,19 +1760,91 @@
       if(meta){
         const big=tierCount.big||0,small=tierCount.small||0,startup=tierCount.startup||0,indie=tierCount.indie||0;
         meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・创业团队 ${startup}・独立设计师 ${indie}。`;
+        delete meta.dataset.original;
       }
       const items=TIER_ORDER.map(t=>({label:TIER_LABELS[t],val:tierCount[t]||0,color:COMPANY_TIER_COLORS[t]})).filter(it=>it.val>0);
       companyTierChart=drawCompanyDoughnut("companyTierChart","companyTierLegend",items);
-      /* 渲染未命中白名单的公司清单（折叠面板里） */
+      /* 渲染未命中白名单的公司清单（折叠面板里），每行带「加入大厂白名单」按钮 */
       if(unBox){
         const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
         if(!list.length){
           unBox.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充白名单。</div>`;
         }else{
-          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。如果你认为某些应进大厂，请把它们加进 <code>BIG_TECH</code> 或 <code>COMPANY_ALIAS</code>：</div>`+
-            `<div class="dist-list">`+list.map((e)=>`<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><span style="color:#888">${e.val} 次</span></div>`).join("")+`</div>`;
+          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。点右侧按钮可把它加入大厂白名单（同步保存到云端配置）：</div>`+
+            `<div class="dist-list">`+list.map((e)=>{
+              const safe=escapeHtml(e.label);
+              return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><span style="color:#888">${e.val} 次</span><button type="button" class="btn-mini" data-action="add-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #d97706;background:#fff7ed;color:#b45309;border-radius:4px;cursor:pointer">加入大厂</button></div>`;
+            }).join("")+`</div>`;
         }
       }
+      /* 渲染用户自定义大厂白名单，每行带「移除」按钮 */
+      if(extraBox)renderExtraBigTechList(extraBox);
+    }
+
+    /* 自定义大厂白名单清单 + 移除按钮渲染 */
+    function renderExtraBigTechList(extraBox){
+      const arr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
+        ?cfg.companyClassify.bigTechExtra:[];
+      if(!arr.length){
+        extraBox.innerHTML=`<div class="help">尚未自定义任何大厂。可以在上方「中小厂清单」点「加入大厂」补充。</div>`;
+        return;
+      }
+      extraBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下是你自己加进大厂白名单的公司（hardcode 名单不会出现在这里）：</div>`+
+        `<div class="dist-list">`+arr.map((name)=>{
+          const safe=escapeHtml(name);
+          return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><button type="button" class="btn-mini" data-action="remove-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #dc2626;background:#fef2f2;color:#b91c1c;border-radius:4px;cursor:pointer">移除</button></div>`;
+        }).join("")+`</div>`;
+    }
+
+    /* 事件委托：监听公司分类卡片里所有按钮点击 */
+    function handleCompanyTierCardClick(ev){
+      const btn=ev.target.closest("button[data-action]");
+      if(!btn)return;
+      const action=btn.getAttribute("data-action");
+      const name=btn.getAttribute("data-name")||"";
+      if(!name)return;
+      let changed=false;
+      let msg="";
+      if(action==="add-bigtech"){
+        changed=addExtraBigTech(name);
+        msg=changed?`已加入大厂白名单：${name}`:`${name} 已在白名单中`;
+      }else if(action==="remove-bigtech"){
+        changed=removeExtraBigTech(name);
+        msg=changed?`已从大厂白名单移除：${name}`:`${name} 不在自定义白名单`;
+      }
+      if(changed){
+        scheduleConfigAutoSave();
+        /* 重新渲染统计图 + 两份清单 */
+        const data=getSurveyData();
+        const companies=data.map(extractCompany).filter(Boolean);
+        renderCompanyDistribution(companies);
+        renderCompanyTier(companies);
+      }
+      flashTierMeta(msg);
+    }
+
+    let _flashTimer=null;
+    function flashTierMeta(msg){
+      if(!msg)return;
+      const meta=document.getElementById("companyTierMeta");
+      if(!meta)return;
+      const prev=meta.dataset.original||meta.textContent;
+      meta.dataset.original=prev;
+      meta.textContent=msg;
+      meta.style.color="#b45309";
+      clearTimeout(_flashTimer);
+      _flashTimer=setTimeout(()=>{
+        meta.textContent=meta.dataset.original||"";
+        meta.style.color="";
+      },1800);
+    }
+
+    /* 一次性给公司分类卡片绑事件委托（避免每次重渲染重复绑） */
+    function ensureCompanyTierCardBound(){
+      const card=document.getElementById("companyTierCard");
+      if(!card||card.dataset.bound==="1")return;
+      card.addEventListener("click",handleCompanyTierCardClick);
+      card.dataset.bound="1";
     }
 
     /* ===== 公司分类（4 档：大厂 / 中小厂 / 创业团队 / 独立设计师） =====
@@ -1816,6 +1895,40 @@
     /* 创业团队关键词 */
     const STARTUP_KEYS=["工作室","studio","创业","初创","startup","start-up","小团队"];
 
+    /* ===== 用户在 admin UI 自定义的大厂白名单（持久化在 cfg.companyClassify.bigTechExtra） =====
+       与 hardcode 的 BIG_TECH 合并使用；自定义项可在 admin 里随时移除，互不影响。 */
+    function getExtraBigTechSet(){
+      const arr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
+        ?cfg.companyClassify.bigTechExtra:[];
+      return new Set(arr.map(s=>String(s||"").toLowerCase()).filter(Boolean));
+    }
+    function isInBigTech(keyLower){
+      if(BIG_TECH.has(keyLower))return true;
+      return getExtraBigTechSet().has(keyLower);
+    }
+    function addExtraBigTech(rawNormalized){
+      const k=String(rawNormalized||"").trim();
+      if(!k)return false;
+      const lower=k.toLowerCase();
+      if(BIG_TECH.has(lower))return false; /* hardcode 里已有，无需重复加 */
+      if(!cfg.companyClassify)cfg.companyClassify={};
+      if(!Array.isArray(cfg.companyClassify.bigTechExtra))cfg.companyClassify.bigTechExtra=[];
+      const existsIdx=cfg.companyClassify.bigTechExtra.findIndex(s=>String(s||"").toLowerCase()===lower);
+      if(existsIdx>=0)return false;
+      cfg.companyClassify.bigTechExtra.push(k); /* 存原始展示名 */
+      return true;
+    }
+    function removeExtraBigTech(rawNormalized){
+      const lower=String(rawNormalized||"").trim().toLowerCase();
+      if(!lower)return false;
+      const arr=cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra)
+        ?cfg.companyClassify.bigTechExtra:null;
+      if(!arr)return false;
+      const before=arr.length;
+      cfg.companyClassify.bigTechExtra=arr.filter(s=>String(s||"").toLowerCase()!==lower);
+      return cfg.companyClassify.bigTechExtra.length!==before;
+    }
+
     function normalizeCompany(raw){
       const s=String(raw||"").trim();
       if(!s)return "";
@@ -1834,7 +1947,7 @@
       const s=String(rawNormalized||"").trim();
       if(!s)return "unknown";
       const k=s.toLowerCase();
-      if(BIG_TECH.has(k))return "big";
+      if(isInBigTech(k))return "big";
       for(let i=0;i<INDIE_KEYS.length;i++)if(k.indexOf(INDIE_KEYS[i])>=0)return "indie";
       for(let i=0;i<STARTUP_KEYS.length;i++)if(k.indexOf(STARTUP_KEYS[i])>=0)return "startup";
       return "small";
