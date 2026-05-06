@@ -2113,10 +2113,10 @@
     /* —— Q7/Q8 加权口径（仅 admin 端，不影响问卷端 / 分享卡） —— */
     let weightMode="raw";
     const WEIGHT_QIDS=new Set(["q7","q8"]);
-    /* 加权样本门槛：宽松策略——只剔除"信噪比过低"的极端情况（1 人档/1 人公司），
-       2 人及以上仍参与加权但在前端标 ⚠️ 提示样本量低，避免一刀切剔除导致小档/小公司声音消失 */
-    const TIER_MIN_SAMPLE=2;        /* 类型档 < 2 人剔除（即仅 1 人时不参与） */
-    const COMPANY_MIN_SAMPLE=1;     /* 公司 ≥ 1 人即参与（按公司加权的初衷就是一家算一份） */
+    /* 加权样本策略：不剔除任何已有数据——只要档/公司里有 ≥ 1 人就参与加权，
+       人数少时仅在前端打 ⚠️ 提示，避免任何类型/公司因人少而被排除在外 */
+    const TIER_MIN_SAMPLE=1;        /* 类型档 ≥ 1 人即参与（不剔除） */
+    const COMPANY_MIN_SAMPLE=1;     /* 公司 ≥ 1 人即参与（不剔除） */
     const TIER_LOW_SAMPLE=5;        /* 档内人数 < 5 时视为"低样本"，参与但加 ⚠️ */
     const COMPANY_LOW_SAMPLE=3;     /* 公司人数 < 3 时视为"低样本"，参与但加 ⚠️ */
 
@@ -2265,30 +2265,22 @@
         const stats=info.tierStats||{};
         const segs=TIER_ORDER.filter(t=>stats[t]&&stats[t].n>0).map(t=>{
           const s=stats[t];
-          const mark=!s.kept?"<sup style='color:#b45309'>剔</sup>":(s.low?"<sup style='color:#b45309'>⚠</sup>":"");
+          const mark=s.low?"<sup style='color:#b45309'>⚠</sup>":"";
           return `${TIER_LABELS[t]} ${s.n}${mark}`;
         }).join(" / ");
         const kept=info.tierKept||0;
         const present=info.tierTotalPresent||0;
-        subParts.push(`${qidUpper} 多选分布 · 按类型加权（实际 ${kept}/${present} 档等权平均）`);
+        subParts.push(`${qidUpper} 多选分布 · 按类型加权（${kept} 档等权平均，全部参与）`);
         subParts.push(`参与加权 ${used}/${total} 条 · ${segs||"—"}`);
         const notes=[];
-        if((info.droppedTiers||[]).length){
-          notes.push(`<span style="color:#b45309">剔 档位仅 1 人不参与：${info.droppedTiers.map(d=>`${d.label} ${d.n}`).join("、")}</span>`);
-        }
         if((info.lowTiers||[]).length){
           notes.push(`<span style="color:#b45309">⚠ 档位 < ${TIER_LOW_SAMPLE} 人（参与但样本量低，参考为主）：${info.lowTiers.map(d=>`${d.label} ${d.n}`).join("、")}</span>`);
         }
         if(notes.length)subParts.push(notes.join("； "));
       }else if(weightMode==="company"){
-        subParts.push(`${qidUpper} 多选分布 · 按公司加权（每家公司权重相等）`);
+        subParts.push(`${qidUpper} 多选分布 · 按公司加权（每家公司权重相等，全部参与）`);
         subParts.push(`参与加权公司 ${info.companyKept||0}/${info.companyTotal||0} 家 · 覆盖 ${info.used||0}/${total} 条`);
         const notes=[];
-        if((info.droppedCompanies||[]).length){
-          const drop=info.droppedCompanies.slice(0,8).map(d=>`${d.label} ${d.n}`).join("、");
-          const more=info.droppedCompanies.length>8?`，等 ${info.droppedCompanies.length} 家`:"";
-          notes.push(`<span style="color:#b45309">剔 公司 < ${COMPANY_MIN_SAMPLE} 人不参与：${drop}${more}</span>`);
-        }
         if((info.lowCompanies||[]).length){
           const head=info.lowCompanies.slice(0,8).map(d=>`${d.label} ${d.n}`).join("、");
           const more=info.lowCompanies.length>8?`，等 ${info.lowCompanies.length} 家`:"";
@@ -2726,8 +2718,8 @@
           if(ds.weightedEmpty){
             wInfoEl.textContent="";
             wWarnEl.textContent=weightMode==="tier"
-              ? "当前口径下无可用样本：所有公司类型档都仅 1 人。请切回原始或换「按公司加权」。"
-              : "当前口径下无可用样本：没有任何公司被记录。请切回原始或先收集更多公司信息。";
+              ? "当前没有任何样本填写了公司类型，无法按类型加权。请切回原始或换「按公司加权」。"
+              : "当前没有任何样本填写了公司，无法按公司加权。请切回原始或先收集更多公司信息。";
             wWarnEl.classList.remove("hidden");
           }else if(isWeightedMulti){
             const info=ds.weightedInfo||{};
@@ -2735,7 +2727,7 @@
             if(weightMode==="tier"){
               const segs=TIER_ORDER.filter(t=>info.tierStats&&info.tierStats[t]&&info.tierStats[t].n>0).map(t=>{
                 const s=info.tierStats[t];
-                return `${TIER_LABELS[t]} ${s.n}${s.kept?"":"*"}`;
+                return `${TIER_LABELS[t]} ${s.n}${s.low?"⚠":""}`;
               }).join(" / ");
               txt=`参与加权 ${info.used||0}/${ds.total} · ${segs||"—"}`;
             }else if(weightMode==="company"){
@@ -2744,23 +2736,15 @@
             wInfoEl.textContent=txt;
             const drops=[];
             if(weightMode==="tier"){
-              if((info.droppedTiers||[]).length){
-                drops.push(`剔 档位仅 1 人不参与：${info.droppedTiers.map(d=>`${d.label} ${d.n}`).join("、")}`);
-              }
               if((info.lowTiers||[]).length){
-                drops.push(`⚠ 档位 < ${TIER_LOW_SAMPLE} 人样本量低：${info.lowTiers.map(d=>`${d.label} ${d.n}`).join("、")}`);
+                drops.push(`⚠ 档位 < ${TIER_LOW_SAMPLE} 人样本量低（已参与）：${info.lowTiers.map(d=>`${d.label} ${d.n}`).join("、")}`);
               }
             }
             if(weightMode==="company"){
-              if((info.droppedCompanies||[]).length){
-                const head=info.droppedCompanies.slice(0,6).map(d=>`${d.label} ${d.n}`).join("、");
-                const more=info.droppedCompanies.length>6?` 等 ${info.droppedCompanies.length} 家`:"";
-                drops.push(`剔 公司 < ${COMPANY_MIN_SAMPLE} 人不参与：${head}${more}`);
-              }
               if((info.lowCompanies||[]).length){
                 const head=info.lowCompanies.slice(0,6).map(d=>`${d.label} ${d.n}`).join("、");
                 const more=info.lowCompanies.length>6?` 等 ${info.lowCompanies.length} 家`:"";
-                drops.push(`⚠ 公司 < ${COMPANY_LOW_SAMPLE} 人样本量低：${head}${more}`);
+                drops.push(`⚠ 公司 < ${COMPANY_LOW_SAMPLE} 人样本量低（已参与）：${head}${more}`);
               }
             }
             if(drops.length){
