@@ -394,19 +394,15 @@
 
       <div class="chart-card" id="companyTierMgrCard">
         <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">分类列表管理</h2>
-        <div class="help" id="companyTierMgrMeta">把误判的「中小厂」一键加入大厂；自定义白名单和内置大厂都能移除（内置可恢复）。</div>
+        <div class="help" id="companyTierMgrMeta">把误判的「中小厂」一键加入大厂；大厂列表里任何一项都能移除（移除可恢复）。</div>
         <div class="tier-mgr">
           <div class="tier-mgr-section is-warn">
             <div class="tier-mgr-head"><span>未归入的「中小厂」</span><span class="tier-mgr-count" id="tierMgrUnclassifiedCount">0</span></div>
             <div class="tier-mgr-body" id="companyUnclassifiedBox"></div>
           </div>
           <div class="tier-mgr-section is-extra">
-            <div class="tier-mgr-head"><span>自定义大厂（可移除）</span><span class="tier-mgr-count" id="tierMgrExtraCount">0</span></div>
-            <div class="tier-mgr-body" id="companyExtraBigTechBox"></div>
-          </div>
-          <div class="tier-mgr-section">
-            <div class="tier-mgr-head"><span>内置大厂（可移除 / 可恢复）</span><span class="tier-mgr-count" id="tierMgrBuiltinCount">20/20</span></div>
-            <div class="tier-mgr-body" id="companyBuiltinBigTechBox"></div>
+            <div class="tier-mgr-head"><span>大厂列表（可移除 / 可恢复）</span><span class="tier-mgr-count" id="tierMgrBigTechCount">0/0</span></div>
+            <div class="tier-mgr-body" id="companyBigTechBox"></div>
           </div>
         </div>
       </div>
@@ -1766,12 +1762,10 @@
       const meta=document.getElementById("companyTierMeta");
       const legend=document.getElementById("companyTierLegend");
       const unBox=document.getElementById("companyUnclassifiedBox");
-      const extraBox=document.getElementById("companyExtraBigTechBox");
-      const builtinBox=document.getElementById("companyBuiltinBigTechBox");
+      const bigTechBox=document.getElementById("companyBigTechBox");
       companyTierChart=destroyChartIfAny(companyTierChart);
-      /* 内置 / 自定义 两段每次都重渲染，跟数据无关 */
-      renderBuiltinBigTechList(builtinBox);
-      renderExtraBigTechList(extraBox);
+      /* 大厂列表（内置 + 自定义合并）每次都重渲染，跟数据无关 */
+      renderBigTechList(bigTechBox);
       if(!companies||!companies.length){
         if(meta)meta.textContent="尚无填写公司的提交记录。";
         if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
@@ -1819,39 +1813,33 @@
       }).join("");
     }
 
-    /* 内置大厂清单（默认可移除；移除后行变灰 + 显示"恢复"按钮） */
-    function renderBuiltinBigTechList(box){
+    /* 大厂列表（内置 + 自定义 合并展示；内置可移除/恢复，自定义只能移除） */
+    function renderBigTechList(box){
       if(!box)return;
       const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
-      const cnt=document.getElementById("tierMgrBuiltinCount");
       const removed=getRemovedBuiltinSet();
-      const activeNum=builtinDisplay.filter(n=>!removed.has(n.toLowerCase())).length;
-      if(cnt)cnt.textContent=`${activeNum}/${builtinDisplay.length}`;
-      box.innerHTML=builtinDisplay.map((name)=>{
+      const extraArr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
+        ?cfg.companyClassify.bigTechExtra:[];
+      const cnt=document.getElementById("tierMgrBigTechCount");
+      const builtinActive=builtinDisplay.filter(n=>!removed.has(n.toLowerCase())).length;
+      const total=builtinDisplay.length+extraArr.length;
+      const active=builtinActive+extraArr.length;
+      if(cnt)cnt.textContent=`${active}/${total}`;
+      const rows=[];
+      builtinDisplay.forEach((name)=>{
         const safe=escapeHtml(name);
         const isRemoved=removed.has(name.toLowerCase());
         if(isRemoved){
-          return `<div class="tier-row" style="opacity:.55"><span class="tier-name" title="${safe}" style="text-decoration:line-through">${safe}</span><span class="tier-tag" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca">已停用</span><button type="button" class="tier-btn restore" data-action="restore-builtin" data-name="${safe}">恢复</button></div>`;
+          rows.push(`<div class="tier-row" style="opacity:.55"><span class="tier-name" title="${safe}" style="text-decoration:line-through">${safe}</span><span class="tier-tag" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca">已停用</span><button type="button" class="tier-btn restore" data-action="restore-builtin" data-name="${safe}">恢复</button></div>`);
+        }else{
+          rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag">内置</span><button type="button" class="tier-btn remove" data-action="remove-builtin" data-name="${safe}">移除</button></div>`);
         }
-        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag">内置</span><button type="button" class="tier-btn remove" data-action="remove-builtin" data-name="${safe}">移除</button></div>`;
-      }).join("");
-    }
-
-    /* 自定义大厂清单（每行带移除按钮） */
-    function renderExtraBigTechList(box){
-      if(!box)return;
-      const extraArr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
-        ?cfg.companyClassify.bigTechExtra:[];
-      const cnt=document.getElementById("tierMgrExtraCount");
-      if(cnt)cnt.textContent=String(extraArr.length);
-      if(!extraArr.length){
-        box.innerHTML=`<div class="help">尚未自定义任何大厂。在上方「未归入的中小厂」点「加入大厂」即可补充。</div>`;
-        return;
-      }
-      box.innerHTML=extraArr.map((name)=>{
+      });
+      extraArr.forEach((name)=>{
         const safe=escapeHtml(name);
-        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-bigtech" data-name="${safe}">移除</button></div>`;
-      }).join("");
+        rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">自定义</span><button type="button" class="tier-btn remove" data-action="remove-bigtech" data-name="${safe}">移除</button></div>`);
+      });
+      box.innerHTML=rows.join("");
     }
 
     /* 事件委托：监听公司分类卡片里所有按钮点击 */
