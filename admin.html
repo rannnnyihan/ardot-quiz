@@ -100,14 +100,32 @@
     .stats-range-bar select{min-width:260px;max-width:100%;width:auto}
     .stats-range-bar .meta{font-size:12px;color:#888}
     /* 公司维度 2 个饼图卡片左右并排 */
-    .company-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-    .company-grid .chart-card{margin:0}
+    .company-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+    .company-grid .chart-card{margin:0;display:flex;flex-direction:column;min-width:0}
     .company-pie-wrap{position:relative;width:100%;height:280px}
     .company-pie-legend{margin-top:10px;display:grid;gap:6px;font-size:12px;color:#444;max-height:160px;overflow:auto}
     .company-pie-legend .lg-row{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center}
     .company-pie-legend .lg-dot{width:10px;height:10px;border-radius:50%}
     .company-pie-legend .lg-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .company-pie-legend .lg-val{color:#888;font-variant-numeric:tabular-nums}
+    /* 分类列表管理：3 段，总高对齐饼图卡片，每段独立滚动 */
+    .tier-mgr{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+    .tier-mgr-section{display:flex;flex-direction:column;min-height:0;border:1px solid #eee7dc;border-radius:8px;background:#fffdfa;overflow:hidden}
+    .tier-mgr-section>.tier-mgr-head{padding:8px 10px;font-size:12px;font-weight:700;color:#444;background:#faf6ee;border-bottom:1px solid #eee7dc;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .tier-mgr-section>.tier-mgr-head .tier-mgr-count{font-weight:500;color:#888;font-size:11px}
+    .tier-mgr-body{padding:8px 10px;overflow:auto;flex:1;min-height:0}
+    .tier-mgr-section.is-warn>.tier-mgr-head{background:#fff7ed;color:#b45309;border-bottom-color:#fed7aa}
+    .tier-mgr-section.is-extra>.tier-mgr-head{background:#fef2f2;color:#b91c1c;border-bottom-color:#fecaca}
+    .tier-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;padding:4px 0}
+    .tier-row+.tier-row{border-top:1px dashed #f0e8d8}
+    .tier-row .tier-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .tier-row .tier-meta{color:#999;font-size:11px;font-variant-numeric:tabular-nums}
+    .tier-row .tier-btn{padding:2px 8px;font-size:11px;border-radius:4px;cursor:pointer;line-height:1.4;white-space:nowrap}
+    .tier-row .tier-btn.add{border:1px solid #d97706;background:#fff7ed;color:#b45309}
+    .tier-row .tier-btn.add:hover{background:#ffedd5}
+    .tier-row .tier-btn.remove{border:1px solid #dc2626;background:#fef2f2;color:#b91c1c}
+    .tier-row .tier-btn.remove:hover{background:#fee2e2}
+    .tier-row .tier-tag{font-size:11px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 8px;border-radius:4px}
     @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}.company-grid{grid-template-columns:1fr}}
   </style>
 </head>
@@ -368,14 +386,25 @@
         <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 创业团队 / 独立设计师」四档。</div>
         <div class="company-pie-wrap"><canvas id="companyTierChart"></canvas></div>
         <div id="companyTierLegend" class="company-pie-legend"></div>
-        <details id="companyUnclassifiedDetails" style="margin-top:10px">
-          <summary class="help" style="cursor:pointer">查看未归入大厂白名单的「中小厂」清单（可补名单）</summary>
-          <div id="companyUnclassifiedBox" style="margin-top:8px"></div>
-        </details>
-        <details id="companyExtraBigTechDetails" style="margin-top:6px">
-          <summary class="help" style="cursor:pointer">查看完整大厂白名单（内置 + 自定义）</summary>
-          <div id="companyExtraBigTechBox" style="margin-top:8px"></div>
-        </details>
+      </div>
+
+      <div class="chart-card" id="companyTierMgrCard">
+        <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">分类列表管理</h2>
+        <div class="help" id="companyTierMgrMeta">把误判的「中小厂」一键加入大厂；或从自定义白名单移除。内置 20 家不可改。</div>
+        <div class="tier-mgr">
+          <div class="tier-mgr-section is-warn">
+            <div class="tier-mgr-head"><span>未归入的「中小厂」</span><span class="tier-mgr-count" id="tierMgrUnclassifiedCount">0</span></div>
+            <div class="tier-mgr-body" id="companyUnclassifiedBox"></div>
+          </div>
+          <div class="tier-mgr-section is-extra">
+            <div class="tier-mgr-head"><span>自定义大厂（可移除）</span><span class="tier-mgr-count" id="tierMgrExtraCount">0</span></div>
+            <div class="tier-mgr-body" id="companyExtraBigTechBox"></div>
+          </div>
+          <div class="tier-mgr-section">
+            <div class="tier-mgr-head"><span>内置大厂（不可移除）</span><span class="tier-mgr-count" id="tierMgrBuiltinCount">20</span></div>
+            <div class="tier-mgr-body" id="companyBuiltinBigTechBox"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1727,19 +1756,22 @@
       companyDistChart=drawCompanyDoughnut("companyDistChart","companyDistLegend",items);
     }
 
-    /* 公司分类：固定 4 档颜色，未命中白名单的「中小厂」清单仍然给出（折叠在 details 里） */
+    /* 公司分类：固定 4 档颜色；未命中清单 / 自定义大厂 / 内置大厂 渲染到独立卡片三段 */
     function renderCompanyTier(companies){
       ensureCompanyTierCardBound();
       const meta=document.getElementById("companyTierMeta");
       const legend=document.getElementById("companyTierLegend");
       const unBox=document.getElementById("companyUnclassifiedBox");
       const extraBox=document.getElementById("companyExtraBigTechBox");
+      const builtinBox=document.getElementById("companyBuiltinBigTechBox");
       companyTierChart=destroyChartIfAny(companyTierChart);
+      /* 内置 / 自定义 两段每次都重渲染，跟数据无关 */
+      renderBuiltinBigTechList(builtinBox);
+      renderExtraBigTechList(extraBox);
       if(!companies||!companies.length){
         if(meta)meta.textContent="尚无填写公司的提交记录。";
         if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
-        if(unBox)unBox.innerHTML="";
-        if(extraBox)renderExtraBigTechList(extraBox);
+        if(unBox)renderUnclassifiedList(unBox,[]);
         return;
       }
       const tierCount={big:0,small:0,startup:0,indie:0};
@@ -1764,40 +1796,52 @@
       }
       const items=TIER_ORDER.map(t=>({label:TIER_LABELS[t],val:tierCount[t]||0,color:COMPANY_TIER_COLORS[t]})).filter(it=>it.val>0);
       companyTierChart=drawCompanyDoughnut("companyTierChart","companyTierLegend",items);
-      /* 渲染未命中白名单的公司清单（折叠面板里），每行带「加入大厂白名单」按钮 */
-      if(unBox){
-        const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
-        if(!list.length){
-          unBox.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充白名单。</div>`;
-        }else{
-          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。点右侧按钮可把它加入大厂白名单（同步保存到云端配置）：</div>`+
-            `<div class="dist-list">`+list.map((e)=>{
-              const safe=escapeHtml(e.label);
-              return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><span style="color:#888">${e.val} 次</span><button type="button" class="btn-mini" data-action="add-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #d97706;background:#fff7ed;color:#b45309;border-radius:4px;cursor:pointer">加入大厂</button></div>`;
-            }).join("")+`</div>`;
-        }
-      }
-      /* 渲染用户自定义大厂白名单，每行带「移除」按钮 */
-      if(extraBox)renderExtraBigTechList(extraBox);
+      const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
+      renderUnclassifiedList(unBox,list);
     }
 
-    /* 自定义大厂白名单清单 + 移除按钮渲染 */
-    function renderExtraBigTechList(extraBox){
+    /* 未归入「中小厂」清单（每行：公司名 / 次数 / 加入大厂按钮） */
+    function renderUnclassifiedList(box,list){
+      if(!box)return;
+      const cnt=document.getElementById("tierMgrUnclassifiedCount");
+      if(cnt)cnt.textContent=String(list.length);
+      if(!list.length){
+        box.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充。</div>`;
+        return;
+      }
+      box.innerHTML=list.map((e)=>{
+        const safe=escapeHtml(e.label);
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-meta">${e.val} 次</span><button type="button" class="tier-btn add" data-action="add-bigtech" data-name="${safe}">加入大厂</button></div>`;
+      }).join("");
+    }
+
+    /* 内置大厂清单（不可移除） */
+    function renderBuiltinBigTechList(box){
+      if(!box)return;
+      const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
+      const cnt=document.getElementById("tierMgrBuiltinCount");
+      if(cnt)cnt.textContent=String(builtinDisplay.length);
+      box.innerHTML=builtinDisplay.map((name)=>{
+        const safe=escapeHtml(name);
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-tag">内置</span></div>`;
+      }).join("");
+    }
+
+    /* 自定义大厂清单（每行带移除按钮） */
+    function renderExtraBigTechList(box){
+      if(!box)return;
       const extraArr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
         ?cfg.companyClassify.bigTechExtra:[];
-      /* 内置 BIG_TECH 列表（按出现顺序渲染） */
-      const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
-      const builtinHtml=`<div class="dist-list" style="margin-bottom:8px">`+builtinDisplay.map((name)=>{
+      const cnt=document.getElementById("tierMgrExtraCount");
+      if(cnt)cnt.textContent=String(extraArr.length);
+      if(!extraArr.length){
+        box.innerHTML=`<div class="help">尚未自定义任何大厂。在上方「未归入的中小厂」点「加入大厂」即可补充。</div>`;
+        return;
+      }
+      box.innerHTML=extraArr.map((name)=>{
         const safe=escapeHtml(name);
-        return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><span style="font-size:11px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:2px 8px;border-radius:4px">内置</span></div>`;
-      }).join("")+`</div>`;
-      const extraHtml=extraArr.length
-        ?`<div class="help" style="margin:8px 0 6px">自定义（点「移除」可回退到中小厂）：</div><div class="dist-list">`+extraArr.map((name)=>{
-            const safe=escapeHtml(name);
-            return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><button type="button" class="btn-mini" data-action="remove-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #dc2626;background:#fef2f2;color:#b91c1c;border-radius:4px;cursor:pointer">移除</button></div>`;
-          }).join("")+`</div>`
-        :`<div class="help" style="margin-top:8px">尚未自定义任何大厂。可以在上方「中小厂清单」点「加入大厂」补充。</div>`;
-      extraBox.innerHTML=`<div class="help" style="margin-bottom:6px">内置 ${builtinDisplay.length} 家（不可移除），自定义 ${extraArr.length} 家：</div>`+builtinHtml+extraHtml;
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-bigtech" data-name="${safe}">移除</button></div>`;
+      }).join("");
     }
 
     /* 事件委托：监听公司分类卡片里所有按钮点击 */
@@ -1843,9 +1887,9 @@
       },1800);
     }
 
-    /* 一次性给公司分类卡片绑事件委托（避免每次重渲染重复绑） */
+    /* 一次性给「分类列表管理」卡片绑事件委托（避免每次重渲染重复绑） */
     function ensureCompanyTierCardBound(){
-      const card=document.getElementById("companyTierCard");
+      const card=document.getElementById("companyTierMgrCard");
       if(!card||card.dataset.bound==="1")return;
       card.addEventListener("click",handleCompanyTierCardClick);
       card.dataset.bound="1";
