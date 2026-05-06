@@ -349,6 +349,20 @@
       <div class="stat"><div class="stat-k">今日提交</div><div class="stat-v" id="stToday">0</div></div>
       <div class="stat"><div class="stat-k">最近一次提交</div><div class="stat-v" id="stLatest" style="font-size:14px;font-weight:700">-</div></div>
       <div class="stat"><div class="stat-k">最多出现的设计师类型（Q8）</div><div class="stat-v" id="stTopQ8" style="font-size:16px;font-weight:700">-</div></div>
+      <div class="stat"><div class="stat-k">已收集公司数</div><div class="stat-v" id="stCompany" style="font-size:16px;font-weight:700">0</div></div>
+    </div>
+
+    <div class="chart-card" id="companyDistCard">
+      <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司 / 团队分布</h2>
+      <div class="help" id="companyDistMeta">来自提交前的"大师，请留个名号"弹窗（必填）。</div>
+      <div id="companyDistBox" class="dist-list" style="margin-top:10px"></div>
+    </div>
+
+    <div class="chart-card" id="companyTierCard">
+      <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司分类（自动归类）</h2>
+      <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 创业团队 / 独立设计师」四档；未命中规则的进入「未分类」，可以根据清单把缺失的公司补进白名单。</div>
+      <div id="companyTierBox" class="dist-list" style="margin-top:10px"></div>
+      <div id="companyUnclassifiedBox" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e5e5e8"></div>
     </div>
 
     <div class="chart-card">
@@ -1462,6 +1476,9 @@
       if(!n){
         document.getElementById("stLatest").textContent="-";
         document.getElementById("stTopQ8").textContent="-";
+        const sc=document.getElementById("stCompany");if(sc)sc.textContent="0";
+        renderCompanyDistribution([]);
+        renderCompanyTier([]);
         renderDistribution();
         return;
       }
@@ -1471,8 +1488,176 @@
       data.forEach((d)=>{const v=normalizeSurveyValue(d,"q10");if(v)q8Map[v]=(q8Map[v]||0)+1});
       const top=Object.entries(q8Map).sort((a,b)=>b[1]-a[1])[0];
       document.getElementById("stTopQ8").textContent=top?`${top[0]} (${top[1]})`:"-";
+      /* 公司统计：兼容顶层 company / answers.company（前端两处都冗余写入），再做 alias 归一去重 */
+      const companies=data.map(extractCompany).filter(Boolean);
+      const stCompany=document.getElementById("stCompany");
+      if(stCompany)stCompany.textContent=String(new Set(companies.map(c=>normalizeCompany(c).toLowerCase())).size);
+      renderCompanyDistribution(companies);
+      renderCompanyTier(companies);
       renderDistribution();
     }
+
+    /* 从一条 survey 记录里提取 company 字段（顶层 / answers.company 都看一下） */
+    function extractCompany(d){
+      if(!d)return "";
+      const c1=typeof d.company==="string"?d.company.trim():"";
+      if(c1)return c1;
+      const c2=d.answers&&typeof d.answers.company==="string"?d.answers.company.trim():"";
+      return c2||"";
+    }
+
+    /* 公司分布：按 trim 后的小写 key 聚合，标签用最早出现的那条原文，倒序展示 */
+    function renderCompanyDistribution(companies){
+      const box=document.getElementById("companyDistBox");
+      const meta=document.getElementById("companyDistMeta");
+      if(!box)return;
+      if(!companies||!companies.length){
+        if(meta)meta.textContent="尚无填写公司的提交记录。";
+        box.innerHTML="<div class='note'>暂无数据</div>";
+        return;
+      }
+      const map=new Map();
+      companies.forEach((raw)=>{
+        /* 先做 alias 归一，让「鹅厂」「字节」等都聚到规范名上 */
+        const norm=normalizeCompany(raw);
+        const key=norm.toLowerCase();
+        if(!key)return;
+        if(!map.has(key))map.set(key,{label:norm,val:0});
+        map.get(key).val+=1;
+      });
+      const entries=[...map.values()].sort((a,b)=>b.val-a.val);
+      const total=companies.length;
+      const max=Math.max(...entries.map(e=>e.val),1);
+      if(meta)meta.textContent=`共 ${total} 条已填写，去重归一后 ${entries.length} 家公司/团队。`;
+      box.innerHTML=entries.map((e)=>{
+        const pct=Math.round((e.val/total)*100);
+        return `<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}（${pct}%）</span></div>`;
+      }).join("");
+    }
+
+    /* ===== 公司分类（4 档：大厂 / 中小厂 / 创业团队 / 独立设计师） =====
+       规则：alias 先归一 → 命中大厂白名单 → 命中独立设计关键词 → 命中创业团队关键词 → 否则中小厂
+       未匹配到任何规则、且也不在「中小厂兜底」前命中的，都进「中小厂」（兜底，不再单独列「未分类」）。
+       但为了让你能扩充白名单，会单独列出"中小厂里没在 alias / 白名单里出现过"的公司清单，方便你补名单。 */
+    const COMPANY_ALIAS={
+      /* 腾讯系 */
+      "鹅厂":"腾讯","tencent":"腾讯","\u817e\u8baf\u79d1\u6280":"腾讯","qq":"腾讯","wechat":"腾讯","微信":"腾讯","tme":"腾讯","csig":"腾讯","ieg":"腾讯","cdg":"腾讯","wxg":"腾讯","pcg":"腾讯",
+      /* 字节系 */
+      "字节":"字节跳动","bytedance":"字节跳动","byte":"字节跳动","抖音":"字节跳动","tiktok":"字节跳动","头条":"字节跳动","今日头条":"字节跳动","飞书":"字节跳动","lark":"字节跳动","巨量":"字节跳动",
+      /* 阿里系 */
+      "阿里":"阿里巴巴","alibaba":"阿里巴巴","ali":"阿里巴巴","淘宝":"阿里巴巴","天猫":"阿里巴巴","支付宝":"阿里巴巴","ant":"阿里巴巴","蚂蚁":"阿里巴巴","蚂蚁集团":"阿里巴巴","菜鸟":"阿里巴巴","钉钉":"阿里巴巴","dingtalk":"阿里巴巴","aliyun":"阿里巴巴","阿里云":"阿里巴巴",
+      /* 美团 */
+      "美团":"美团","meituan":"美团","点评":"美团","大众点评":"美团",
+      /* 网易 */
+      "netease":"网易","网易游戏":"网易",
+      /* 小米 */
+      "xiaomi":"小米","mi":"小米","redmi":"小米",
+      /* 百度 */
+      "baidu":"百度",
+      /* 京东 */
+      "jd":"京东","jingdong":"京东","京东集团":"京东",
+      /* 拼多多 */
+      "pdd":"拼多多","pinduoduo":"拼多多","temu":"拼多多",
+      /* 快手 */
+      "kuaishou":"快手","kwai":"快手",
+      /* 小红书 */
+      "xiaohongshu":"小红书","xhs":"小红书","redbook":"小红书",
+      /* 滴滴 */
+      "didi":"滴滴","didichuxing":"滴滴",
+      /* B站 */
+      "bilibili":"哔哩哔哩","b站":"哔哩哔哩","bili":"哔哩哔哩",
+      /* 华为 */
+      "huawei":"华为","荣耀":"华为",
+      /* 海外大厂 */
+      "google":"Google","谷歌":"Google",
+      "microsoft":"微软","ms":"微软",
+      "apple":"Apple","苹果":"Apple",
+      "meta":"Meta","facebook":"Meta","fb":"Meta","instagram":"Meta",
+      "adobe":"Adobe",
+      "amazon":"Amazon","亚马逊":"Amazon"
+    };
+    /* 大厂白名单（已经过 alias 归一后的规范名小写） */
+    const BIG_TECH=new Set(["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","google","adobe","apple","meta","amazon"].map(s=>s.toLowerCase()));
+    /* 独立设计 / 学生 关键词（小写后做包含匹配） */
+    const INDIE_KEYS=["独立","自由","freelance","freelancer","学生","在校","无业","个人","soho","自雇","gap"];
+    /* 创业团队关键词 */
+    const STARTUP_KEYS=["工作室","studio","创业","初创","startup","start-up","小团队"];
+
+    function normalizeCompany(raw){
+      const s=String(raw||"").trim();
+      if(!s)return "";
+      const k=s.toLowerCase();
+      if(COMPANY_ALIAS[k])return COMPANY_ALIAS[k];
+      /* 长名里包含别名也归一，比如「腾讯 CDC」「字节跳动设计中心」 */
+      const aliasKeys=Object.keys(COMPANY_ALIAS);
+      for(let i=0;i<aliasKeys.length;i++){
+        const ak=aliasKeys[i];
+        /* 只在 ak 是有意义的子串时匹配，避免「ms」误中其他英文词 */
+        if(ak.length>=3&&k.indexOf(ak)>=0)return COMPANY_ALIAS[ak];
+      }
+      return s;
+    }
+    function classifyCompanyTier(rawNormalized){
+      const s=String(rawNormalized||"").trim();
+      if(!s)return "unknown";
+      const k=s.toLowerCase();
+      if(BIG_TECH.has(k))return "big";
+      for(let i=0;i<INDIE_KEYS.length;i++)if(k.indexOf(INDIE_KEYS[i])>=0)return "indie";
+      for(let i=0;i<STARTUP_KEYS.length;i++)if(k.indexOf(STARTUP_KEYS[i])>=0)return "startup";
+      return "small";
+    }
+    const TIER_LABELS={big:"大厂",small:"中小厂",startup:"创业团队",indie:"独立设计师"};
+    const TIER_ORDER=["big","small","startup","indie"];
+
+    function renderCompanyTier(companies){
+      const box=document.getElementById("companyTierBox");
+      const meta=document.getElementById("companyTierMeta");
+      const unBox=document.getElementById("companyUnclassifiedBox");
+      if(!box)return;
+      if(!companies||!companies.length){
+        if(meta)meta.textContent="尚无填写公司的提交记录。";
+        box.innerHTML="<div class='note'>暂无数据</div>";
+        if(unBox)unBox.innerHTML="";
+        return;
+      }
+      const tierCount={big:0,small:0,startup:0,indie:0};
+      /* 中小厂里、且公司原文不在 alias 表/大厂白名单里的，单独列出来给运营补名单 */
+      const unknownMap=new Map();
+      companies.forEach((raw)=>{
+        const norm=normalizeCompany(raw);
+        const tier=classifyCompanyTier(norm);
+        tierCount[tier]=(tierCount[tier]||0)+1;
+        if(tier==="small"){
+          const k=norm.toLowerCase();
+          if(!BIG_TECH.has(k)){
+            if(!unknownMap.has(k))unknownMap.set(k,{label:norm,val:0});
+            unknownMap.get(k).val+=1;
+          }
+        }
+      });
+      const total=companies.length;
+      const max=Math.max(...TIER_ORDER.map(t=>tierCount[t]||0),1);
+      if(meta){
+        const big=tierCount.big||0,small=tierCount.small||0,startup=tierCount.startup||0,indie=tierCount.indie||0;
+        meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・创业团队 ${startup}・独立设计师 ${indie}。`;
+      }
+      box.innerHTML=TIER_ORDER.map((t)=>{
+        const v=tierCount[t]||0;
+        const pct=total?Math.round((v/total)*100):0;
+        return `<div class="dist-row"><span>${TIER_LABELS[t]}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((v/max)*100)}%"></div></div><span>${v}（${pct}%）</span></div>`;
+      }).join("");
+      /* 渲染未命中白名单的公司清单 */
+      if(unBox){
+        const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
+        if(!list.length){
+          unBox.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充白名单。</div>`;
+        }else{
+          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。如果你认为某些应进大厂，请把它们加进 <code>BIG_TECH</code> 或 <code>COMPANY_ALIAS</code>：</div>`+
+            `<div class="dist-list">`+list.map((e)=>`<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><span style="color:#888">${e.val} 次</span></div>`).join("")+`</div>`;
+        }
+      }
+    }
+    function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
 
     function renderDistribution(){
       const q=cfg.questions[activeQid];
@@ -2309,6 +2494,9 @@
       const headers=[
         "序号",
         "提交时间",
+        "公司/团队",
+        "公司归一名",
+        "公司分类",
         "结果角色ID",
         "结果角色名称",
         ...ids.map((qid,idx)=>{
@@ -2318,9 +2506,15 @@
       ];
       const lines=[headers.map(csvEscape).join(",")];
       rows.forEach((item,idx)=>{
+        const rawCompany=extractCompany(item);
+        const normCompany=rawCompany?normalizeCompany(rawCompany):"";
+        const tier=normCompany?(TIER_LABELS[classifyCompanyTier(normCompany)]||""):"";
         const row=[
           idx+1,
           item&&item.timestamp?item.timestamp:(item&&item._server_ts?item._server_ts:""),
+          rawCompany,
+          normCompany,
+          tier,
           item&&item.result_role_id?item.result_role_id:"",
           item&&item.result_role_name?item.result_role_name:"",
           ...ids.map((qid)=>rawAnswerToCsvCell(qid,item,vc))
