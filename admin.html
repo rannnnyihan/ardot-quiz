@@ -99,7 +99,16 @@
     .stats-range-bar label{margin:0;font-weight:700;color:#444;font-size:12px}
     .stats-range-bar select{min-width:260px;max-width:100%;width:auto}
     .stats-range-bar .meta{font-size:12px;color:#888}
-    @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}}
+    /* 公司维度 2 个饼图卡片左右并排 */
+    .company-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .company-grid .chart-card{margin:0}
+    .company-pie-wrap{position:relative;width:100%;height:280px}
+    .company-pie-legend{margin-top:10px;display:grid;gap:6px;font-size:12px;color:#444;max-height:160px;overflow:auto}
+    .company-pie-legend .lg-row{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center}
+    .company-pie-legend .lg-dot{width:10px;height:10px;border-radius:50%}
+    .company-pie-legend .lg-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .company-pie-legend .lg-val{color:#888;font-variant-numeric:tabular-nums}
+    @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}.company-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -341,6 +350,11 @@
         <option value="__current__">当前收集中的数据（最新配置）</option>
       </select>
       <span class="meta" id="snapshotRangeMeta"></span>
+      <label style="margin-left:6px">公司筛选：</label>
+      <select id="companyFilterSel" onchange="onCompanyFilterChange()">
+        <option value="__all__">全部公司</option>
+      </select>
+      <span class="meta" id="companyFilterMeta"></span>
       <button class="btn" type="button" onclick="refreshSnapshotList()" style="margin-left:auto">刷新快照列表</button>
       <button class="btn danger" type="button" id="deleteSnapshotBtn" onclick="deleteCurrentSnapshot()" style="display:none">删除此快照</button>
     </div>
@@ -348,21 +362,27 @@
       <div class="stat"><div class="stat-k">总提交数</div><div class="stat-v" id="stTotal">0</div></div>
       <div class="stat"><div class="stat-k">今日提交</div><div class="stat-v" id="stToday">0</div></div>
       <div class="stat"><div class="stat-k">最近一次提交</div><div class="stat-v" id="stLatest" style="font-size:14px;font-weight:700">-</div></div>
-      <div class="stat"><div class="stat-k">最多出现的设计师类型（Q8）</div><div class="stat-v" id="stTopQ8" style="font-size:16px;font-weight:700">-</div></div>
       <div class="stat"><div class="stat-k">已收集公司数</div><div class="stat-v" id="stCompany" style="font-size:16px;font-weight:700">0</div></div>
     </div>
 
-    <div class="chart-card" id="companyDistCard">
-      <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司 / 团队分布</h2>
-      <div class="help" id="companyDistMeta">来自提交前的"大师，请留个名号"弹窗（必填）。</div>
-      <div id="companyDistBox" class="dist-list" style="margin-top:10px"></div>
-    </div>
+    <div class="company-grid">
+      <div class="chart-card" id="companyDistCard">
+        <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司 / 团队分布</h2>
+        <div class="help" id="companyDistMeta">来自提交前的"大师，请留个名号"弹窗（必填）。</div>
+        <div class="company-pie-wrap"><canvas id="companyDistChart"></canvas></div>
+        <div id="companyDistLegend" class="company-pie-legend"></div>
+      </div>
 
-    <div class="chart-card" id="companyTierCard">
-      <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司分类（自动归类）</h2>
-      <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 创业团队 / 独立设计师」四档；未命中规则的进入「未分类」，可以根据清单把缺失的公司补进白名单。</div>
-      <div id="companyTierBox" class="dist-list" style="margin-top:10px"></div>
-      <div id="companyUnclassifiedBox" style="margin-top:14px;padding-top:12px;border-top:1px dashed #e5e5e8"></div>
+      <div class="chart-card" id="companyTierCard">
+        <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司分类（自动归类）</h2>
+        <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 创业团队 / 独立设计师」四档。</div>
+        <div class="company-pie-wrap"><canvas id="companyTierChart"></canvas></div>
+        <div id="companyTierLegend" class="company-pie-legend"></div>
+        <details id="companyUnclassifiedDetails" style="margin-top:10px">
+          <summary class="help" style="cursor:pointer">查看未归入大厂白名单的「中小厂」清单（可补名单）</summary>
+          <div id="companyUnclassifiedBox" style="margin-top:8px"></div>
+        </details>
+      </div>
     </div>
 
     <div class="chart-card">
@@ -395,6 +415,9 @@
     let chartType="bar";
     let statsMode="survey";
     let statsChart=null;
+    /* 公司维度两个独立 doughnut 图实例，重渲前 destroy，避免 Chart.js 复用 canvas 报错 */
+    let companyDistChart=null;
+    let companyTierChart=null;
     let activeTab="manage";
     let activeManageSubTab="question";
     /** 题库默认与 quiz-h5.html 同步：6 维 × 6 角色（D1..D6）。仓库或对话里改题时两边一起改，并递增 meta.questionSchema / roleSetVersion。 */
@@ -608,7 +631,7 @@
       const n=Math.round(Number(v));
       return Number.isFinite(n)&&n>0?n:fallback;
     }
-    function getSurveyData(){
+    function getSurveyDataRaw(){
       if(viewingSnapshotId){
         return Array.isArray(viewingSnapshotAnswers)?viewingSnapshotAnswers.slice():[];
       }
@@ -617,6 +640,96 @@
         return Array.isArray(window.__serverSurveyCache)?window.__serverSurveyCache.slice():[];
       }
       return JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+    }
+    /* getSurveyData() 默认返回「按公司筛选后的数据」。
+       下游统计/题目分布/图表/CSV 导出全部走过滤后的数据，
+       只有顶部 4 个 stat 卡片 + 公司饼图本身用 getSurveyDataRaw()（看全量，避免逻辑死循环）。 */
+    function getSurveyData(){
+      return applyCompanyFilter(getSurveyDataRaw());
+    }
+    /* 当前公司筛选状态。值的取值：
+       - "__all__"          —— 不过滤
+       - "tier:big|small|startup|indie" —— 按公司分类筛选
+       - "co:<归一名小写>"   —— 按某家具体公司筛选 */
+    let companyFilter="__all__";
+    function applyCompanyFilter(rows){
+      if(!Array.isArray(rows)||!rows.length)return rows||[];
+      const f=companyFilter||"__all__";
+      if(f==="__all__")return rows;
+      if(f.indexOf("tier:")===0){
+        const tier=f.slice(5);
+        return rows.filter((d)=>{
+          const c=extractCompany(d);
+          if(!c)return false;
+          return classifyCompanyTier(normalizeCompany(c))===tier;
+        });
+      }
+      if(f.indexOf("co:")===0){
+        const target=f.slice(3);
+        return rows.filter((d)=>{
+          const c=extractCompany(d);
+          if(!c)return false;
+          return normalizeCompany(c).toLowerCase()===target;
+        });
+      }
+      return rows;
+    }
+    function onCompanyFilterChange(){
+      const sel=document.getElementById("companyFilterSel");
+      companyFilter=sel?sel.value:"__all__";
+      /* 切公司筛选要把 stats / 分布 / 图表 / 摘要全部刷一次 */
+      try{renderStats()}catch(e){}
+      try{renderDistribution()}catch(e){}
+      try{renderChart()}catch(e){}
+      updateCompanyFilterMeta();
+    }
+    /* 把当前所有公司 + 4 档塞进 companyFilterSel；切换数据源/快照后需要重新生成 */
+    function refreshCompanyFilterOptions(){
+      const sel=document.getElementById("companyFilterSel");
+      if(!sel)return;
+      const rows=getSurveyDataRaw();
+      const companies=rows.map(extractCompany).filter(Boolean);
+      const tierCount={big:0,small:0,startup:0,indie:0};
+      const map=new Map();
+      companies.forEach((raw)=>{
+        const norm=normalizeCompany(raw);
+        const key=norm.toLowerCase();
+        if(!key)return;
+        if(!map.has(key))map.set(key,{label:norm,val:0});
+        map.get(key).val+=1;
+        const t=classifyCompanyTier(norm);
+        tierCount[t]=(tierCount[t]||0)+1;
+      });
+      const entries=[...map.values()].sort((a,b)=>b.val-a.val);
+      let html=`<option value="__all__">全部公司（${rows.length} 条）</option>`;
+      /* 分类 4 档 */
+      const tierOpts=TIER_ORDER.filter(t=>tierCount[t]>0).map(t=>
+        `<option value="tier:${t}">分类 · ${TIER_LABELS[t]}（${tierCount[t]} 条）</option>`).join("");
+      if(tierOpts)html+=`<optgroup label="按分类">${tierOpts}</optgroup>`;
+      /* 单家公司 */
+      if(entries.length){
+        const coOpts=entries.map(e=>{
+          const key=e.label.toLowerCase();
+          /* option value 只要不含双引号就安全；公司名经 normalize/白名单后是中英文+空格+.&-/，不会出现 " */
+          return `<option value="co:${escapeHtml(key)}">${escapeHtml(e.label)}（${e.val}）</option>`;
+        }).join("");
+        html+=`<optgroup label="按公司">${coOpts}</optgroup>`;
+      }
+      sel.innerHTML=html;
+      /* 如果当前筛选值在新数据里不存在了（比如切了快照），回退到「全部」。
+         用 Array.from + value 严格匹配，避开 querySelector 转义坑 */
+      const valid=Array.from(sel.options).some(o=>o.value===companyFilter);
+      if(!valid)companyFilter="__all__";
+      sel.value=companyFilter;
+      updateCompanyFilterMeta();
+    }
+    function updateCompanyFilterMeta(){
+      const meta=document.getElementById("companyFilterMeta");
+      if(!meta)return;
+      if(companyFilter==="__all__"){meta.textContent="";return}
+      const filtered=getSurveyData().length;
+      const total=getSurveyDataRaw().length;
+      meta.textContent=`已筛选：${filtered}/${total} 条`;
     }
     /* 统计相关渲染用的 cfg：查看历史快照时用冻结 cfg，否则用当前 cfg */
     function viewingCfg(){
@@ -1468,14 +1581,15 @@
     }
 
     function renderStats(){
-      const data=getSurveyData();
+      /* 注意：顶部 4 张 stat 卡 + 公司饼图永远显示全量数据，不受公司筛选影响。
+         筛选会影响：renderDistribution / renderChart / getQuestionStats / 导出 CSV。 */
+      const data=getSurveyDataRaw();
       const n=data.length;
       document.getElementById("stTotal").textContent=n;
       const today=new Date().toISOString().slice(0,10);
       document.getElementById("stToday").textContent=data.filter(d=>(d.timestamp||"").startsWith(today)).length;
       if(!n){
         document.getElementById("stLatest").textContent="-";
-        document.getElementById("stTopQ8").textContent="-";
         const sc=document.getElementById("stCompany");if(sc)sc.textContent="0";
         renderCompanyDistribution([]);
         renderCompanyTier([]);
@@ -1484,16 +1598,14 @@
       }
       const sorted=[...data].filter(d=>d.timestamp).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
       document.getElementById("stLatest").textContent=sorted[0]&&sorted[0].timestamp?new Date(sorted[0].timestamp).toLocaleString("zh-CN"):"-";
-      const q8Map={};
-      data.forEach((d)=>{const v=normalizeSurveyValue(d,"q10");if(v)q8Map[v]=(q8Map[v]||0)+1});
-      const top=Object.entries(q8Map).sort((a,b)=>b[1]-a[1])[0];
-      document.getElementById("stTopQ8").textContent=top?`${top[0]} (${top[1]})`:"-";
       /* 公司统计：兼容顶层 company / answers.company（前端两处都冗余写入），再做 alias 归一去重 */
       const companies=data.map(extractCompany).filter(Boolean);
       const stCompany=document.getElementById("stCompany");
       if(stCompany)stCompany.textContent=String(new Set(companies.map(c=>normalizeCompany(c).toLowerCase())).size);
       renderCompanyDistribution(companies);
       renderCompanyTier(companies);
+      /* 数据集变了（首次/快照切换/服务端刷新后），重建公司筛选下拉的选项列表 */
+      try{refreshCompanyFilterOptions()}catch(e){}
       renderDistribution();
     }
 
@@ -1506,19 +1618,58 @@
       return c2||"";
     }
 
-    /* 公司分布：按 trim 后的小写 key 聚合，标签用最早出现的那条原文，倒序展示 */
+    /* 调色板：分布饼图最多展示 Top 12，超出归到「其他」一项；颜色循环够用即可 */
+    const COMPANY_PIE_PALETTE=["#d7a062","#7d5832","#c46a47","#e6b673","#9e6e3a","#a98a5c","#6b8e7f","#7a4f8b","#3f6f8a","#b25c5c","#8aa66e","#c89c66"];
+    const COMPANY_TIER_COLORS={big:"#a7651f",small:"#d7a062",startup:"#7a4f8b",indie:"#6b8e7f"};
+
+    function destroyChartIfAny(inst){if(inst){try{inst.destroy()}catch(e){}}return null}
+
+    /* 把数据画成 doughnut + 渲染右下方的自定义图例（Chart.js 内置 legend 信息密度太低） */
+    function drawCompanyDoughnut(canvasId, legendId, items, opts){
+      const canvas=document.getElementById(canvasId);
+      if(!canvas)return null;
+      const total=items.reduce((s,it)=>s+(it.val||0),0);
+      const labels=items.map(it=>it.label);
+      const values=items.map(it=>it.val);
+      const colors=items.map((it,i)=>it.color||COMPANY_PIE_PALETTE[i%COMPANY_PIE_PALETTE.length]);
+      const inst=new Chart(canvas.getContext("2d"),{
+        type:"doughnut",
+        data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:"#fff",borderWidth:2}]},
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          cutout:"58%",
+          plugins:{
+            legend:{display:false},
+            tooltip:{callbacks:{label:(ctx)=>{
+              const v=ctx.parsed||0;
+              const pct=total?Math.round(v/total*100):0;
+              return `${ctx.label}：${v}（${pct}%）`;
+            }}}
+          }
+        }
+      });
+      const legend=document.getElementById(legendId);
+      if(legend){
+        legend.innerHTML=items.map((it,i)=>{
+          const pct=total?Math.round((it.val/total)*100):0;
+          return `<div class="lg-row"><span class="lg-dot" style="background:${colors[i]}"></span><span class="lg-name" title="${escapeHtml(it.label)}">${escapeHtml(it.label)}</span><span class="lg-val">${it.val}（${pct}%）</span></div>`;
+        }).join("");
+      }
+      return inst;
+    }
+
+    /* 公司分布：alias 归一去重后按出现次数倒序，Top 12 直显，其余合并到「其他 N 家」 */
     function renderCompanyDistribution(companies){
-      const box=document.getElementById("companyDistBox");
       const meta=document.getElementById("companyDistMeta");
-      if(!box)return;
+      const legend=document.getElementById("companyDistLegend");
+      companyDistChart=destroyChartIfAny(companyDistChart);
       if(!companies||!companies.length){
         if(meta)meta.textContent="尚无填写公司的提交记录。";
-        box.innerHTML="<div class='note'>暂无数据</div>";
+        if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
         return;
       }
       const map=new Map();
       companies.forEach((raw)=>{
-        /* 先做 alias 归一，让「鹅厂」「字节」等都聚到规范名上 */
         const norm=normalizeCompany(raw);
         const key=norm.toLowerCase();
         if(!key)return;
@@ -1527,12 +1678,61 @@
       });
       const entries=[...map.values()].sort((a,b)=>b.val-a.val);
       const total=companies.length;
-      const max=Math.max(...entries.map(e=>e.val),1);
       if(meta)meta.textContent=`共 ${total} 条已填写，去重归一后 ${entries.length} 家公司/团队。`;
-      box.innerHTML=entries.map((e)=>{
-        const pct=Math.round((e.val/total)*100);
-        return `<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}（${pct}%）</span></div>`;
-      }).join("");
+      const TOP=12;
+      let items=entries;
+      if(entries.length>TOP){
+        const head=entries.slice(0,TOP);
+        const tail=entries.slice(TOP);
+        const otherVal=tail.reduce((s,e)=>s+e.val,0);
+        items=[...head,{label:`其他（${tail.length} 家）`,val:otherVal,color:"#bdbdc4"}];
+      }
+      companyDistChart=drawCompanyDoughnut("companyDistChart","companyDistLegend",items);
+    }
+
+    /* 公司分类：固定 4 档颜色，未命中白名单的「中小厂」清单仍然给出（折叠在 details 里） */
+    function renderCompanyTier(companies){
+      const meta=document.getElementById("companyTierMeta");
+      const legend=document.getElementById("companyTierLegend");
+      const unBox=document.getElementById("companyUnclassifiedBox");
+      companyTierChart=destroyChartIfAny(companyTierChart);
+      if(!companies||!companies.length){
+        if(meta)meta.textContent="尚无填写公司的提交记录。";
+        if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
+        if(unBox)unBox.innerHTML="";
+        return;
+      }
+      const tierCount={big:0,small:0,startup:0,indie:0};
+      const unknownMap=new Map();
+      companies.forEach((raw)=>{
+        const norm=normalizeCompany(raw);
+        const tier=classifyCompanyTier(norm);
+        tierCount[tier]=(tierCount[tier]||0)+1;
+        if(tier==="small"){
+          const k=norm.toLowerCase();
+          if(!BIG_TECH.has(k)){
+            if(!unknownMap.has(k))unknownMap.set(k,{label:norm,val:0});
+            unknownMap.get(k).val+=1;
+          }
+        }
+      });
+      const total=companies.length;
+      if(meta){
+        const big=tierCount.big||0,small=tierCount.small||0,startup=tierCount.startup||0,indie=tierCount.indie||0;
+        meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・创业团队 ${startup}・独立设计师 ${indie}。`;
+      }
+      const items=TIER_ORDER.map(t=>({label:TIER_LABELS[t],val:tierCount[t]||0,color:COMPANY_TIER_COLORS[t]})).filter(it=>it.val>0);
+      companyTierChart=drawCompanyDoughnut("companyTierChart","companyTierLegend",items);
+      /* 渲染未命中白名单的公司清单（折叠面板里） */
+      if(unBox){
+        const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
+        if(!list.length){
+          unBox.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充白名单。</div>`;
+        }else{
+          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。如果你认为某些应进大厂，请把它们加进 <code>BIG_TECH</code> 或 <code>COMPANY_ALIAS</code>：</div>`+
+            `<div class="dist-list">`+list.map((e)=>`<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><span style="color:#888">${e.val} 次</span></div>`).join("")+`</div>`;
+        }
+      }
     }
 
     /* ===== 公司分类（4 档：大厂 / 中小厂 / 创业团队 / 独立设计师） =====
@@ -1609,54 +1809,6 @@
     const TIER_LABELS={big:"大厂",small:"中小厂",startup:"创业团队",indie:"独立设计师"};
     const TIER_ORDER=["big","small","startup","indie"];
 
-    function renderCompanyTier(companies){
-      const box=document.getElementById("companyTierBox");
-      const meta=document.getElementById("companyTierMeta");
-      const unBox=document.getElementById("companyUnclassifiedBox");
-      if(!box)return;
-      if(!companies||!companies.length){
-        if(meta)meta.textContent="尚无填写公司的提交记录。";
-        box.innerHTML="<div class='note'>暂无数据</div>";
-        if(unBox)unBox.innerHTML="";
-        return;
-      }
-      const tierCount={big:0,small:0,startup:0,indie:0};
-      /* 中小厂里、且公司原文不在 alias 表/大厂白名单里的，单独列出来给运营补名单 */
-      const unknownMap=new Map();
-      companies.forEach((raw)=>{
-        const norm=normalizeCompany(raw);
-        const tier=classifyCompanyTier(norm);
-        tierCount[tier]=(tierCount[tier]||0)+1;
-        if(tier==="small"){
-          const k=norm.toLowerCase();
-          if(!BIG_TECH.has(k)){
-            if(!unknownMap.has(k))unknownMap.set(k,{label:norm,val:0});
-            unknownMap.get(k).val+=1;
-          }
-        }
-      });
-      const total=companies.length;
-      const max=Math.max(...TIER_ORDER.map(t=>tierCount[t]||0),1);
-      if(meta){
-        const big=tierCount.big||0,small=tierCount.small||0,startup=tierCount.startup||0,indie=tierCount.indie||0;
-        meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・创业团队 ${startup}・独立设计师 ${indie}。`;
-      }
-      box.innerHTML=TIER_ORDER.map((t)=>{
-        const v=tierCount[t]||0;
-        const pct=total?Math.round((v/total)*100):0;
-        return `<div class="dist-row"><span>${TIER_LABELS[t]}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((v/max)*100)}%"></div></div><span>${v}（${pct}%）</span></div>`;
-      }).join("");
-      /* 渲染未命中白名单的公司清单 */
-      if(unBox){
-        const list=[...unknownMap.values()].sort((a,b)=>b.val-a.val);
-        if(!list.length){
-          unBox.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充白名单。</div>`;
-        }else{
-          unBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下公司被自动归到「中小厂」，但不在大厂白名单里。如果你认为某些应进大厂，请把它们加进 <code>BIG_TECH</code> 或 <code>COMPANY_ALIAS</code>：</div>`+
-            `<div class="dist-list">`+list.map((e)=>`<div class="dist-row"><span title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</span><span style="color:#888">${e.val} 次</span></div>`).join("")+`</div>`;
-        }
-      }
-    }
     function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
 
     function renderDistribution(){
@@ -2528,7 +2680,17 @@
       const ts=new Date().toISOString().replace(/[:T]/g,"-").slice(0,19);
       a.href=url;
       const suffix=viewingSnapshotId?("_snapshot_"+viewingSnapshotId):"";
-      a.download=`ardot_raw_answers${suffix}_${ts}.csv`;
+      /* 文件名带上公司筛选标识，导出时一眼能看出是哪家公司 / 哪类公司的数据 */
+      let filterTag="";
+      if(companyFilter&&companyFilter!=="__all__"){
+        if(companyFilter.indexOf("tier:")===0){
+          filterTag="_tier-"+companyFilter.slice(5);
+        }else if(companyFilter.indexOf("co:")===0){
+          /* 文件名里只留字母数字，避免中文/特殊符号被浏览器/系统截断 */
+          filterTag="_co-"+companyFilter.slice(3).replace(/[^a-z0-9]/gi,"").slice(0,20);
+        }
+      }
+      a.download=`ardot_raw_answers${suffix}${filterTag}_${ts}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
