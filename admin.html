@@ -250,7 +250,7 @@
           <div id="qPriorityWeightRankOnly" class="note" style="display:none;line-height:1.55;margin-bottom:10px"></div>
           <label id="qPriorityWeightCbWrap" style="display:none;align-items:flex-start;gap:10px;font-size:13px;color:#444;font-weight:600;line-height:1.45">
             <input type="checkbox" id="qMapsToRoles" style="margin-top:3px;flex-shrink:0">
-            <span>参与角色映射与得分：勾选后本题计入角色维度分。具体计分规则由前端固定逻辑决定（见下方「计分规则」说明），不可在此编辑。</span>
+            <span>参与角色映射与得分：勾选后本题计入角色维度分。</span>
           </label>
         </div>
 
@@ -1154,6 +1154,7 @@
       if(!q||!cb)return;
       q.mapsToRoles=!!cb.checked;
       syncRoleMappingSection();
+      renderScoreBindBlock();
       scheduleConfigAutoSave();
     }
 
