@@ -1797,18 +1797,32 @@
       renderUnclassifiedList(unBox,list);
     }
 
-    /* 未归入「中小厂」清单（每行：公司名 / 次数 / 加入大厂按钮） */
+    /* 未归入「中小厂」清单（每行：公司名 / 次数 / 加入大厂按钮）
+       两类来源：① 问卷数据里实际填过、被分到 small 的公司（带次数）
+                ② 被移除的内置大厂（永远显示，标 0 次，方便随时点"加入大厂"恢复） */
     function renderUnclassifiedList(box,list){
       if(!box)return;
+      /* 内置大厂展示名（与 renderBigTechList 保持一致） */
+      const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
+      const removedSet=getRemovedBuiltinSet();
+      /* 已经在 list 里的（按 lower 去重） */
+      const seen=new Set((list||[]).map(e=>String(e.label||"").toLowerCase()));
+      const removedBuiltinRows=builtinDisplay
+        .filter(n=>removedSet.has(n.toLowerCase()) && !seen.has(n.toLowerCase()))
+        .map(n=>({label:n,val:0,isRemovedBuiltin:true}));
+      /* 合并 + 排序：有次数的排前面（多→少），0 次（恢复入口）排最后 */
+      const merged=[...(list||[]),...removedBuiltinRows]
+        .sort((a,b)=>(b.val||0)-(a.val||0));
       const cnt=document.getElementById("tierMgrUnclassifiedCount");
-      if(cnt)cnt.textContent=String(list.length);
-      if(!list.length){
+      if(cnt)cnt.textContent=String(merged.length);
+      if(!merged.length){
         box.innerHTML=`<div class="help">所有「中小厂」记录都是已知公司，无需补充。</div>`;
         return;
       }
-      box.innerHTML=list.map((e)=>{
+      box.innerHTML=merged.map((e)=>{
         const safe=escapeHtml(e.label);
-        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><span class="tier-meta">${e.val} 次</span><button type="button" class="tier-btn add" data-action="add-bigtech" data-name="${safe}">加入大厂</button></div>`;
+        const meta=e.isRemovedBuiltin?`<span class="tier-meta" style="color:#b91c1c">已从大厂移除</span>`:`<span class="tier-meta">${e.val} 次</span>`;
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span>${meta}<button type="button" class="tier-btn add" data-action="add-bigtech" data-name="${safe}">加入大厂</button></div>`;
       }).join("");
     }
 
