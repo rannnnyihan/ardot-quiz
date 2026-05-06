@@ -373,7 +373,7 @@
           <div id="companyUnclassifiedBox" style="margin-top:8px"></div>
         </details>
         <details id="companyExtraBigTechDetails" style="margin-top:6px">
-          <summary class="help" style="cursor:pointer">已加入大厂白名单（自定义，可移除）</summary>
+          <summary class="help" style="cursor:pointer">查看完整大厂白名单（内置 + 自定义）</summary>
           <div id="companyExtraBigTechBox" style="margin-top:8px"></div>
         </details>
       </div>
@@ -1783,17 +1783,21 @@
 
     /* 自定义大厂白名单清单 + 移除按钮渲染 */
     function renderExtraBigTechList(extraBox){
-      const arr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
+      const extraArr=(cfg&&cfg.companyClassify&&Array.isArray(cfg.companyClassify.bigTechExtra))
         ?cfg.companyClassify.bigTechExtra:[];
-      if(!arr.length){
-        extraBox.innerHTML=`<div class="help">尚未自定义任何大厂。可以在上方「中小厂清单」点「加入大厂」补充。</div>`;
-        return;
-      }
-      extraBox.innerHTML=`<div class="help" style="margin-bottom:6px">以下是你自己加进大厂白名单的公司（hardcode 名单不会出现在这里）：</div>`+
-        `<div class="dist-list">`+arr.map((name)=>{
-          const safe=escapeHtml(name);
-          return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><button type="button" class="btn-mini" data-action="remove-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #dc2626;background:#fef2f2;color:#b91c1c;border-radius:4px;cursor:pointer">移除</button></div>`;
-        }).join("")+`</div>`;
+      /* 内置 BIG_TECH 列表（按出现顺序渲染） */
+      const builtinDisplay=["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","Google","Adobe","Apple","Meta","Amazon"];
+      const builtinHtml=`<div class="dist-list" style="margin-bottom:8px">`+builtinDisplay.map((name)=>{
+        const safe=escapeHtml(name);
+        return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><span style="font-size:11px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:2px 8px;border-radius:4px">内置</span></div>`;
+      }).join("")+`</div>`;
+      const extraHtml=extraArr.length
+        ?`<div class="help" style="margin:8px 0 6px">自定义（点「移除」可回退到中小厂）：</div><div class="dist-list">`+extraArr.map((name)=>{
+            const safe=escapeHtml(name);
+            return `<div class="dist-row" style="gap:8px"><span title="${safe}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe}</span><button type="button" class="btn-mini" data-action="remove-bigtech" data-name="${safe}" style="padding:2px 8px;font-size:11px;border:1px solid #dc2626;background:#fef2f2;color:#b91c1c;border-radius:4px;cursor:pointer">移除</button></div>`;
+          }).join("")+`</div>`
+        :`<div class="help" style="margin-top:8px">尚未自定义任何大厂。可以在上方「中小厂清单」点「加入大厂」补充。</div>`;
+      extraBox.innerHTML=`<div class="help" style="margin-bottom:6px">内置 ${builtinDisplay.length} 家（不可移除），自定义 ${extraArr.length} 家：</div>`+builtinHtml+extraHtml;
     }
 
     /* 事件委托：监听公司分类卡片里所有按钮点击 */
