@@ -447,7 +447,7 @@
       <div class="help" id="chartNote">-</div>
       <div class="help" id="chartMean">均分：-</div>
       <table>
-        <thead><tr><th>选项/分项</th><th>数值</th><th>占比</th></tr></thead>
+        <thead><tr><th>选项/分项</th><th id="chartTableValHead">数值</th><th>占比</th></tr></thead>
         <tbody id="chartTable"></tbody>
       </table>
       <div id="chartExtra" class="mt"></div>
@@ -2607,7 +2607,9 @@
 
     function renderChartTable(labels,values,ds){
       const tbody=document.getElementById("chartTable");
+      const valHead=document.getElementById("chartTableValHead");
       const isWeightedMulti=ds&&ds.type==="multi"&&ds.weighted&&!ds.weightedEmpty;
+      if(valHead) valHead.textContent=isWeightedMulti?"等效人数":"数值";
       if(isWeightedMulti){
         /* 加权多选：数值=等效人数（小数），占比=等效人数/参与加权人数（多选时合计可 >100%） */
         const denom=ds.weightedValid||0;
