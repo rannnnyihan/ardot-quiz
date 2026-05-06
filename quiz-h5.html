@@ -1109,20 +1109,6 @@
           <div class="radar-wrap radar-full" id="rRadar"></div>
         </div>
 
-        <!-- 性格标签 + 选择解读（同一行，左右两列） -->
-        <div class="res-section">
-          <div class="tags-reading-row">
-            <div class="tags-block">
-              <div class="res-section-title">口头禅</div>
-              <div class="tag-list" id="rMantras"></div>
-            </div>
-            <div class="reading-block">
-              <div class="res-section-title">选择解读</div>
-              <div class="reading-box" id="rReading"></div>
-            </div>
-          </div>
-        </div>
-
         <!-- 你的两个副属性 -->
         <div class="res-section">
           <div class="res-section-title">你的两个副属性</div>
@@ -1133,10 +1119,8 @@
 
         <!-- 你缺的工具（解锁建议） -->
         <div class="res-section">
-          <div class="res-section-title">你缺的工具</div>
           <div class="advice-intro">你最需要的不是<em>"更努力"</em>，而是一个能帮你：</div>
           <ul class="advice-list" id="rAdvice"></ul>
-          <div class="advice-outro">的 AI 设计工具。</div>
         </div>
 
         <!-- 扫码测你（二维码会被 html2canvas 一并拍进"保存图片"长图里） -->
@@ -2461,16 +2445,6 @@
       /* 暗格解读（大师点评） */
       setText("rComment",rc.masterComment||"");
 
-      /* 选择解读：whyLines + 总结 */
-      const reading=document.getElementById("rReading");
-      if(reading){
-        const paras=[];
-        const why=Array.isArray(rc.whyLines)?rc.whyLines.join(""):"";
-        if(why)paras.push(`<p>${why}</p>`);
-        paras.push(`<p>这说明这个环节同时满足：你很希望 AI 介入；你当前处理起来不够顺；它最可能成为你的效率突破口。</p>`);
-        reading.innerHTML=paras.join("");
-      }
-
       /* 副属性（两张卡片：大师的状态 / 你的状态） */
       const subEl=document.getElementById("rSubStats");
       const stateCards=[
@@ -2486,11 +2460,6 @@
       const advEl=document.getElementById("rAdvice");
       const advArr=Array.isArray(rc.advice)?rc.advice:[];
       if(advEl)advEl.innerHTML=advArr.map(a=>`<li>${a}</li>`).join("");
-
-      /* 口头禅（左栏列表：复用 tag-list / tag-pill 样式，竖排 4 条） */
-      const mtEl=document.getElementById("rMantras");
-      const mtArr=Array.isArray(rc.mantras)?rc.mantras:[];
-      if(mtEl)mtEl.innerHTML=mtArr.slice(0,4).map(m=>`<div class="tag-pill">${(m||"").replace(/^[\u201C"]/,"").replace(/[\u201D"]$/,"")}</div>`).join("");
 
       /* 结果页右下角"保存图片"悬浮按钮 + 绑定长按截图保存（兼容老交互） */
       showSaveFab();
