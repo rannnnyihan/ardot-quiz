@@ -252,9 +252,21 @@
     .btn-n{height:42px;padding:0 22px;border-radius:8px;border:none;background:#1a1a2e;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-left:auto}
     .btn-n:hover{background:#2d2d4a}
     .btn-n:disabled{opacity:.3;cursor:not-allowed}
-    .ld{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center}
+    .ld{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;position:relative;padding:0 32px;box-sizing:border-box}
     .ld.active{display:flex}
-    .spinner{width:44px;height:44px;border-radius:50%;border:3px solid #e8e5e0;border-top-color:#c46a1a;animation:spin .7s linear infinite;margin-bottom:24px}
+    /* 大号百分比数字 */
+    .ld-pct{font-size:96px;line-height:1;font-weight:900;color:#111;letter-spacing:-2px;margin-bottom:28px;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+    .ld-pct .ld-pct-sym{font-size:64px;font-weight:900;margin-left:2px}
+    /* 进度条 */
+    .ld-bar{width:min(360px,72vw);height:4px;border-radius:999px;background:#e5e7e5;overflow:hidden;margin-bottom:22px}
+    .ld-bar-inner{height:100%;width:0%;background:#3b82f6;border-radius:999px;transition:width .3s linear}
+    /* 文案胶囊 */
+    .ld-tip{display:inline-block;padding:10px 22px;border-radius:8px;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;letter-spacing:.5px}
+    /* 底部绿色渐变 */
+    .ld-grad{position:fixed;left:0;right:0;bottom:0;height:42vh;pointer-events:none;background:linear-gradient(to top,#C8F0DA 0%,rgba(200,240,218,0) 100%);z-index:0}
+    .ld>*{position:relative;z-index:1}
+    /* 老的 spinner / 文字样式保留兼容性，但默认隐藏（新页面已不用） */
+    .spinner{width:44px;height:44px;border-radius:50%;border:3px solid #e8e5e0;border-top-color:#c46a1a;animation:spin .7s linear infinite;margin-bottom:24px;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
     .ld-t{font-size:16px;font-weight:600;margin-bottom:6px}
     .ld-s{font-size:13px;color:#bbb}
@@ -917,8 +929,8 @@
     /* ============================================================ */
     /* ==========  Loading 态皮肤：白底 + 绿色转圈 + 黑字 ========== */
     /* ============================================================ */
-    body:has(#ld.active){background:#ffffff!important;color:#1a1d1a!important}
-    body:has(#ld.active) .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
+    body:has(#ld.active){background:#F3F3F3!important;color:#1a1d1a!important}
+    body:has(#ld.active) .nav{background:rgba(243,243,243,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
     body:has(#ld.active) .nav-logo{color:#1a1d1a!important}
     body:has(#ld.active) .nav-logo-icon{background:#111!important}
     body:has(#ld.active) .nav-logo-icon svg path{fill:#fff!important}
@@ -1083,9 +1095,10 @@
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
 
     <div class="ld" id="ld">
-      <div class="spinner"></div>
-      <div class="ld-t">正在匹配你的艺术大师人格<span class="ld-dots"></span></div>
-      <p class="ld-s">从 6 维设计痛点里找出最像你的那一位</p>
+      <div class="ld-pct"><span id="ldPctNum">0</span><span class="ld-pct-sym">%</span></div>
+      <div class="ld-bar"><div class="ld-bar-inner" id="ldBarInner"></div></div>
+      <div class="ld-tip">分析你的设计大师角色中…</div>
+      <div class="ld-grad"></div>
     </div>
 
     <div class="res" id="res">
@@ -3348,6 +3361,27 @@
       document.body.classList.remove("quiz-on-q");
       document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
       document.getElementById("ld").classList.add("active");
+      /* 进度条动画：2200ms 内从 0 → 99（最后切结果时再显示 100） */
+      const pctEl=document.getElementById("ldPctNum");
+      const barEl=document.getElementById("ldBarInner");
+      const startTs=Date.now();
+      const DURATION=2000;
+      if(pctEl)pctEl.textContent="0";
+      if(barEl)barEl.style.width="0%";
+      const tick=setInterval(()=>{
+        const t=Math.min(1,(Date.now()-startTs)/DURATION);
+        /* easeOutCubic 让进度前快后慢，更像"在认真分析" */
+        const eased=1-Math.pow(1-t,3);
+        const v=Math.min(99,Math.floor(eased*99));
+        if(pctEl)pctEl.textContent=String(v);
+        if(barEl)barEl.style.width=v+"%";
+        if(t>=1)clearInterval(tick);
+      },40);
+      setTimeout(()=>{
+        clearInterval(tick);
+        if(pctEl)pctEl.textContent="100";
+        if(barEl)barEl.style.width="100%";
+      },2150);
       setTimeout(()=>{
         document.getElementById("ld").classList.remove("active");
         const result=FEEDBACK_ENABLED ? renderResult() : renderSurveyOnlyResult();
