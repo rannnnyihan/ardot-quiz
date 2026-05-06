@@ -110,6 +110,18 @@
     .company-pie-legend .lg-dot{width:10px;height:10px;border-radius:50%}
     .company-pie-legend .lg-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .company-pie-legend .lg-val{color:#888;font-variant-numeric:tabular-nums}
+    /* Q7/Q8 加权口径切换 */
+    .weight-bar{display:flex;align-items:center;gap:8px;margin:8px 0 4px;flex-wrap:wrap;font-size:12px;color:#555}
+    .weight-bar.hidden{display:none}
+    .weight-bar .seg{display:inline-flex;border:1px solid #d6cdbb;border-radius:8px;overflow:hidden;background:#fffdfa}
+    .weight-bar .seg button{appearance:none;border:0;background:transparent;padding:5px 12px;font-size:12px;color:#555;cursor:pointer;line-height:1.4;border-right:1px solid #ece2cf}
+    .weight-bar .seg button:last-child{border-right:0}
+    .weight-bar .seg button.active{background:#c46a1a;color:#fff;font-weight:600}
+    .weight-bar .seg button:hover:not(.active){background:#faf3e6}
+    .weight-bar .wm-help{color:#999;font-size:11px}
+    .weight-bar .wm-warn{color:#b45309;font-size:11px;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px}
+    .weight-bar .wm-info{color:#888;font-size:11px}
+    .dist-row .dist-fill.is-weighted{background:repeating-linear-gradient(135deg,#c46a1a 0 8px,#d77d2a 8px 16px)}
     /* 分类列表管理：3 段平均分高度，超出独立滚动 */
     .tier-mgr{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0;overflow:hidden}
     .tier-mgr-section{display:flex;flex-direction:column;flex:1 1 0;min-height:64px;border:1px solid #eee7dc;border-radius:8px;background:#fffdfa;overflow:hidden}
@@ -420,6 +432,16 @@
           <button class="btn active" id="barBtn" onclick="setChartType('bar')">柱状图</button>
           <button class="btn" id="pieBtn" onclick="setChartType('pie')">饼图</button>
         </div>
+      </div>
+      <div class="weight-bar hidden" id="weightBar">
+        <span style="font-weight:600;color:#444">样本视角</span>
+        <div class="seg" role="tablist">
+          <button type="button" data-mode="raw" class="active" onclick="setWeightMode('raw')">原始</button>
+          <button type="button" data-mode="tier" onclick="setWeightMode('tier')">按类型加权</button>
+          <button type="button" data-mode="company" onclick="setWeightMode('company')">按公司加权</button>
+        </div>
+        <span class="wm-info" id="weightInfo"></span>
+        <span class="wm-warn hidden" id="weightWarn"></span>
       </div>
       <div class="chart-wrap"><canvas id="statsChart"></canvas></div>
       <div class="help" id="chartNote">-</div>
@@ -1743,7 +1765,19 @@
       });
       const entries=[...map.values()].sort((a,b)=>b.val-a.val);
       const total=companies.length;
-      if(meta)meta.textContent=`共 ${total} 条已填写，去重归一后 ${entries.length} 家公司/团队。`;
+      if(meta){
+        let line=`共 ${total} 条已填写，去重归一后 ${entries.length} 家公司/团队。`;
+        /* Top1 占比 ≥ 30% 时给一行健康度提示，提醒切到加权口径再看 Q7/Q8 */
+        if(entries.length&&total>0){
+          const top=entries[0];
+          const ratio=top.val/total;
+          if(ratio>=0.3){
+            const pct=(ratio*100).toFixed(0);
+            line+=` ⚠️ Top1 占比 ${pct}%（${top.label}），看 Q7/Q8 时建议切「按类型加权」或「按公司加权」。`;
+          }
+        }
+        meta.textContent=line;
+      }
       const TOP=12;
       let items=entries;
       if(entries.length>TOP){
@@ -2076,12 +2110,90 @@
     const TIER_LABELS={big:"大厂",small:"中小厂",startup:"创业团队",indie:"独立设计师"};
     const TIER_ORDER=["big","small","startup","indie"];
 
+    /* —— Q7/Q8 加权口径（仅 admin 端，不影响问卷端 / 分享卡） —— */
+    let weightMode="raw";
+    const WEIGHT_QIDS=new Set(["q7","q8"]);
+    /* 加权样本门槛：宽松策略——只剔除"信噪比过低"的极端情况（1 人档/1 人公司），
+       2 人及以上仍参与加权但在前端标 ⚠️ 提示样本量低，避免一刀切剔除导致小档/小公司声音消失 */
+    const TIER_MIN_SAMPLE=2;        /* 类型档 < 2 人剔除（即仅 1 人时不参与） */
+    const COMPANY_MIN_SAMPLE=1;     /* 公司 ≥ 1 人即参与（按公司加权的初衷就是一家算一份） */
+    const TIER_LOW_SAMPLE=5;        /* 档内人数 < 5 时视为"低样本"，参与但加 ⚠️ */
+    const COMPANY_LOW_SAMPLE=3;     /* 公司人数 < 3 时视为"低样本"，参与但加 ⚠️ */
+
+    function buildWeightingMeta(data){
+      const tierBucket={big:[],small:[],startup:[],indie:[]};
+      const companyBucket=new Map();
+      let withCompany=0;
+      data.forEach((d,idx)=>{
+        const raw=extractCompany(d);
+        if(!raw)return;
+        withCompany++;
+        const norm=normalizeCompany(raw);
+        const key=norm.toLowerCase();
+        const tier=classifyCompanyTier(norm);
+        tierBucket[tier].push(idx);
+        if(!companyBucket.has(key))companyBucket.set(key,{label:norm,indices:[]});
+        companyBucket.get(key).indices.push(idx);
+      });
+      return {tierBucket,companyBucket,total:data.length,withCompany};
+    }
+
+    function computeRecordWeights(data,mode){
+      const meta=buildWeightingMeta(data);
+      const weights=new Array(data.length).fill(0);
+      const info={mode,used:0,droppedTiers:[],droppedCompanies:[],lowTiers:[],lowCompanies:[],tierStats:{},companyTotal:0,companyKept:0,withCompany:meta.withCompany};
+      if(mode==="tier"){
+        const validTiers=TIER_ORDER.filter(t=>meta.tierBucket[t].length>=TIER_MIN_SAMPLE);
+        const droppedTiers=TIER_ORDER.filter(t=>meta.tierBucket[t].length>0&&meta.tierBucket[t].length<TIER_MIN_SAMPLE);
+        info.droppedTiers=droppedTiers.map(t=>({tier:t,label:TIER_LABELS[t],n:meta.tierBucket[t].length}));
+        info.lowTiers=validTiers.filter(t=>meta.tierBucket[t].length<TIER_LOW_SAMPLE).map(t=>({tier:t,label:TIER_LABELS[t],n:meta.tierBucket[t].length}));
+        TIER_ORDER.forEach(t=>{
+          const n=meta.tierBucket[t].length;
+          info.tierStats[t]={n,kept:validTiers.indexOf(t)>=0,low:n>0&&n<TIER_LOW_SAMPLE&&validTiers.indexOf(t)>=0};
+        });
+        if(!validTiers.length)return {weights,info,meta,empty:true};
+        info.tierKept=validTiers.length;
+        info.tierTotalPresent=TIER_ORDER.filter(t=>meta.tierBucket[t].length>0).length;
+        const tierW=1/validTiers.length;
+        validTiers.forEach(t=>{
+          const arr=meta.tierBucket[t];
+          const w=tierW/arr.length;
+          arr.forEach(i=>{weights[i]=w;info.used++;});
+        });
+      }else if(mode==="company"){
+        const valid=[],dropped=[],low=[];
+        meta.companyBucket.forEach((v,k)=>{
+          if(v.indices.length>=COMPANY_MIN_SAMPLE){
+            valid.push({key:k,label:v.label,n:v.indices.length,indices:v.indices});
+            if(v.indices.length<COMPANY_LOW_SAMPLE)low.push({label:v.label,n:v.indices.length});
+          }else{
+            dropped.push({key:k,label:v.label,n:v.indices.length});
+          }
+        });
+        info.companyTotal=meta.companyBucket.size;
+        info.companyKept=valid.length;
+        info.droppedCompanies=dropped;
+        info.lowCompanies=low;
+        if(!valid.length)return {weights,info,meta,empty:true};
+        const cw=1/valid.length;
+        valid.forEach(c=>{
+          const w=cw/c.n;
+          c.indices.forEach(i=>{weights[i]=w;info.used++;});
+        });
+      }else{
+        for(let i=0;i<data.length;i++)weights[i]=1;
+        info.used=data.length;
+      }
+      return {weights,info,meta,empty:false};
+    }
+
     function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
 
     function renderDistribution(){
       const q=cfg.questions[activeQid];
       if(!q)return;
-      const ds=getQuestionStats(activeQid);
+      /* 「快速看」卡片始终展示原始计数，不受加权口径影响 */
+      const ds=getQuestionStats(activeQid,0,cfg,{forceRaw:true});
       const box=document.getElementById("distBox");
       const title=document.getElementById("distTitle");
       if(!ds.total){
@@ -2142,6 +2254,76 @@
       }
     }
 
+    /* 加权后的多选渲染：百分比 + 等效计数 + 模式说明副标题 */
+    function renderWeightedMulti(ds,box,title){
+      const qidUpper=displayQid(activeQid).toUpperCase();
+      const info=ds.weightedInfo||{};
+      const total=ds.total||0;
+      const subParts=[];
+      if(weightMode==="tier"){
+        const used=info.used||0;
+        const stats=info.tierStats||{};
+        const segs=TIER_ORDER.filter(t=>stats[t]&&stats[t].n>0).map(t=>{
+          const s=stats[t];
+          const mark=!s.kept?"<sup style='color:#b45309'>剔</sup>":(s.low?"<sup style='color:#b45309'>⚠</sup>":"");
+          return `${TIER_LABELS[t]} ${s.n}${mark}`;
+        }).join(" / ");
+        const kept=info.tierKept||0;
+        const present=info.tierTotalPresent||0;
+        subParts.push(`${qidUpper} 多选分布 · 按类型加权（实际 ${kept}/${present} 档等权平均）`);
+        subParts.push(`参与加权 ${used}/${total} 条 · ${segs||"—"}`);
+        const notes=[];
+        if((info.droppedTiers||[]).length){
+          notes.push(`<span style="color:#b45309">剔 档位仅 1 人不参与：${info.droppedTiers.map(d=>`${d.label} ${d.n}`).join("、")}</span>`);
+        }
+        if((info.lowTiers||[]).length){
+          notes.push(`<span style="color:#b45309">⚠ 档位 < ${TIER_LOW_SAMPLE} 人（参与但样本量低，参考为主）：${info.lowTiers.map(d=>`${d.label} ${d.n}`).join("、")}</span>`);
+        }
+        if(notes.length)subParts.push(notes.join("； "));
+      }else if(weightMode==="company"){
+        subParts.push(`${qidUpper} 多选分布 · 按公司加权（每家公司权重相等）`);
+        subParts.push(`参与加权公司 ${info.companyKept||0}/${info.companyTotal||0} 家 · 覆盖 ${info.used||0}/${total} 条`);
+        const notes=[];
+        if((info.droppedCompanies||[]).length){
+          const drop=info.droppedCompanies.slice(0,8).map(d=>`${d.label} ${d.n}`).join("、");
+          const more=info.droppedCompanies.length>8?`，等 ${info.droppedCompanies.length} 家`:"";
+          notes.push(`<span style="color:#b45309">剔 公司 < ${COMPANY_MIN_SAMPLE} 人不参与：${drop}${more}</span>`);
+        }
+        if((info.lowCompanies||[]).length){
+          const head=info.lowCompanies.slice(0,8).map(d=>`${d.label} ${d.n}`).join("、");
+          const more=info.lowCompanies.length>8?`，等 ${info.lowCompanies.length} 家`:"";
+          notes.push(`<span style="color:#b45309">⚠ 公司 < ${COMPANY_LOW_SAMPLE} 人（参与但样本量低）：${head}${more}</span>`);
+        }
+        if(notes.length)subParts.push(notes.join("； "));
+      }
+      title.innerHTML=subParts.join("<br>");
+      if(ds.weightedEmpty||!ds.weightedShares){
+        box.innerHTML="<div class='note'>当前加权口径下无可用样本，请切回原始或换一种口径。</div>";
+        return;
+      }
+      const shares=ds.weightedShares;/* 0~1 */
+      const entries=ds.labels.map((l,idx)=>({
+        label:ds.shortLabels[idx],
+        full:l,
+        share:shares[idx]||0,
+        val:ds.values[idx]
+      })).sort((a,b)=>b.share-a.share);
+      const maxShare=Math.max(...entries.map(e=>e.share),0.0001);
+      box.innerHTML=entries.map((e)=>{
+        const pct=(e.share*100).toFixed(1);
+        const w=Math.round((e.share/maxShare)*100);
+        return `<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill is-weighted" style="width:${w}%"></div></div><span style="font-variant-numeric:tabular-nums">${pct}%</span></div>`;
+      }).join("");
+    }
+
+    function setWeightMode(mode){
+      if(mode!=="raw"&&mode!=="tier"&&mode!=="company")return;
+      if(weightMode===mode)return;
+      weightMode=mode;
+      try{renderDistribution()}catch(e){}
+      try{renderChart()}catch(e){}
+    }
+
     function getScaleStemStats(qid, cfgSrc){
       const data=getSurveyData();
       const src=cfgSrc||cfg;
@@ -2172,9 +2354,11 @@
       });
     }
 
-    function getQuestionStats(qid, stemIndex, cfgSrc){
+    function getQuestionStats(qid, stemIndex, cfgSrc, opts){
       const data=getSurveyData();
       const src=cfgSrc||cfg;
+      const forceRaw=!!(opts&&opts.forceRaw);
+      const effectiveMode=forceRaw?"raw":weightMode;
       const q=src.questions&&src.questions[qid];
       if(!q)return {type:"single",labels:[],shortLabels:[],values:[],valid:0,total:data.length};
       if(q.type==="single"){
@@ -2202,7 +2386,39 @@
         const labels=(q.options||[]).map(o=>o.label);
         const shortLabels=(q.options||[]).map(o=>o.key);
         const values=(q.options||[]).map(o=>cnt[o.key]||0);
-        return {type:"multi",labels,shortLabels,values,valid,total:data.length,minSelect:safePositiveInt(q.minSelect||q.maxSelect,3)};
+        const base={type:"multi",labels,shortLabels,values,valid,total:data.length,minSelect:safePositiveInt(q.minSelect||q.maxSelect,3)};
+        /* —— Q7/Q8 加权分支：仅在 effectiveMode 非 raw、且当前 qid 在白名单 —— */
+        if(WEIGHT_QIDS.has(qid)&&effectiveMode!=="raw"){
+          const wr=computeRecordWeights(data,effectiveMode);
+          if(!wr.empty){
+            /* 选项层面：按权重累加，分母用"参与加权且选了该题的总权重"，得到每个选项的份额 */
+            const optShare={};(q.options||[]).forEach(o=>optShare[o.key]=0);
+            let validW=0;
+            data.forEach((d,idx)=>{
+              const w=wr.weights[idx];
+              if(!w)return;
+              const raw=(d&&d.answers&&d.answers[qid]!==undefined)?d.answers[qid]:normalizeSurveyValue(d,qid);
+              const arr=Array.isArray(raw)?raw:(raw?[raw]:[]);
+              if(!arr.length)return;
+              validW+=w;
+              arr.forEach((v)=>{if(v&&optShare[v]!==undefined)optShare[v]+=w;});
+            });
+            /* 用"等效计数"输出：份额 × 有效样本量，便于条形长度对比；同时返回 share 百分比 */
+            const denom=validW||1;
+            const shares=(q.options||[]).map(o=>optShare[o.key]/denom);
+            const eqValues=shares.map(s=>Math.round(s*1000)/10);/* 等效计数=share×100，留 1 位 */
+            base.values=eqValues;
+            base.weighted=true;
+            base.weightedShares=shares;/* 0~1 之间，可能 >1（多选） */
+            base.weightedInfo=wr.info;
+            base.valid=Math.round(validW*1000)/1000;
+          }else{
+            base.weighted=true;
+            base.weightedEmpty=true;
+            base.weightedInfo=wr.info;
+          }
+        }
+        return base;
       }
       if(q.type==="rank"){
         const options=(q.options||[]);
@@ -2446,6 +2662,24 @@
       const vc=viewingCfg();
       let ds=null;
       let labels=[];
+      /* 加权切换器：仅 survey 模式 + Q7/Q8 + multi 时出现 */
+      const wbar=document.getElementById("weightBar");
+      let isWeightable=false;
+      if(statsMode==="survey"){
+        const _qid=sel.value;
+        const _q=vc.questions&&vc.questions[_qid];
+        isWeightable=!!(_q&&_q.type==="multi"&&WEIGHT_QIDS.has(_qid));
+      }
+      if(wbar){
+        if(isWeightable){
+          wbar.classList.remove("hidden");
+          wbar.querySelectorAll(".seg button").forEach(b=>{
+            b.classList.toggle("active",b.dataset.mode===weightMode);
+          });
+        }else{
+          wbar.classList.add("hidden");
+        }
+      }
       if(statsMode==="result"){
         ds=getResultRoleStats();
         labels=ds.labels;
@@ -2465,10 +2699,13 @@
         document.getElementById("chartMean").textContent="均分：-";
       }else{
         const qid=sel.value;
+        const isWeighted=ds.type==="multi"&&ds.weighted&&!ds.weightedEmpty;
         document.getElementById("chartNote").textContent=ds.type==="single"
           ? `${displayQid(qid).toUpperCase()} 单选分布（${ds.valid}/${ds.total} 有效）`
           : ds.type==="multi"
-            ? `${displayQid(qid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`
+            ? (isWeighted
+                ? `${displayQid(qid).toUpperCase()} 多选分布 · ${weightMode==="tier"?"按类型加权":"按公司加权"}（数值=份额%）`
+                : `${displayQid(qid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`)
           : ds.type==="rank"
             ? `${displayQid(qid).toUpperCase()} 排序分布 · 第 ${Number(ds.rankIndex||0)+1} 位（${ds.valid}/${ds.total} 有效）`
           : ds.type==="score"
@@ -2480,10 +2717,77 @@
       }
       const ctx=document.getElementById("statsChart");
       if(statsChart){statsChart.destroy();statsChart=null}
+      const isWeightedMulti=ds.type==="multi"&&ds.weighted&&!ds.weightedEmpty;
+      /* 加权切换器旁边的辅助文字 / 警告 */
+      const wInfoEl=document.getElementById("weightInfo");
+      const wWarnEl=document.getElementById("weightWarn");
+      if(wInfoEl&&wWarnEl){
+        if(isWeightable&&weightMode!=="raw"){
+          if(ds.weightedEmpty){
+            wInfoEl.textContent="";
+            wWarnEl.textContent=weightMode==="tier"
+              ? "当前口径下无可用样本：所有公司类型档都仅 1 人。请切回原始或换「按公司加权」。"
+              : "当前口径下无可用样本：没有任何公司被记录。请切回原始或先收集更多公司信息。";
+            wWarnEl.classList.remove("hidden");
+          }else if(isWeightedMulti){
+            const info=ds.weightedInfo||{};
+            let txt="";
+            if(weightMode==="tier"){
+              const segs=TIER_ORDER.filter(t=>info.tierStats&&info.tierStats[t]&&info.tierStats[t].n>0).map(t=>{
+                const s=info.tierStats[t];
+                return `${TIER_LABELS[t]} ${s.n}${s.kept?"":"*"}`;
+              }).join(" / ");
+              txt=`参与加权 ${info.used||0}/${ds.total} · ${segs||"—"}`;
+            }else if(weightMode==="company"){
+              txt=`参与加权公司 ${info.companyKept||0}/${info.companyTotal||0} 家 · 覆盖 ${info.used||0}/${ds.total} 条`;
+            }
+            wInfoEl.textContent=txt;
+            const drops=[];
+            if(weightMode==="tier"){
+              if((info.droppedTiers||[]).length){
+                drops.push(`剔 档位仅 1 人不参与：${info.droppedTiers.map(d=>`${d.label} ${d.n}`).join("、")}`);
+              }
+              if((info.lowTiers||[]).length){
+                drops.push(`⚠ 档位 < ${TIER_LOW_SAMPLE} 人样本量低：${info.lowTiers.map(d=>`${d.label} ${d.n}`).join("、")}`);
+              }
+            }
+            if(weightMode==="company"){
+              if((info.droppedCompanies||[]).length){
+                const head=info.droppedCompanies.slice(0,6).map(d=>`${d.label} ${d.n}`).join("、");
+                const more=info.droppedCompanies.length>6?` 等 ${info.droppedCompanies.length} 家`:"";
+                drops.push(`剔 公司 < ${COMPANY_MIN_SAMPLE} 人不参与：${head}${more}`);
+              }
+              if((info.lowCompanies||[]).length){
+                const head=info.lowCompanies.slice(0,6).map(d=>`${d.label} ${d.n}`).join("、");
+                const more=info.lowCompanies.length>6?` 等 ${info.lowCompanies.length} 家`:"";
+                drops.push(`⚠ 公司 < ${COMPANY_LOW_SAMPLE} 人样本量低：${head}${more}`);
+              }
+            }
+            if(drops.length){
+              wWarnEl.textContent=drops.join("； ");
+              wWarnEl.classList.remove("hidden");
+            }else{
+              wWarnEl.textContent="";
+              wWarnEl.classList.add("hidden");
+            }
+          }else{
+            wInfoEl.textContent="";
+            wWarnEl.textContent="";
+            wWarnEl.classList.add("hidden");
+          }
+        }else{
+          wInfoEl.textContent="";
+          wWarnEl.textContent="";
+          wWarnEl.classList.add("hidden");
+        }
+      }
+      const yTicks=isWeightedMulti
+        ? {callback:function(v){return v+"%"}}
+        : {precision:0,callback:function(v){return Number.isInteger(v)?v:null}};
       statsChart=new Chart(ctx,{
         type:chartType,
-        data:{labels,datasets:[{label:chartType==="bar"?"数值":"占比",data:values,backgroundColor:palette(labels.length)}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true,ticks:{precision:0,callback:function(v){return Number.isInteger(v)?v:null}}}}:{}}
+        data:{labels,datasets:[{label:chartType==="bar"?(isWeightedMulti?"份额%":"数值"):"占比",data:values,backgroundColor:palette(labels.length)}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true,ticks:yTicks}}:{}}
       });
     }
 
@@ -2924,6 +3228,28 @@
         })
       ];
       const lines=[headers.map(csvEscape).join(",")];
+      /* 在表头前追加一行 # 注释，离线分析时一眼看出样本分布、不丢上下文 */
+      try{
+        const compMap=new Map();
+        const tierCnt={big:0,small:0,startup:0,indie:0};
+        let withCo=0;
+        rows.forEach((r)=>{
+          const raw=extractCompany(r);
+          if(!raw)return;
+          withCo++;
+          const norm=normalizeCompany(raw);
+          const k=norm.toLowerCase();
+          if(!compMap.has(k))compMap.set(k,{label:norm,val:0});
+          compMap.get(k).val+=1;
+          tierCnt[classifyCompanyTier(norm)]+=1;
+        });
+        const topCompanies=[...compMap.values()].sort((a,b)=>b.val-a.val).slice(0,10)
+          .map(e=>`${e.label} ${e.val}`).join("、");
+        const tierLine=TIER_ORDER.map(t=>`${TIER_LABELS[t]} ${tierCnt[t]||0}`).join(" / ");
+        lines.unshift(`# 样本分布 · 公司分类：${tierLine}（合计 ${withCo}/${rows.length} 条填写公司）`);
+        if(topCompanies)lines.unshift(`# 样本分布 · Top10 公司：${topCompanies}`);
+        lines.unshift(`# 导出时间：${new Date().toLocaleString("zh-CN")}`);
+      }catch(e){}
       rows.forEach((item,idx)=>{
         const rawCompany=extractCompany(item);
         const normCompany=rawCompany?normalizeCompany(rawCompany):"";
