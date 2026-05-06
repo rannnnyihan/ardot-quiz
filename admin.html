@@ -2395,13 +2395,15 @@
               validW+=w;
               arr.forEach((v)=>{if(v&&optShare[v]!==undefined)optShare[v]+=w;});
             });
-            /* 用"等效计数"输出：份额 × 有效样本量，便于条形长度对比；同时返回 share 百分比 */
+            /* 输出"等效人数"：share × 有效样本数 —— 直观表示"加权后约多少人选了这个"，可有小数 */
             const denom=validW||1;
-            const shares=(q.options||[]).map(o=>optShare[o.key]/denom);
-            const eqValues=shares.map(s=>Math.round(s*1000)/10);/* 等效计数=share×100，留 1 位 */
-            base.values=eqValues;
+            const shares=(q.options||[]).map(o=>optShare[o.key]/denom);/* 0~1，多选时合计 > 1 */
+            const validCount=wr.info.used||0;/* 参与加权的样本条数（整数） */
+            const eqPersons=shares.map(s=>Math.round(s*validCount*10)/10);/* 等效人数，1 位小数 */
+            base.values=eqPersons;
             base.weighted=true;
-            base.weightedShares=shares;/* 0~1 之间，可能 >1（多选） */
+            base.weightedShares=shares;
+            base.weightedValid=validCount;/* 表格用：分母=参与加权人数 */
             base.weightedInfo=wr.info;
             base.valid=Math.round(validW*1000)/1000;
           }else{
@@ -2603,8 +2605,21 @@
       renderChart();
     }
 
-    function renderChartTable(labels,values){
+    function renderChartTable(labels,values,ds){
       const tbody=document.getElementById("chartTable");
+      const isWeightedMulti=ds&&ds.type==="multi"&&ds.weighted&&!ds.weightedEmpty;
+      if(isWeightedMulti){
+        /* 加权多选：数值=等效人数（小数），占比=等效人数/参与加权人数（多选时合计可 >100%） */
+        const denom=ds.weightedValid||0;
+        tbody.innerHTML=labels.map((l,i)=>{
+          const v=values[i]||0;
+          const num=Number.isInteger(v)?String(v):v.toFixed(1);
+          const pct=denom?((v/denom)*100).toFixed(1)+"%":"-";
+          return `<tr><td>${l}</td><td>${num}</td><td>${pct}</td></tr>`;
+        }).join("");
+        return;
+      }
+      /* 其它（单选/原始多选/排序）：占比=v/总和 */
       const sum=values.reduce((a,b)=>a+b,0);
       tbody.innerHTML=labels.map((l,i)=>{
         const v=values[i]||0;
@@ -2684,7 +2699,7 @@
         labels=(ds.type==="single"||ds.type==="rank"||ds.type==="multi")?ds.labels:ds.shortLabels;
       }
       const values=ds.values;
-      renderChartTable(ds.labels, values);
+      renderChartTable(ds.labels, values, ds);
       renderChartExtra(ds, statsMode==="survey"?document.getElementById("chartQuestionSelect").value:"");
       if(statsMode==="result"){
         document.getElementById("chartNote").textContent=`结果反馈分布（${ds.valid}/${ds.total} 有效）`;
@@ -2696,7 +2711,7 @@
           ? `${displayQid(qid).toUpperCase()} 单选分布（${ds.valid}/${ds.total} 有效）`
           : ds.type==="multi"
             ? (isWeighted
-                ? `${displayQid(qid).toUpperCase()} 多选分布 · ${weightMode==="tier"?"按类型加权":"按公司加权"}（数值=份额%）`
+                ? `${displayQid(qid).toUpperCase()} 多选分布 · ${weightMode==="tier"?"按类型加权":"按公司加权"}（数值=加权后等效人数，占比=该选项等效人数/参与加权人数）`
                 : `${displayQid(qid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`)
           : ds.type==="rank"
             ? `${displayQid(qid).toUpperCase()} 排序分布 · 第 ${Number(ds.rankIndex||0)+1} 位（${ds.valid}/${ds.total} 有效）`
@@ -2766,11 +2781,11 @@
         }
       }
       const yTicks=isWeightedMulti
-        ? {callback:function(v){return v+"%"}}
+        ? {callback:function(v){return v+" 人"}}
         : {precision:0,callback:function(v){return Number.isInteger(v)?v:null}};
       statsChart=new Chart(ctx,{
         type:chartType,
-        data:{labels,datasets:[{label:chartType==="bar"?(isWeightedMulti?"份额%":"数值"):"占比",data:values,backgroundColor:palette(labels.length)}]},
+        data:{labels,datasets:[{label:chartType==="bar"?(isWeightedMulti?"等效人数":"数值"):"占比",data:values,backgroundColor:palette(labels.length)}]},
         options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true,ticks:yTicks}}:{}}
       });
     }
