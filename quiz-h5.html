@@ -318,6 +318,20 @@
     .share-mask-close{margin-top:20px;display:inline-block;padding:8px 18px;border:1px solid #fff;border-radius:20px;font-size:13px;cursor:pointer}
     /* 非微信环境顶部提示条 */
     .wx-hint{position:fixed;top:0;left:0;right:0;background:#fff8ee;border-bottom:1px solid #f0e6d4;color:#8f5d24;font-size:12px;padding:8px 16px;text-align:center;z-index:1001;display:none}
+    /* 提交前公司收集弹窗 */
+    .company-modal{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:24px}
+    .company-modal.show{display:flex}
+    .company-modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+    .company-modal-card{position:relative;width:100%;max-width:360px;background:#fff;border-radius:18px;padding:24px 22px 20px;box-shadow:0 16px 48px rgba(0,0,0,.32);animation:companyModalIn .26s cubic-bezier(.2,.9,.3,1.1)}
+    @keyframes companyModalIn{from{transform:translateY(16px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+    .company-modal-title{font-size:20px;font-weight:700;color:#111;line-height:1.3;margin-bottom:8px;letter-spacing:.01em}
+    .company-modal-desc{font-size:13px;color:#5a5a60;line-height:1.6;margin-bottom:18px}
+    .company-modal-input{width:100%;box-sizing:border-box;border:1px solid #e0e0e4;background:#fafafa;border-radius:10px;padding:12px 14px;font-size:14px;color:#111;outline:none;transition:border-color .15s,background .15s}
+    .company-modal-input:focus{border-color:#111;background:#fff}
+    .company-modal-tip{min-height:18px;font-size:12px;color:#d83a3a;margin-top:6px;line-height:1.4}
+    .company-modal-btn{width:100%;margin-top:6px;border:none;border-radius:12px;background:#111;color:#fff;font-size:15px;font-weight:600;padding:13px 0;cursor:pointer;transition:opacity .15s,transform .1s}
+    .company-modal-btn:disabled{background:#ccc;cursor:not-allowed}
+    .company-modal-btn:not(:disabled):active{transform:scale(.98)}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
     @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:20px;padding-right:20px}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
@@ -1193,6 +1207,18 @@
     </div>
   </div>
 
+  <!-- 提交前公司收集弹窗：q9 完成后必填，填完才进结果页 -->
+  <div class="company-modal" id="companyModal" aria-hidden="true">
+    <div class="company-modal-mask"></div>
+    <div class="company-modal-card" role="dialog" aria-modal="true" aria-labelledby="companyModalTitle">
+      <div class="company-modal-title" id="companyModalTitle">大师，请留个名号</div>
+      <div class="company-modal-desc">你来自哪家公司？我们想看看是哪些团队的设计师在被同样的问题困扰。</div>
+      <input class="company-modal-input" id="companyInput" type="text" maxlength="30" autocomplete="organization" placeholder="例如：腾讯 / 美团 / 字节跳动 / 独立设计师" />
+      <div class="company-modal-tip" id="companyModalTip"></div>
+      <button class="company-modal-btn" id="companyModalBtn" type="button" disabled>提交并查看我的大师人格</button>
+    </div>
+  </div>
+
   <script>
     /* =========================================================
      * 环境检测（自适应版 · 一个页面跑全平台）
@@ -1248,13 +1274,14 @@
       return {
         meta:{
           badge:"AI Designer Personality Test",
-          mainTitle:"《好险，<br><em>差点就会做设计了</em>》",
-          subtitle:"11 道题，测测你是被什么工作困住的设计大师",
-          note:"11 题 · 约 6 分钟",
+          mainTitle:"《好险，<br><em>差点就成设计大师了</em>》",
+          subtitle:"终于有人懂我做设计的苦了",
+          note:"5 分钟｜生成专属你的设计人格海报",
           feedbackEnabled:true,
           /* 保持与 admin.html defaultConfig 同步，避免 schemaOutdated 把服务端配置的题目改动（新增/删除/改文案/改顺序）整个回退成默认模板 */
           questionSchema:"designer_personality_v4",
-          roleSetVersion:8
+          roleSetVersion:8,
+          questionOrder:["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10"]
         },
         roles:[
           {
@@ -1458,88 +1485,91 @@
           }
         ],
         questions:{
-          q1:{type:"multi",minSelect:1,title:"老板临时说\u201C下午给我 3 个方向\u201D，你打开 AI 找灵感，但最常遇到的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d1",options:[
-            {key:"A",label:"A. 输出内容太空洞，缺少新意"},
-            {key:"B",label:"B. 方向太多，没有收敛"},
-            {key:"C",label:"C. 不理解我告诉他的品牌、用户或场景限制"},
-            {key:"D",label:"D. 看起来效果不错，但实际用不了"}
+          q1:{type:"single",minSelect:1,title:"作为设计师，你最怀念的状态什么时候？",desc:"",mapsToRoles:true,scoreRole:"d1",options:[
+            {key:"A",label:"A. 刚学设计，什么都敢试"},
+            {key:"B",label:"B. 抠图修图也愿意慢慢磨细节"},
+            {key:"C",label:"C. 可以按自己的风格和规范做"},
+            {key:"D",label:"D. 只做设计本身，不被流程和沟通切碎时间"}
           ]},
-          q2:{type:"multi",minSelect:1,title:"方案方向有了，你让 AI 出图或改图，就害怕它？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d2",options:[
-            {key:"A",label:"A. 细节总出错，比如手、文字、产品结构"},
-            {key:"B",label:"B. 总不按我要求的范围进行局部修改"},
-            {key:"C",label:"C. 多张图之间风格、主体或质感不一致"},
-            {key:"D",label:"D. 图清晰度、质感或商用品质不够"}
+          q2:{type:"single",minSelect:1,title:"如果不用为上班操心，你更想做的是？",desc:"",mapsToRoles:true,scoreRole:"d2",options:[
+            {key:"A",label:"A. 把脑子里的奇怪想法做出来"},
+            {key:"B",label:"B. 探索一遍新的工具"},
+            {key:"C",label:"C. 慢慢整理回顾之前的作品"},
+            {key:"D",label:"D. 脱离重复工作，放空充电"}
           ]},
-          q3:{type:"multi",minSelect:1,title:"你把文案、规范和需求给 AI，希望它先排一版，但最常出现的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d3",options:[
-            {key:"A",label:"A. 信息层级不清楚"},
-            {key:"B",label:"B. 对齐、间距、比例还需要手动调整"},
-            {key:"C",label:"C. 不能按照我的描述生成排版"},
-            {key:"D",label:"D. 生成结果模板感强，难以直接使用"}
+          q3:{type:"single",minSelect:1,title:"甲方 10 点发消息：\u201C明早要用，再改一版\u201D——你第一反应是？",desc:"",mapsToRoles:true,scoreRole:"d4",options:[
+            {key:"A",label:"A. 完了，又要新想方向"},
+            {key:"B",label:"B. 完了，图要重新抠"},
+            {key:"C",label:"C. 完了，版式又要重新排"},
+            {key:"D",label:"D. 完了，明早还要拉会过稿"}
           ]},
-          q4:{type:"multi",minSelect:1,title:"设计过程中，十几张物料要改尺寸、换文案，AI让你头疼的是？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d4",options:[
-            {key:"A",label:"A. 画布比例变了，但文字、图片、按钮位置挤在一起"},
-            {key:"B",label:"B. 换内容时出错"},
-            {key:"C",label:"C. 同一批素材改后，字号、间距或层级不一致"},
-            {key:"D",label:"D. 同时给AI多个修改规则时，它稳定性会降低"}
+          q4:{type:"single",minSelect:1,title:"别人说\u201C参考上次那个\u201D，你最怕什么？",desc:"",mapsToRoles:true,scoreRole:"d5",options:[
+            {key:"A",label:"A. 参考了方向，他说\u201C再突破一下\u201D"},
+            {key:"B",label:"B. 参考了画面，他说\u201C再精致一点\u201D"},
+            {key:"C",label:"C. 参考了版式，他说\u201C再松弛一点\u201D"},
+            {key:"D",label:"D. 参考了一圈，他说\u201C你再问下别人意见\u201D"}
           ]},
-          q5:{type:"multi",minSelect:1,title:"之前做过一个类似项目，这次你想让 AI 直接复用经验，但？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d5",options:[
-            {key:"A",label:"A. 草稿、废案、定稿混在一起，AI 分不清真正可参考的内容"},
-            {key:"B",label:"B. AI不能整理出可复用的版式、素材或文案"},
-            {key:"C",label:"C. AI不能吸收上次被改、被否、被认可的原因"},
-            {key:"D",label:"D. 换了目标、人群、渠道或尺寸后，AI 容易照搬旧方案"}
+          q5:{type:"single",minSelect:3,title:"真正让你下不了班的，通常是？",desc:"",mapsToRoles:false,options:[
+            {key:"A",label:"创意方向定不下来，反复推翻"},
+            {key:"B",label:"抠图修图耗时间"},
+            {key:"C",label:"版式反复调整，达不到预期"},
+            {key:"D",label:"会议对齐讲解，没心情创作"}
           ]},
-          q6:{type:"multi",minSelect:1,title:"你把设计稿交给 AI，希望它直接变成可演示原型或开发稿，但它会？",desc:"多选（至少 1 项）",mapsToRoles:true,scoreRole:"d6",options:[
-            {key:"A",label:"A. 只复原了界面视觉，没有复原交互逻辑"},
-            {key:"B",label:"B. 间距、字号、颜色、组件样式和原稿不一致"},
-            {key:"C",label:"C. 设计稿改了之后，原型或开发稿不能自动跟着更新"},
-            {key:"D",label:"D. 不能正确匹配现有组件库、设计系统或前端规范"}
+          q6:{type:"single",minSelect:1,title:"如果有个 AI 设计搭子，你最想让它像谁？",desc:"",mapsToRoles:true,scoreRole:"d6",options:[
+            {key:"A",label:"A. 会搜信息快速发散的助手"},
+            {key:"B",label:"B. 不翻车的修图师傅"},
+            {key:"C",label:"C. 强迫症级别的排版搭子"},
+            {key:"D",label:"D. 记得住项目细节的老同事"}
           ]},
-          q7:{type:"rank",ui:"pickOrdered",title:"下班前对电脑说声「晚安」，早上最希望它替你先把哪些事搞定了？",desc:"按你最希望的顺序依次点选（可只选最在意的几项）",mapsToRoles:true,scoreKind:"rankWeights",options:[
-            {key:"A",label:"一组概念图和 moodboard",scoreRole:"d1"},
-            {key:"B",label:"该抠的抠、该修的修的图片素材",scoreRole:"d2"},
-            {key:"C",label:"符合我规范、对得齐的界面版式",scoreRole:"d3"},
-            {key:"D",label:"在一批稿子里替我批量改好",scoreRole:"d4"},
-            {key:"E",label:"梳理过去项目的风格与复用建议",scoreRole:"d5"},
-            {key:"F",label:"同步到原型/标注/其他软件里的交付物",scoreRole:"d6"}
+          q7:{type:"multi",minSelect:1,title:"平时做设计时，你会用哪些设计编辑器或 AI 工具？",desc:"多选",mapsToRoles:false,options:[
+            {key:"A",label:"A. Figma"},
+            {key:"B",label:"B. Motiff"},
+            {key:"C",label:"C. MasterGo"},
+            {key:"D",label:"D. Pixso"},
+            {key:"E",label:"E. Sketch"},
+            {key:"F",label:"F. Adobe"},
+            {key:"G",label:"G. Canva"},
+            {key:"I",label:"I. Midjourney"},
+            {key:"J",label:"J. Stable Diffusion"},
+            {key:"K",label:"K. 即梦 AI"},
+            {key:"L",label:"L. 豆包"},
+            {key:"N",label:"N. Recraft"},
+            {key:"P",label:"P. Lovart"},
+            {key:"Q",label:"Q. Google Stitch"},
+            {key:"R",label:"R. Pencil"},
+            {key:"T",label:"T. Galileo AI"},
+            {key:"U",label:"U. Framer"},
+            {key:"W",label:"W. Cursor"},
+            {key:"X",label:"X. Claude Design"},
+            {key:"Y",label:"Y. Runway"},
+            {key:"Z",label:"Z. Pika"}
           ]},
-          q8:{type:"multi",minSelect:3,title:"你最希望 AI 设计工具帮你记住什么？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
-            {key:"A",label:"我的设计风格"},
-            {key:"B",label:"我的组件规范"},
-            {key:"C",label:"我的项目上下文"},
-            {key:"D",label:"我的操作习惯"},
-            {key:"E",label:"我的素材库"},
-            {key:"F",label:"我的历史方案逻辑"}
+          q8:{type:"multi",minSelect:1,title:"如果 AI 今晚真的替你加班，希望它能靠谱的做什么？",desc:"多选",mapsToRoles:false,options:[
+            {key:"A",label:"文生 UI"},
+            {key:"B",label:"图生 UI"},
+            {key:"C",label:"设计稿转代码"},
+            {key:"D",label:"代码转设计稿"},
+            {key:"E",label:"文生图/logo"},
+            {key:"F",label:"AI 抠图"},
+            {key:"G",label:"局部重绘"},
+            {key:"H",label:"图像增强"},
+            {key:"I",label:"图生视频"},
+            {key:"J",label:"文生动效"},
+            {key:"K",label:"动效智能调节"},
+            {key:"L",label:"文生3D"},
+            {key:"M",label:"图生3D"},
+            {key:"N",label:"AI生设计系统/组件"},
+            {key:"O",label:"智能排版"}
           ]},
-          q9:{type:"single",title:"你目前在使用 AI 辅助设计时，最大的阻碍是什么？",desc:"单选",mapsToRoles:false,options:[
-            {key:"A",label:"A. 结果不稳定，需要反复调整"},
-            {key:"B",label:"B. 工具太分散，流程不连贯"},
-            {key:"C",label:"C. 不理解我的设计规范和项目背景"},
-            {key:"D",label:"D. 不适合处理批量修改和重复执行"}
+          q9:{type:"single",title:"说到AI，你现在的态度是？",desc:"",mapsToRoles:false,options:[
+            {key:"A",label:"A. 能替我做的都替我做，我只想早点下班"},
+            {key:"B",label:"B. 新工具可以玩，但别让我为了学它更累"},
+            {key:"C",label:"C. AI永远是辅助，最终效果还得我把关"},
+            {key:"D",label:"D. 怕被AI替代是真的，想靠AI变强也是真的"}
           ]},
-          q10:{type:"single",title:"你的主要设计类型是？",desc:"单选",mapsToRoles:false,options:[
-            {key:"A",label:"UI / 交互设计"},
-            {key:"B",label:"视觉 / 品牌设计"},
-            {key:"C",label:"电商 / 运营设计"},
-            {key:"D",label:"平面 / 动效设计"}
-          ]},
-          q11:{type:"multi",minSelect:3,title:"你目前最常使用的 AI 设计工具是？",desc:"多选（最多 3 项）",mapsToRoles:false,options:[
-            {key:"A",label:"Midjourney"},
-            {key:"B",label:"即梦（Dreamina）"},
-            {key:"C",label:"Stable Diffusion / ComfyUI"},
-            {key:"D",label:"Ideogram"},
-            {key:"E",label:"Recraft"},
-            {key:"F",label:"ChatGPT / Claude"},
-            {key:"G",label:"Figma Make"},
-            {key:"H",label:"Galileo AI"},
-            {key:"I",label:"Uizard"},
-            {key:"J",label:"v0（Vercel）"},
-            {key:"K",label:"K. Framer AI"},
-            {key:"L",label:"MasterGo AI"},
-            {key:"M",label:"Pixso AI"},
-            {key:"N",label:"Lovart"}
-          ]}
-          /* 注：结果页的"填写心愿参与抽奖"功能在代码里直接用 A.q12 收集，不依赖 questions.q12 配置，因此这里默认模板不再列 q12；
-             admin 里删除 q12 时服务端会返回没有 q12 的 questions，前端渲染就不会再出现这道题。 */
+          q10:{type:"text",resultOnly:true,title:"你希望 AI 有哪种\u201C目前还没见过\u201D的能力？（填写后可参与抽奖）",desc:"填空题（可选）",placeholder:"例如：希望 AI 能真的记住我这个项目的设计规范和历史方案，别每次都让我重讲一遍。"}
+          /* 注：结果页的"填写心愿参与抽奖"功能在代码里直接用 A.q10 收集（旧 q12 字段已废弃）；
+             admin 里删除某题时服务端会返回没有该题的 questions，前端渲染就不会再出现这道题。 */
         },
         mappings:{single:{},rank:{},multi:{},score:{},scale:{}}
       };
@@ -1810,7 +1840,7 @@
         }
         const nextBtn=document.getElementById("b"+(idx+1));
         if(nextBtn){
-          nextBtn.onclick=idx===T-1?gen:nx;
+          nextBtn.onclick=idx===T-1?tryFinalSubmit:nx;
           nextBtn.textContent=idx===T-1?"看我的生存角色":"继续";
           nextBtn.disabled=true;
         }
@@ -2330,6 +2360,8 @@
       QUESTION_ORDER.forEach((qid)=>{answers[qid]=A[qid]===undefined?"":A[qid];});
       /* 结果页心愿填空固定走 q12（resultOnly text），同时把补充调研题单独冗余一份方便数据分析 */
       answers.q12=String(A.q12||"");
+      /* 提交前弹窗收集到的公司信息（必填）。answers.company 与顶层 company 各冗余一份，admin 任一都能读到 */
+      answers.company=String(A.company||"");
       const q11Arr=Array.isArray(A.q11)?A.q11.slice(0,3):[];
       const q8Arr=Array.isArray(A.q8)?A.q8.slice(0,3):[];
       const d={
@@ -2340,6 +2372,7 @@
         q10_designer_type:A.q10||"",
         q11_ai_tools_top3:q11Arr,
         q12_ai_wish:String(A.q12||""),
+        company:String(A.company||""),
         result_role_id:result&&result.id?result.id:"",
         result_role_name:result&&result.name?result.name:"",
         result_dimension:(personality&&personality.finalDimension)||"",
@@ -3340,6 +3373,99 @@
       },2200);
     }
 
+    /* ===== 提交前公司收集弹窗 =====
+       触发时机：q9（即问卷最后一题）按"看我的生存角色"时。
+       规则：
+       - 每次提交都弹，必填才能进结果页（避免漏掉每次提交的公司数据）
+       - 老用户体验优化：从 localStorage.ardot_survey 最后一条记录里回填 company，
+         弹窗一打开就已经填好，按钮直接可点，老用户秒过
+       - 提交后写入 A.company，submit() 会把 company 一并打包到 d.company / d.answers.company
+    */
+    function getLastSubmittedCompany(){
+      try{
+        const arr=JSON.parse(localStorage.getItem("ardot_survey")||"[]");
+        if(!Array.isArray(arr)||arr.length===0)return "";
+        /* 从最近一条往前找第一条带 company 的 */
+        for(let i=arr.length-1;i>=0;i--){
+          const it=arr[i]||{};
+          const c=String(it.company||(it.answers&&it.answers.company)||"").trim();
+          if(c)return c;
+        }
+        return "";
+      }catch(e){return ""}
+    }
+    function tryFinalSubmit(){
+      /* 每次都弹，但用历史值预填，老用户一键过 */
+      openCompanyModal();
+    }
+    function openCompanyModal(){
+      const modal=document.getElementById("companyModal");
+      if(!modal){gen();return}
+      const input=document.getElementById("companyInput");
+      const btn=document.getElementById("companyModalBtn");
+      const tip=document.getElementById("companyModalTip");
+      /* 回填优先级：当前 session A.company > localStorage 最后一次提交 */
+      const prefill=String(A.company||"").trim()||getLastSubmittedCompany();
+      if(prefill&&!A.company)A.company=prefill;
+      if(input){
+        input.value=prefill;
+        input.oninput=()=>{
+          const v=String(input.value||"").trim();
+          const r=validateCompanyName(v);
+          if(btn)btn.disabled=!r.ok;
+          if(tip)tip.textContent=v.length===0?"":(r.ok?"":r.msg);
+        };
+      }
+      if(btn){
+        btn.disabled=!validateCompanyName(prefill).ok;
+        btn.onclick=submitCompanyAndGo;
+      }
+      modal.setAttribute("aria-hidden","false");
+      modal.classList.add("show");
+      /* 弹窗打开后聚焦输入框，方便键盘输入 */
+      setTimeout(()=>{if(input)try{input.focus()}catch(e){}},120);
+    }
+    function closeCompanyModal(){
+      const modal=document.getElementById("companyModal");
+      if(!modal)return;
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+    }
+    /* 公司名校验：防乱填，规则尽量宽松以兼容真实公司名（中英文 / 缩写 / 「TBWA\Chiat\Day」式名字）
+       通过：返回 {ok:true}
+       不通过：返回 {ok:false, msg:"提示文案"} */
+    function validateCompanyName(v){
+      const s=String(v||"").trim();
+      if(s.length===0)return {ok:false,msg:""};
+      if(s.length<2)return {ok:false,msg:"至少 2 个字"};
+      if(s.length>30)return {ok:false,msg:"最多 30 个字"};
+      /* 字符白名单：中文 / 英文 / 数字 / 空格 / & . - / */
+      if(!/^[\u4e00-\u9fa5A-Za-z0-9 .&\-\/]+$/.test(s))return {ok:false,msg:"只支持中英文、数字和 . & - / 空格"};
+      /* 纯数字 / 纯标点 */
+      if(/^[0-9]+$/.test(s))return {ok:false,msg:"请填写公司或团队名，不要只填数字"};
+      if(/^[ .&\-\/]+$/.test(s))return {ok:false,msg:"请填写真实的公司或团队名"};
+      /* 连续 ≥4 个相同字符（aaaa / 啊啊啊啊 / 1111） */
+      if(/(.)\1{3,}/.test(s))return {ok:false,msg:"请填写真实的公司或团队名"};
+      /* 明显垃圾词黑名单（整体匹配，大小写不敏感） */
+      const trash=["test","testing","123","1234","12345","123456","abc","abcd","asdf","asdfgh","qwer","qwerty","xxx","xxxx","aaa","aaaa","你好","哈哈","呵呵","随便","无","无所谓","不知道","不告诉你","保密","mmp","nmsl","\u51cf\u80a5","\u5783\u573e"];
+      if(trash.indexOf(s.toLowerCase())>=0)return {ok:false,msg:"请填写真实的公司或团队名"};
+      return {ok:true};
+    }
+    function submitCompanyAndGo(){
+      const input=document.getElementById("companyInput");
+      const tip=document.getElementById("companyModalTip");
+      const v=String((input&&input.value)||"").trim();
+      const r=validateCompanyName(v);
+      if(!r.ok){
+        if(tip)tip.textContent=r.msg||"请填写你来自的公司或团队";
+        if(input)try{input.focus()}catch(e){}
+        return;
+      }
+      A.company=v;
+      closeCompanyModal();
+      gen();
+    }
+
     function share(){
       var roleId=(latestResult&&latestResult.id)||"";
       var isOnResult=!!roleId; // 有 roleId 代表当前已经在结果页
@@ -3606,20 +3732,32 @@
     })();
 
     /* =========================================================
-     * AI 设计人格测试：6 维 × 6 角色 结果计算（v4：按 scoreRole 驱动）
+     * AI 设计人格测试：6 维 × 6 角色 结果计算（v5：支持 option 级 scoreRole 加权）
      *
-     * 计算关系不再绑在 qid / 题号上，而是绑在题目的 scoreRole / scoreKind 字段上：
-     *   - 普通题（single / multi）：question.scoreRole = "d1".."d6"
+     * 计算关系不再绑在 qid / 题号上，而是绑在题目/选项的 scoreRole / scoreKind / scoreValue 字段上：
+     *
+     *   【新】option 级加权（推荐路径）：
+     *     - question.scoreKind = "optionRole"（或选项里任一带 scoreRole）
+     *     - 每个 option：{ scoreRole:"dX", scoreValue:N }（scoreValue 默认 1）
+     *     - 用户每勾选一个 option，就把 scoreValue 累加到对应维度（raw）
+     *     - 归一化：radar[d] = round(raw[d] / dimensionMaxScore[d] × 100)
+     *       dimensionMaxScore 来自 cfg.meta.dimensionMaxScore，若缺省则用所有题里该维度理论最大之和自动推算
+     *     - 选出 argmax(radar[d]) 作为 finalRole
+     *
+     *   【旧】普通题（single / multi）：question.scoreRole = "d1".."d6"
      *       该题的 base 分累加到对应维度。
      *       base 公式：勾选数 / 选项总数。单选勾 1 个；多选勾几个就几个。
      *       *例外*：兼容旧单选题 ABCD 为痛点 4 档（A 最轻…D 最重）——
      *       当单选题没有 painScaleDisabled 标记时，视 A→1, B→2, C→3, D→4（再 / 选项数）。
      *       结果都落在 [1/n, 1.0]，可无缝切换题型。
-     *   - 排序题（rank）：question.scoreKind = "rankWeights" 且每个 option.scoreRole = "dX"
+     *   【旧】排序题（rank）：question.scoreKind = "rankWeights" 且每个 option.scoreRole = "dX"
      *       用户把某选项排在第 r 名（1..6）→ 其对应维度获得 weight[r] 的权重：
      *         1st=1.5, 2nd=1.25, 3rd=1.0, 4th=0.85, 5th=0.7, 6th=0.6
      *       未排名的维度权重默认 = 0.6（第 6 档）。
      *   - 其它题（mapsToRoles=false 或没打 scoreRole）：不参与计算。
+     *
+     * 优先级：optionRole 路径 > 旧 rank/single/multi 路径。
+     * 如果一张问卷里同时存在两种路径的题，两路分数都算，最终按 radar 值比较。
      *
      * 最终：
      *   score[d] = base[d] × weight[d]           // 范围 [0.25*0.6, 1.0*1.5] = [0.15, 1.5]
@@ -3664,6 +3802,76 @@
         if(opts&&opts.questions)return opts.questions;
         if(typeof window!=="undefined"&&window.__QUIZ_QUESTIONS__)return window.__QUIZ_QUESTIONS__;
         return {};
+      }
+      function getDimensionMaxScore(opts){
+        /* 优先用外部传入（opts.dimensionMaxScore）→ 再找 window.__QUIZ_DIM_MAX__（由 cfg.meta.dimensionMaxScore 写入）
+           如果都没有，返回 null，调用方需要用"自动推算"兜底（见下面 autoDimensionMax）。 */
+        if(opts&&opts.dimensionMaxScore&&typeof opts.dimensionMaxScore==="object")return opts.dimensionMaxScore;
+        if(typeof window!=="undefined"&&window.__QUIZ_DIM_MAX__&&typeof window.__QUIZ_DIM_MAX__==="object")return window.__QUIZ_DIM_MAX__;
+        return null;
+      }
+
+      /* 自动推算每个维度的理论最大分：遍历所有题目，把单选/多选对该维度的潜在最大贡献累加起来。
+         - single（optionRole）：该题所有选项里该维度权重的最大值（只能选一个）
+         - multi（optionRole）：该题所有选项里该维度权重之和（可全选） */
+      function autoDimensionMax(questions){
+        var out={d1:0,d2:0,d3:0,d4:0,d5:0,d6:0};
+        Object.keys(questions||{}).forEach(function(qid){
+          var q=questions[qid];
+          if(!q||q.mapsToRoles===false)return;
+          var opts=q.options||[];
+          /* 只处理 optionRole 路径（每选项自带 scoreRole） */
+          var hasOptRole=opts.some(function(o){return o&&o.scoreRole;});
+          if(!hasOptRole)return;
+          if(q.type==="single"){
+            /* 每维度取最大 */
+            var maxByDim={d1:0,d2:0,d3:0,d4:0,d5:0,d6:0};
+            opts.forEach(function(o){
+              if(!o||!o.scoreRole)return;
+              var k=String(o.scoreRole).toLowerCase();
+              if(maxByDim[k]==null)return;
+              var v=Number(o.scoreValue);
+              if(!isFinite(v))v=1;
+              if(v>maxByDim[k])maxByDim[k]=v;
+            });
+            Object.keys(maxByDim).forEach(function(k){out[k]+=maxByDim[k];});
+          }else{
+            /* multi / rank 等：全选 */
+            opts.forEach(function(o){
+              if(!o||!o.scoreRole)return;
+              var k=String(o.scoreRole).toLowerCase();
+              if(out[k]==null)return;
+              var v=Number(o.scoreValue);
+              if(!isFinite(v))v=1;
+              out[k]+=v;
+            });
+          }
+        });
+        return out;
+      }
+
+      /* 累加 option 级分到 rawByDim[]，返回是否命中（至少一个维度被加分） */
+      function accumulateOptionRole(q,ans,rawByDim){
+        if(!q||!q.options||!q.options.length)return false;
+        var optMap={};
+        q.options.forEach(function(o){
+          if(!o||o.key==null)return;
+          optMap[String(o.key).trim().toUpperCase()]=o;
+        });
+        var selected=toArray(ans);
+        if(!selected.length)return false;
+        var hit=false;
+        selected.forEach(function(k){
+          var o=optMap[k];
+          if(!o||!o.scoreRole)return;
+          var di=resolveDimIndex(o.scoreRole);
+          if(di<0)return;
+          var v=Number(o.scoreValue);
+          if(!isFinite(v))v=1;
+          rawByDim[di]+=v;
+          hit=true;
+        });
+        return hit;
       }
 
       /* 普通题（single / multi）→ 该题所绑维度的 base 贡献 */
@@ -3718,6 +3926,10 @@
         var weightByDim=[DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT,DEFAULT_UNRANKED_WEIGHT];
         var rankByDim=[0,0,0,0,0,0];
 
+        /* optionRole 路径：累加每选项的 scoreValue 到对应维度 */
+        var rawByDim=[0,0,0,0,0,0];
+        var hasOptionRoleAny=false;
+
         Object.keys(questions).forEach(function(qid){
           var q=questions[qid];
           if(!q)return;
@@ -3732,7 +3944,15 @@
             });
             return;
           }
-          /* 普通题：必须有 scoreRole */
+          /* 新：option 自带 scoreRole / scoreValue */
+          var hasOptRole=(q.options||[]).some(function(o){return o&&o.scoreRole;});
+          if(q.scoreKind==="optionRole"||hasOptRole){
+            if(accumulateOptionRole(q,answers[qid],rawByDim)){
+              hasOptionRoleAny=true;
+            }
+            return;
+          }
+          /* 旧普通题：必须有 scoreRole */
           var di=resolveDimIndex(q.scoreRole);
           if(di<0)return;
           var b=baseForQuestion(q,answers[qid]);
@@ -3745,6 +3965,38 @@
 
         var finalByDim=baseByDim.map(function(b,i){return b*weightByDim[i];});
 
+        /* 如果走了 optionRole 路径，radarByDim 用 raw/max 归一化；否则用旧 final/MAX_SCORE */
+        var radarByDim;
+        if(hasOptionRoleAny){
+          var dimMax=getDimensionMaxScore(opts);
+          if(!dimMax)dimMax=autoDimensionMax(questions);
+          /* 归一化模式：base20sqrt（默认，保底 20 + sqrt 柔化）/ base20linear / linear */
+          var mode=(opts&&opts.normalizationMode)||(typeof window!=="undefined"&&window.__QUIZ_NORM_MODE__)||"base20sqrt";
+          var BASE=20,SPAN=80;
+          radarByDim=DIMENSIONS.map(function(dim,i){
+            var key=dim.id; /* "d1".."d6" */
+            var mx=Number(dimMax[key]);
+            if(!isFinite(mx)||mx<=0)return BASE;
+            var ratio=rawByDim[i]/mx;
+            if(ratio<0)ratio=0;
+            if(ratio>1)ratio=1;
+            var v;
+            if(mode==="linear"){
+              v=Math.round(ratio*100);
+            }else if(mode==="base20linear"){
+              v=Math.round(BASE+ratio*SPAN);
+            }else{ /* base20sqrt */
+              v=Math.round(BASE+Math.sqrt(ratio)*SPAN);
+            }
+            if(v<0)v=0;if(v>100)v=100;
+            return v;
+          });
+          /* 覆盖 finalByDim 作为 winner 判定依据（归一化后的值） */
+          finalByDim=radarByDim.slice();
+          /* 同时保留 rawByDim 到 baseByDim 方便调试展示 */
+          rawByDim.forEach(function(v,i){if(baseByDim[i]===0)baseByDim[i]=v;});
+        }
+
         /* 选最终维度：finalScore desc；并列时 q7 排名 asc；再并列 base desc；再并列 d1→d6 */
         var order=DIMENSIONS.map(function(_,i){return i;});
         order.sort(function(a,b){
@@ -3756,12 +4008,14 @@
         });
         var winnerIdx=order[0];
 
-        var radarByDim=finalByDim.map(function(v){
-          var r=Math.round(v/MAX_SCORE*100);
-          if(!isFinite(r)||r<0)return 0;
-          if(r>100)return 100;
-          return r;
-        });
+        if(!radarByDim){
+          radarByDim=finalByDim.map(function(v){
+            var r=Math.round(v/MAX_SCORE*100);
+            if(!isFinite(r)||r<0)return 0;
+            if(r>100)return 100;
+            return r;
+          });
+        }
 
         var scores=DIMENSIONS.map(function(dim,i){
           return {
