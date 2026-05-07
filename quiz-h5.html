@@ -58,23 +58,23 @@
   <meta property="og:title" content="《好险，差点就会做设计了》">
   <meta property="og:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
   <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
-  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
-  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
+  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
+  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="《好险，差点就会做设计了》 — 你是哪位还没下班的设计大师">
   <!-- Twitter Card（部分抓取引擎 fallback） -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="《好险，差点就会做设计了》">
   <meta name="twitter:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
-  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
+  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- Schema.org（部分场景 fallback） -->
   <meta itemprop="name" content="《好险，差点就会做设计了》">
   <meta itemprop="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
-  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
+  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
-  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
+  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 微信 / QQ 专属 thumbnail 提示（非官方但部分版本有效） -->
-  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=e838771b">
+  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
   <meta name="application-name" content="Ardot · 艺术家测试">
 
@@ -3644,7 +3644,7 @@
       // 分享卡片"公网可访问图"：
       //  - 结果页：用角色主题图（对应 share-<roleId>.html 里 og:image）
       //  - 开头/过程中：用首页封面 share-cover.png
-      var posterImg=baseDir+"img/share-cover.png?v=e838771b";
+      var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       var roleShareImg=roleId?(baseDir+roleMetaImgName(roleId)):"";
       var shareImg=isOnResult&&roleShareImg?roleShareImg:posterImg;
       // 更新分享卡片 meta（社交平台/微信会重读）
@@ -3684,7 +3684,7 @@
     /* 把 roleId 映射成完整 /img/ 路径（与 share-d*.html 里的 og:image 一致；?v= 由 scripts/sync-share-version.mjs 自动维护） */
     function roleMetaImgName(roleId){
       var map={d1:"img/picasso.png?v=dd361e6f",d2:"img/hara.png?v=6ae8715a",d3:"img/mondrian.png?v=c6c0db4b",d4:"img/kusama.png?v=cf1cc87f",d5:"img/gogh.png?v=b4244665",d6:"img/monet.png?v=a5f7daa1"};
-      return map[roleId]||"img/share-cover.png?v=e838771b";
+      return map[roleId]||"img/share-cover.png?v=767a2297";
     }
 
     /* 原生分享（结果页专用）：实时截一张"当前结果页"的长图，作为分享图 */
@@ -3711,7 +3711,7 @@
     function tryShareWithImage(title,txt,shareLink,shareImg){
       return new Promise(function(resolve,reject){
         if(!navigator.canShare||!navigator.share)return reject();
-        var imgUrl=shareImg||"img/share-cover.png?v=e838771b";
+        var imgUrl=shareImg||"img/share-cover.png?v=767a2297";
         var tipToast=typeof toast==="function"?toast("正在准备分享…"):null;
         // 拉取分享图作为文件（同源 public 资源，fetch 无跨域问题）
         fetch(imgUrl,{cache:"force-cache"}).then(function(r){
@@ -3772,7 +3772,7 @@
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var shareLink=baseDir+"share-"+encodeURIComponent(role.id)+".html?v="+SHARE_BUILD;
       var rImgEl=document.getElementById("rImg");
-      var posterImg=baseDir+"img/share-cover.png?v=e838771b";
+      var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
       /* 分享卡片标题：AI时代我是「xxx」（副标题仍使用角色 tagline，保持不变） */
       var title="AI时代我是「"+(role.name||"设计大师")+"」";
