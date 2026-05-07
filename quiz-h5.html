@@ -3266,35 +3266,45 @@
         for(let x=16;x<=W;x+=128){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
         for(let y=16;y<=H;y+=128){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-        const avatarSrc=topRole&&topRole.img?topRole.img:"";
-        const loadImg=(src)=>new Promise((res)=>{
-          if(!src)return res(null);
-          const img=new Image();img.crossOrigin="anonymous";
-          img.onload=()=>res(img);img.onerror=()=>res(null);
-          img.src=src;
+        const avatarCandidates=roleImageCandidates(topRole,"back");
+        const loadFirstImg=(list)=>new Promise((res)=>{
+          const arr=uniqPaths(list);
+          let idx=0;
+          const next=()=>{
+            const src=arr[idx++];
+            if(!src)return res(null);
+            const img=new Image();img.crossOrigin="anonymous";
+            img.onload=()=>res(img);
+            img.onerror=next;
+            img.src=src;
+          };
+          next();
         });
-        loadImg(avatarSrc).then((img)=>{
-          /* 结果标题 */
+        loadFirstImg(avatarCandidates).then((img)=>{
+          /* 结果标题：保持页面样式，标题居中 + 黑底姓名块 */
           ctx.fillStyle="#111";
-          ctx.textAlign="left";
-          ctx.font="900 44px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText(RESULT_SHARE_TITLE_PREFIX,56,86);
-          ctx.font="900 66px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          wrapTextLines(ctx,"「"+(topRole.name||"设计大师")+"」",56,164,560,72,2);
+          ctx.textAlign="center";
+          ctx.font="900 50px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText(RESULT_SHARE_TITLE_PREFIX,W/2,88);
+          const nameText="「"+(topRole.name||"设计大师")+"」";
+          const nameW=Math.min(720,Math.max(520,ctx.measureText(nameText).width+72));
+          roundRect(ctx,(W-nameW)/2,118,nameW,82,0,"#111",null,0);
+          ctx.fillStyle="#fff";
+          ctx.font="900 48px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText(nameText,W/2,174);
 
-          /* 角色图 */
-          const imgX=54,imgY=230,imgW=540,imgH=520;
-          roundRect(ctx,imgX,imgY,imgW,imgH,28,"rgba(255,255,255,.72)","rgba(17,17,17,.12)",2);
+          /* B 面角色图 */
+          const imgX=50,imgY=210,imgW=560,imgH=540;
           if(img){
             const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-            const r=Math.min((imgW-36)/iw,(imgH-36)/ih);
+            const r=Math.min(imgW/iw,imgH/ih);
             const dw=iw*r,dh=ih*r;
             ctx.drawImage(img,imgX+(imgW-dw)/2,imgY+(imgH-dh)/2,dw,dh);
           }
 
           /* 分享二维码列 */
-          const qrColX=630,qrColY=250,qrColW=214,qrColH=470;
-          roundRect(ctx,qrColX,qrColY,qrColW,qrColH,24,"rgba(255,255,255,.84)","rgba(17,17,17,.12)",2);
+          const qrColX=638,qrColY=248,qrColW=212,qrColH=460;
+          roundRect(ctx,qrColX,qrColY,qrColW,qrColH,0,"rgba(255,255,255,.9)","#e5e7e5",2);
           ctx.fillStyle="#111";
           ctx.textAlign="center";
           ctx.font="800 30px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
@@ -3323,12 +3333,12 @@
           const cardY=866,cardW=386,cardH=236,gap=24;
           cards.forEach((c,i)=>{
             const x=56+i*(cardW+gap);
-            roundRect(ctx,x,cardY,cardW,cardH,22,"rgba(255,255,255,.86)","rgba(17,17,17,.12)",2);
-            ctx.fillStyle="#00b900";
+            const isMaster=i===0;
+            roundRect(ctx,x,cardY,cardW,cardH,0,isMaster?"#111":"#00EC00",isMaster?"#111":"#00EC00",2);
+            ctx.fillStyle=isMaster?"#fff":"#111";
             ctx.textAlign="left";
             ctx.font="800 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
             ctx.fillText(c.label,x+24,cardY+44);
-            ctx.fillStyle="#111";
             ctx.font="700 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
             wrapTextLines(ctx,c.val,x+24,cardY+86,cardW-48,32,4);
           });
