@@ -1067,7 +1067,17 @@
     #res .gap-item,
     #res .gap-item.master,
     #res .dim-table,
-    #res .insight-box{border-radius:0!important}
+    #res .insight-box,
+    #res .radar-wrap,
+    #res .radar-wrap.radar-full,
+    #res .substat-card{border-radius:0!important}
+
+    /* 结果页：雷达卡片 / 副属性卡片描边加粗 */
+    #res .radar-wrap,
+    #res .radar-wrap.radar-full{border:2px solid #111!important}
+    #res .substat-card{border-width:2px!important}
+    #res .substat-grid>.substat-card:nth-child(1){border:2px solid #111!important}
+    #res .substat-grid>.substat-card:nth-child(2){border:2px solid #111!important}
 
     /* 口头禅 */
     #res .mantra-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
