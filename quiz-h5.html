@@ -4863,10 +4863,45 @@
       set('meta[name="twitter:description"]',"content",opts.desc);
       set('meta[itemprop="description"]',"content",opts.desc);
       set('meta[name="description"]',"content",opts.desc);
+      /* og:image 全家桶：og:image / og:image:secure_url / twitter:image / itemprop=image
+         + link[rel=image_src]（电脑微信/老版 IE）+ meta[name=thumbnail]（QQ/微信旧抓取器）
+         一张图同步覆盖所有抓取入口，避免某些平台读到旧值 */
       set('meta[property="og:image"]',"content",opts.img);
+      set('meta[property="og:image:secure_url"]',"content",opts.img);
       set('meta[name="twitter:image"]',"content",opts.img);
       set('meta[itemprop="image"]',"content",opts.img);
+      set('link[rel="image_src"]',"href",opts.img);
+      set('meta[name="thumbnail"]',"content",opts.img);
       if(opts.link){set('meta[property="og:url"]',"content",opts.link);}
+      /* DOM 兜底：部分微信版本在抓不到 og:image 时会扫 DOM 第一张大图作为分享缩略图。
+         我们在 body 顶部插一张隐藏但实际有 width/height 的 <img>，src 与 og:image 同步，
+         保证哪怕 head 那条没被抓到，也至少有图。 */
+      if(opts.img){injectShareFallbackImg(opts.img);}
+    }
+    /* 在 body 顶部插入一张"对人不可见、对爬虫可见"的大图，src 同步当前分享图。
+       关键：不能用 display:none / visibility:hidden（部分微信抓取器会跳过），
+       改用极小的 opacity 0.01 + 绝对定位到屏幕外，但保留实际宽高。 */
+    function injectShareFallbackImg(src){
+      try{
+        if(!src)return;
+        var id="__share_fallback_img__";
+        var img=document.getElementById(id);
+        if(!img){
+          img=document.createElement("img");
+          img.id=id;
+          img.alt=document.title||"share";
+          img.style.cssText="position:absolute;left:-9999px;top:0;width:600px;height:600px;opacity:.01;pointer-events:none;z-index:-1";
+          img.width=600;img.height=600;
+          if(document.body){
+            document.body.insertBefore(img,document.body.firstChild);
+          }else{
+            document.addEventListener("DOMContentLoaded",function(){
+              if(document.body)document.body.insertBefore(img,document.body.firstChild);
+            });
+          }
+        }
+        if(img.getAttribute("src")!==src)img.setAttribute("src",src);
+      }catch(e){}
     }
 
     /** 尝试调用微信 JSSDK 设置分享（需要后端 /api/wx-signature 返回签名）。

@@ -24,8 +24,10 @@
   <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/mondrian.png?v=c6c0db4b">
   <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/mondrian.png?v=c6c0db4b">
   <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/mondrian.png?v=c6c0db4b">
-  <meta http-equiv="refresh" content="0; url=quiz-h5.html">
-  <script>location.replace("quiz-h5.html");</script>
+  <!-- 延迟 1.2 秒再跳转：给微信/社交平台爬虫足够时间读完上方的 og:* meta，
+       否则 0 秒立即跳走会让爬虫跟着重定向去 quiz-h5.html，导致分享卡缩略图错位/丢失 -->
+  <meta http-equiv="refresh" content="1; url=quiz-h5.html">
+  <script>setTimeout(function(){location.replace("quiz-h5.html");},1200);</script>
   <style>body{margin:0;background:#faf9f7}</style>
 </head>
 <body></body>
