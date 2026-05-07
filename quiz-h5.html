@@ -4132,9 +4132,10 @@
           const hl=ROLE_NAME_HIGHLIGHT[topRole.name||""]||"";
           const slogan=ROLE_SHARE_SLOGAN[topRole.name||""]||(rc.shareLine||rc.tagline||"");
 
-          /* ===== 顶部用户身份区：圆头像 32 + 右侧两行文字（昵称 / kicker）整体垂直居中 ===== */
-          const headSize=32;
-          const headX=padX,headY=24;
+          /* ===== 顶部用户身份区：圆头像 26 + 右侧两行文字（昵称 / kicker）整体垂直居中
+             （较之前 32 缩小，整体更克制，避免抢镜主标题） ===== */
+          const headSize=26;
+          const headX=padX,headY=22;
           /* 头像背景（淡蓝灰） */
           ctx.save();
           ctx.beginPath();
@@ -4152,7 +4153,7 @@
           }else{
           /* 兜底图标字号根据头像调整 */
             ctx.fillStyle="#aab2c0";
-            ctx.font="700 14px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+            ctx.font="700 12px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
             ctx.textAlign="center";
             ctx.textBaseline="middle";
             const initial=(me.name||"?").trim().charAt(0).toUpperCase()||"?";
@@ -4161,11 +4162,12 @@
           }
           ctx.restore();
 
-          /* 右侧两行文字：昵称 16px 粗 + kicker 14px 细，整体与头像垂直居中 */
-          const textX=headX+headSize+10;
-          const nameSize=16;
-          const kickerSize=14;
-          const lineGap=4;          /* 两行之间的留白 */
+          /* 右侧两行文字：昵称 13px 粗 + kicker 11px 细，整体与头像垂直居中
+             （视觉收敛，让 H1 主名/角色立绘成为画面焦点） */
+          const textX=headX+headSize+8;
+          const nameSize=13;
+          const kickerSize=11;
+          const lineGap=3;          /* 两行之间的留白 */
           /* 用 middle 基线渲染，让两行视觉中线严格对齐头像中线 */
           const headCenterY=headY+headSize/2;
           const nameCenterY=headCenterY-(nameSize/2+lineGap/2);
@@ -4243,8 +4245,8 @@
           }
 
           /* ===== 角色立绘（尽量铺大，不与底栏重叠） ===== */
-          /* 底栏区域：QR 72 + 上下边距 27 = 126，预留给底部 */
-          const footerReserve=27+72+27; /* 27 上 + 72 QR + 27 下 = 126 */
+          /* 底栏区域：QR 92 + 上下边距 24 = 140，预留给底部 */
+          const footerReserve=24+92+24; /* 24 上 + 92 QR + 24 下 = 140 */
           const avatarTop=sloganY+sloganBoxH+8;
           const avatarMaxH=H-footerReserve-avatarTop-2;
           if(img){
@@ -4262,13 +4264,13 @@
           }
 
           /* ===== 底部：左下 brand logo，右下 QR 码 + 文案 =====
-             二维码 72×72，距画布右边 27、下边 27 */
-          const qrSize=72;
-          const qrMargin=27;
+             二维码 92×92（放大，扫描更友好），距画布右边 24、下边 24 */
+          const qrSize=92;
+          const qrMargin=24;
           const qrX=W-qrMargin-qrSize;
           const qrY=H-qrMargin-qrSize;
-          /* logo 与 QR 在同一行，垂直对齐到 QR 中线 */
-          const logoH=36;
+          /* logo 高度 26（缩小，与 QR 体量更协调），垂直居中对齐 QR 中线 */
+          const logoH=26;
           if(logoImg){
             const lw=logoImg.naturalWidth||logoImg.width,lh=logoImg.naturalHeight||logoImg.height;
             const lr=logoH/lh;
@@ -4279,8 +4281,8 @@
             roundRect(ctx,padX,logoY,logoH,logoH,6,"#111",null,0);
             ctx.fillStyle="#fff";
             ctx.textAlign="center";
-            ctx.font="900 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-            ctx.fillText("a",padX+logoH/2,logoY+logoH-8);
+            ctx.font="900 16px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+            ctx.fillText("a",padX+logoH/2,logoY+logoH-6);
           }
 
           try{
@@ -4288,16 +4290,16 @@
             drawQrToCanvas(ctx,qr,qrX,qrY,qrSize,true);
           }catch(err){console.warn("QR encode 失败",err);}
           /* QR 左侧两行文案，整体与 QR 垂直居中：
-             第一行"扫码测试" 14px 粗
-             第二行"测测你是什么设计大师" 10px 细（避免左端被 logo 挤压） */
+             第一行"扫码测试" 11px 粗
+             第二行"测测你是什么设计大师" 9px 细（避免左端被 logo 挤压） */
           ctx.fillStyle="#111";
           ctx.textAlign="right";
           ctx.textBaseline="alphabetic";
-          ctx.font="700 14px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          ctx.font="700 11px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
           ctx.fillText("扫码测试",qrX-10,qrY+qrSize/2-2);
           ctx.fillStyle="#9a9b95";
-          ctx.font="500 10px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
-          ctx.fillText("测测你是什么设计大师",qrX-10,qrY+qrSize/2+16);
+          ctx.font="500 9px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          ctx.fillText("测测你是什么设计大师",qrX-10,qrY+qrSize/2+13);
 
           try{resolve(canvas.toDataURL("image/png"));}
           catch(e){reject(e);}
