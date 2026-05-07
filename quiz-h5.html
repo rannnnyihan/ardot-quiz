@@ -106,25 +106,24 @@
     .scene.active{display:block}
     .welcome.scene.active{display:flex}
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    /* ===== 首页（新版）：垂直排列 ===== */
+    /* ===== 首页（新版）：垂直排列；详细布局规则见下方 body:has(#s0.welcome.active) ===== */
     .welcome{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-      min-height:calc(100vh - 120px);
-      padding:0;margin:-12px 0 0;
+      width:100%;
+      padding:0;margin:0;
       background:#ffffff}
     .welcome-head{display:none}
     .welcome-head-art{display:block;width:100%;height:auto;margin:0}
     /* 按钮 */
-    .welcome-cta{display:flex;justify-content:center;margin:28px 0 0}
-    /* 人物头像组 */
+    .welcome-cta{display:flex;justify-content:center;margin:0}
+    /* 人物海报"显示框"——基础占位，详细高度由首页规则覆盖 */
     .welcome-poster{position:relative;display:block;
-      width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
-      height:392px;
+      width:100%;
       background-image:url("img/home-poster.png?v=20260506");
-      background-repeat:no-repeat;background-position:center bottom;
-      background-size:auto 100%;
+      background-repeat:no-repeat;background-position:center center;
+      background-size:contain;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 底部标签图片 - 固定尺寸 */
-    .welcome-down-tag{display:block;width:166px;height:17px;margin:51px auto calc(20px + env(safe-area-inset-bottom,0px))}
+    .welcome-down-tag{display:block;width:166px;height:17px;margin:0 auto}
     .welcome-cover,
     .master-preview{display:none!important}
     /* 按钮样式 */
@@ -813,9 +812,9 @@
     }
 
     /* ============================================================ */
-    /* ==========  新版首屏：白底 · 文字在上 · 插画贴底 ========== */
+    /* ==========  新版首屏：白底 · 头图在上 · 海报居中 · down 贴底 ========== */
     /* ============================================================ */
-    /* 首屏 body 背景换成小网格，并去掉底部安全区 padding，避免底下留一条空白 */
+    /* 首屏 body 背景换成小网格，去掉默认 safe-area padding，避免顶部/底部留空白 */
     body:has(#s0.welcome.active){
       background-color:#fff!important;
       background-image:
@@ -824,59 +823,87 @@
       background-size:32px 32px!important;
       background-position:center top!important;
       background-attachment:fixed!important;
-      padding-bottom:0!important
+      padding-top:0!important;
+      padding-bottom:0!important;
+      overflow:hidden;                   /* 首页禁止滚动 */
     }
+    /* 首屏 .bar 进度条容器隐藏（首页不显示进度条，避免顶部 3px 黑/绿条空位） */
+    body:has(#s0.welcome.active) .bar{display:none!important}
+    /* 首屏全局题号也隐藏 */
+    body:has(#s0.welcome.active) .q-num-global{display:none!important}
+
     body:has(#s0.welcome.active) .wrap{
-      padding-top:0;                     /* 顶部 padding 由 .welcome 自己的 padding 负责 */
-      padding-bottom:0;                  /* 插画贴底，不留额外空白 */
-      padding-left:0;padding-right:0;
-      max-width:720px;
+      padding:0!important;
+      max-width:none;
+      margin:0;
+      width:100%;
+      height:100dvh;
+      height:100vh;                       /* 兜底 */
+      height:100dvh;                      /* 现代浏览器 */
     }
-    /* 首屏 welcome 容器：纵向 flex，文字在上、插画在下
-       min-height 用 100dvh，并扣掉顶栏 56px，确保整个容器正好撑到视口底边 */
+    /* 首屏 welcome 容器：100dvh，纵向 flex 严格分配空间，禁止溢出滚动 */
     body:has(#s0.welcome.active) .welcome{
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
-      align-items:stretch;
+      align-items:center;
+      justify-content:flex-start;
       margin:0;
-      min-height:calc(100vh - 56px);     /* 兜底 */
-      min-height:calc(100dvh - 56px);    /* 现代浏览器：动态视口，地址栏收起也能贴底 */
       width:100%;
-      padding:0 0 calc(28px + env(safe-area-inset-bottom,0px));
+      height:100vh;
+      height:100dvh;
+      min-height:0;
+      padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+      box-sizing:border-box;
       border-radius:0;
       background:transparent;
-      overflow:visible;                  /* 关键：让底部插画的 100vw 溢出可见，不被裁 */
+      overflow:hidden;                   /* 首页严格不滚动 */
       box-shadow:none;
     }
-    /* 顶部文字容器 */
-    body:has(#s0.welcome.active) .welcome-head{
-      padding:0 28px 0;
+    /* 顶部 head 插画：紧贴顶部，宽度满屏，按比例缩放 */
+    body:has(#s0.welcome.active) .welcome-head-art{
+      flex:0 0 auto;
+      display:block;
       width:100%;
-      max-width:700px;
+      max-width:520px;
+      height:auto;
+      max-height:28vh;                   /* 限制最大高度，避免在窄屏吃掉太多空间 */
+      object-fit:contain;
+      object-position:center top;
       margin:0 auto;
     }
-    /* 欢迎页下：把插画推到 flex 容器底部（只管定位，样式走上面的 .welcome-poster）
-       margin-bottom 负值是为了吃掉 PNG 底部可能存在的 1~2% 透明像素条，让画面真的贴底 */
+    /* 中间海报"显示框"：与 head/down 各自保持固定边距，自身按可用空间缩放 */
     body:has(#s0.welcome.active) .welcome-poster{
-      margin-top:auto;                   /* 推到最底 */
-      margin-bottom:0;                   /* 紧贴 .welcome 底边 */
+      flex:1 1 auto;                     /* 吃掉剩余空间 */
+      width:100%;
+      max-width:520px;
+      margin:16px auto 0;                /* 与上方 head 之间固定 16px 间距 */
+      background-image:url("img/home-poster.png?v=20260506");
+      background-repeat:no-repeat;
+      background-position:center center;
+      background-size:contain;
+      min-height:0;                      /* 关键：允许 flex 子项收缩 */
       align-self:stretch;
-      display:block;
     }
-    /* 按钮回归文档流 */
+    /* 按钮区：固定高度，海报与按钮间 16px */
     body:has(#s0.welcome.active) .welcome-cta{
+      flex:0 0 auto;
       position:static;
-      left:auto;
-      bottom:auto;
-      transform:none;
-      margin:30px auto 0;
+      margin:16px auto 0;
       width:100%;
       max-width:440px;
       padding:0 20px;
+      box-sizing:border-box;
       z-index:auto;
     }
-    /* 旧的底部渐变遮罩关掉（新版没 ::after 规则，这里保底） */
+    /* 底部 down 标签：固定边距贴底 */
+    body:has(#s0.welcome.active) .welcome-down-tag{
+      flex:0 0 auto;
+      display:block;
+      width:166px;
+      height:17px;
+      margin:14px auto 16px;             /* 与按钮 14px、与底部 16px */
+    }
+    /* 旧的底部渐变遮罩关掉 */
     body:has(#s0.welcome.active) .welcome::after{display:none}
 
     /* ============================================================ */
