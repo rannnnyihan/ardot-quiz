@@ -1164,22 +1164,18 @@
     /* ============================================================ */
     /* ==========  结果态皮肤：白底 + 格纹 + 顶/底绿色渐变 ========== */
     /* ============================================================ */
-    /* 结果页：顶/底绿色渐变 + 全屏浅灰格纹（格纹始终在最上层显示） */
+    /* 结果页：整屏统一浅绿底色 + 格纹（去掉原来的顶部/中段灰白渐变，避免视觉上分层） */
     body:has(#res.active){
-      background-color:#F6F6F6!important;
+      background-color:#C5FFD9!important;
       background-image:
-        /* 1. 格纹横线（最上层，始终可见） */
+        /* 格纹横线 */
         linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
-        /* 2. 格纹竖线 */
-        linear-gradient(90deg, rgba(17,17,17,.05) 1px, transparent 1px),
-        /* 3. 顶部绿色渐变 → F6F6F6（到图片中间约 380px） */
-        linear-gradient(to bottom, #C5FFD9 0%, rgba(246,246,246,1) 380px),
-        /* 4. 底部绿色渐变（从底向上 220px） */
-        linear-gradient(to top, rgba(197,255,217,.85) 0%, rgba(197,255,217,0) 220px)!important;
-      background-size:32px 32px, 32px 32px, 100% 100%, 100% 100%!important;
-      background-position:center top, center top, top, bottom!important;
-      background-repeat:repeat, repeat, no-repeat, no-repeat!important;
-      background-attachment:fixed, fixed, fixed, fixed!important;
+        /* 格纹竖线 */
+        linear-gradient(90deg, rgba(17,17,17,.05) 1px, transparent 1px)!important;
+      background-size:32px 32px, 32px 32px!important;
+      background-position:center top, center top!important;
+      background-repeat:repeat, repeat!important;
+      background-attachment:fixed, fixed!important;
       color:#1a1d1a!important
     }
     body:has(#res.active) .bar{background:transparent!important}
