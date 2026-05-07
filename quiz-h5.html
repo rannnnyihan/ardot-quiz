@@ -4241,8 +4241,9 @@
           }
 
           /* ===== 角色立绘（尽量铺大，不与底栏重叠） ===== */
-          /* 底栏区域：QR 92 + 上下边距 24 = 140，预留给底部 */
-          const footerReserve=24+92+24; /* 24 上 + 92 QR + 24 下 = 140 */
+          /* 底栏区域：QR 92 + 上 22 + 下 14 = 128，预留给底部
+             （下边距收紧到 14，让 logo / 二维码更贴近画布底边） */
+          const footerReserve=22+92+14; /* 22 上 + 92 QR + 14 下 = 128 */
           const avatarTop=sloganY+sloganBoxH+8;
           const avatarMaxH=H-footerReserve-avatarTop-2;
           if(img){
@@ -4260,11 +4261,12 @@
           }
 
           /* ===== 底部：左下 brand logo，右下 QR 码 + 文案 =====
-             二维码 92×92（放大，扫描更友好），距画布右边 24、下边 24 */
+             二维码 92×92，距画布右边 14、下边 14（更贴右贴底，整体收紧） */
           const qrSize=92;
-          const qrMargin=24;
-          const qrX=W-qrMargin-qrSize;
-          const qrY=H-qrMargin-qrSize;
+          const qrMarginR=14;   /* 右边距：更靠近右边缘 */
+          const qrMarginB=14;   /* 下边距：更贴近底边 */
+          const qrX=W-qrMarginR-qrSize;
+          const qrY=H-qrMarginB-qrSize;
           /* logo 高度 26（缩小，与 QR 体量更协调），垂直居中对齐 QR 中线 */
           const logoH=26;
           if(logoImg){
