@@ -3248,10 +3248,10 @@
       }
     }
 
-    /* 构建分享图：Canvas -> dataURL。只保留结果标题、角色图、两个副属性和二维码列。 */
+    /* 构建分享图：Canvas -> dataURL。保留结果标题、角色图、人格 slogan、两个副属性和二维码列。 */
     function buildShareImage(topRole,rc,link){
       return new Promise((resolve,reject)=>{
-        const W=900,H=1200;
+        const W=900,H=1340;
         const canvas=document.createElement("canvas");
         canvas.width=W;canvas.height=H;
         const ctx=canvas.getContext("2d");
@@ -3322,15 +3322,48 @@
           ctx.fillText("ardot-quiz.edgeone.dev",qrColX+qrColW/2,qrColY+qrColH-36);
 
           /* 你的两个副属性 */
+          const slogan=(rc.tagline||topRole.desc||"").trim();
+          const sloganBoxX=50,sloganBoxY=770,sloganBoxW=800;
+          const sloganLineH=36;
+          ctx.font="600 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          /* 先估算行数，决定 slogan 块高度 */
+          let sloganLines=0;
+          if(slogan){
+            const tmp=(slogan).split("");
+            let line="";
+            for(let i=0;i<tmp.length;i++){
+              const test=line+tmp[i];
+              if(ctx.measureText(test).width>sloganBoxW-90&&line){sloganLines++;line=tmp[i];}
+              else{line=test;}
+              if(sloganLines>=3)break;
+            }
+            if(line&&sloganLines<3)sloganLines++;
+            if(sloganLines<1)sloganLines=1;
+          }
+          const sloganBoxH=slogan?Math.max(80,sloganLines*sloganLineH+44):0;
+          if(slogan){
+            roundRect(ctx,sloganBoxX,sloganBoxY,sloganBoxW,sloganBoxH,0,"#f7f8f7","#e5e7e5",2);
+            /* 左上角绿色引号 */
+            ctx.fillStyle="#00EC00";
+            ctx.textAlign="left";
+            ctx.font="900 48px Georgia,serif";
+            ctx.fillText("\u201C",sloganBoxX+22,sloganBoxY+50);
+            /* 金句正文 */
+            ctx.fillStyle="#1a1d1a";
+            ctx.font="600 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+            wrapTextLines(ctx,slogan,sloganBoxX+74,sloganBoxY+44,sloganBoxW-90,sloganLineH,3);
+          }
+
+          const subStatTitleY=(slogan?sloganBoxY+sloganBoxH:760)+50;
           ctx.fillStyle="#111";
           ctx.textAlign="left";
           ctx.font="900 34px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("你的两个副属性",56,830);
+          ctx.fillText("你的两个副属性",56,subStatTitleY);
           const cards=[
             {label:"你的大师基因",val:rc.masterState||"—"},
             {label:"你的下班阻碍",val:rc.userState||"—"}
           ];
-          const cardY=866,cardW=386,cardH=236,gap=24;
+          const cardY=subStatTitleY+36,cardW=386,cardH=236,gap=24;
           cards.forEach((c,i)=>{
             const x=56+i*(cardW+gap);
             const isMaster=i===0;
