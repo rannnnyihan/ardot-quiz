@@ -16,6 +16,7 @@
 import { getKV } from "./api/_utils.js";
 
 const CONFIG_KEY = "quiz_config_v2";
+const SHARE_CARD_SUBTITLE = "测一测你是什么类型的大师";
 
 // 需要被替换的目标路径。命中才改写，其他走原响应。
 // 注意不要拦截 share-d1~d6.html（它们是角色专属跳转页，标题语义不同）。
@@ -52,8 +53,8 @@ export async function onRequest(context) {
   if (!meta) return resp;
 
   const title = plainText(meta.mainTitle || "");
-  const desc = plainText(meta.subtitle || "");
-  // 两个都没有就不改，避免把合法的默认文案洗空
+  const desc = SHARE_CARD_SUBTITLE;
+  // 主标题没有时也要继续固定写入分享副标题
   if (!title && !desc) return resp;
 
   let html = await resp.text();
@@ -67,9 +68,9 @@ export async function onRequest(context) {
     html = rewriteMetaByAttr(html, "name", "twitter:description", desc);
     html = rewriteMetaByAttr(html, "itemprop", "description", desc);
   }
-  // og:image:alt = 标题 + 副标题，和前端 syncDocMetaFromConfig 里的格式保持一致
+  // og:image:alt = 标题 + 固定副标题，和前端 syncDocMetaFromConfig 里的格式保持一致
   if (title) {
-    const altText = title + " — " + (desc || "AI 设计师人格测试");
+    const altText = title + " — " + desc;
     html = rewriteMetaByAttr(html, "property", "og:image:alt", altText);
   }
 

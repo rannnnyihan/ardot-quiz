@@ -18,13 +18,14 @@
       if(!raw)return;
       var cfg=JSON.parse(raw);
       var meta=(cfg&&cfg.meta)||{};
+      var shareSubtitle="测一测你是什么类型的大师";
       /* 剥掉主标题里的 <br>/<em> 等 HTML 标签 —— 这里还没 DOM，手工正则剥 */
       function plain(s){
         if(!s)return"";
         return String(s).replace(/<br\s*\/?>/gi," ").replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim();
       }
       var title=plain(meta.mainTitle||"");
-      var desc =plain(meta.subtitle ||"");
+      var desc=shareSubtitle;
       if(title){
         document.title=title;
         /* 同步 head 里已有的所有"标题类"meta；社交平台抓页面时读的是这些 */
@@ -34,12 +35,10 @@
           if(el)el.setAttribute("content",title);
         }
       }
-      if(desc){
-        var descSel=['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]','meta[itemprop="description"]'];
-        for(var k=0;k<descSel.length;k++){
-          var e2=document.querySelector(descSel[k]);
-          if(e2)e2.setAttribute("content",desc);
-        }
+      var descSel=['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]','meta[itemprop="description"]'];
+      for(var k=0;k<descSel.length;k++){
+        var e2=document.querySelector(descSel[k]);
+        if(e2)e2.setAttribute("content",desc);
       }
       /* 暴露给后续 syncDocMetaFromConfig() 做 iOS/WeChat tab 刷新 hack 用 */
       window.__earlyTitle=title||"";
@@ -50,26 +49,26 @@
   <link rel="apple-touch-icon" href="https://ardot-quiz.edgeone.dev/img/image%2023.png?v=4">
 
   <!-- 分享卡片元数据（统一：首页海报 poster.png，兼容微信聊天/朋友圈/电脑微信/老版客户端） -->
-  <meta name="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta name="description" content="测一测你是什么类型的大师">
   <meta name="keywords" content="AI设计,设计师人格测试,还没下班的大师,Ardot">
   <!-- Open Graph（微信 / Facebook / 大部分社交平台主抓） -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Ardot">
   <meta property="og:title" content="《好险，差点就会做设计了》">
-  <meta property="og:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta property="og:description" content="测一测你是什么类型的大师">
   <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
   <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="《好险，差点就会做设计了》 — 你是哪位还没下班的设计大师">
+  <meta property="og:image:alt" content="《好险，差点就会做设计了》 — 测一测你是什么类型的大师">
   <!-- Twitter Card（部分抓取引擎 fallback） -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="《好险，差点就会做设计了》">
-  <meta name="twitter:description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta name="twitter:description" content="测一测你是什么类型的大师">
   <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- Schema.org（部分场景 fallback） -->
   <meta itemprop="name" content="《好险，差点就会做设计了》">
-  <meta itemprop="description" content="测一测你是哪位还没下班的设计大师 · 共 11 题 · 预计 4 分钟">
+  <meta itemprop="description" content="测一测你是什么类型的大师">
   <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
   <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
@@ -1178,7 +1177,7 @@
     <div class="res" id="res">
       <div class="res-card">
         <div class="res-top">
-          <div class="res-kicker">AI设计时代你是</div>
+          <div class="res-kicker">我的设计大师人格是</div>
           <div class="res-name" id="rName">「草稿太多的毕加班索」</div>
           <div class="res-avatar-frame">
             <button class="res-avatar-flip" id="rFlip" type="button" aria-label="点击翻看另一面">
@@ -1332,6 +1331,8 @@
     let latestResult={id:"",name:""};
     let latestSurveyIndex=-1;
     const QUIZ_CFG_KEY="ardot_quiz_config_v2";
+    const SHARE_CARD_SUBTITLE="测一测你是什么类型的大师";
+    const RESULT_SHARE_TITLE_PREFIX="我的设计大师人格是";
     const BTN_FOR_SCALE={q4:"b4",q5:"b5",q6:"b6",q7:"b7"};
     function safePositiveInt(v,fallback){
       const n=Math.round(Number(v));
@@ -1853,20 +1854,20 @@
         return (tmp.textContent||tmp.innerText||"").replace(/\s+/g," ").trim();
       }catch(e){return String(s).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();}
     }
-    /* admin 里的主/副标题要同步到：① 浏览器 tab ② 微信/社交平台抓取的 head meta。
-       这样管理员改完 admin 主副标题、推送到服务端后，所有地方的标题都会跟着变。
+    /* admin 里的主标题要同步到：① 浏览器 tab ② 微信/社交平台抓取的 head meta。
+       分享卡片副标题固定为 SHARE_CARD_SUBTITLE，避免被首页副标题或结果 tagline 覆盖。
        注意：share-d1~d6.html 是"结果页角色专属"中转（标题是角色名，语义不同），不在此处统一。*/
     function syncDocMetaFromConfig(){
       try{
         const title=plainTextFromHtml((CFG&&CFG.meta&&CFG.meta.mainTitle)||"");
-        const desc=plainTextFromHtml((CFG&&CFG.meta&&CFG.meta.subtitle)||"");
+        const desc=SHARE_CARD_SUBTITLE;
         if(!title&&!desc)return;
         /* 复用 updateShareMeta 统一改所有 head meta（og/twitter/itemprop/description 都覆盖） */
-        updateShareMeta({title:title||undefined,desc:desc||undefined});
+        updateShareMeta({title:title||undefined,desc:desc});
         /* og:image:alt 语义是"标题 + 场景描述"，单独补一下 */
         if(title){
           const altEl=document.querySelector('meta[property="og:image:alt"]');
-          if(altEl)altEl.setAttribute("content",title+" — "+(desc||"AI 设计师人格测试"));
+          if(altEl)altEl.setAttribute("content",title+" — "+desc);
         }
         /* iOS Safari / 微信内置 WebView 的坑：首次加载后直接赋值 document.title
            有时不会刷新浏览器 tab / 微信顶部条。解决办法是"插一个空 iframe 再移除"，
@@ -3620,18 +3621,13 @@
     function share(){
       var roleId=(latestResult&&latestResult.id)||"";
       var isOnResult=!!roleId; // 有 roleId 代表当前已经在结果页
-      /* 分享卡片使用问卷调研自身的标题/副标题/首页海报（不带角色结果），吸引朋友进来做测试 */
-      /* 标题/描述从 admin 配置的 CFG.meta.mainTitle / subtitle 读，admin 改完推送服务端后，
-         这里的分享卡片标题也会跟着变。主标题里的 <br>/<em> 要剥成纯文本（分享卡片不认富文本）。
+      /* 分享卡片使用问卷调研自身的标题 + 固定副标题 + 首页海报（不带角色结果），吸引朋友进来做测试 */
+      /* 标题从 admin 配置的 CFG.meta.mainTitle 读；副标题必须始终固定为 SHARE_CARD_SUBTITLE。
+         主标题里的 <br>/<em> 要剥成纯文本（分享卡片不认富文本）。
          读不到配置时回退到历史默认文案，确保老缓存/首次加载也能分享。*/
       var cfgMeta=(typeof CFG!=="undefined"&&CFG&&CFG.meta)||{};
       var title=plainTextFromHtml(cfgMeta.mainTitle||"")||"《好险，差点就会做设计了》";
-      // 题数 & 预计时长（按每题约 20 秒估算，向上取整，最少 1 分钟）
-      var qCount=(typeof T==="number"&&T>0)?T:((typeof QUESTION_ORDER!=="undefined"&&QUESTION_ORDER&&QUESTION_ORDER.length)||11);
-      var estMin=Math.max(1,Math.ceil(qCount*20/60));
-      /* 描述优先用 admin 配的副标题；若为空则拼一条带题数/时长的兜底。*/
-      var subtitlePlain=plainTextFromHtml(cfgMeta.subtitle||"");
-      var txt=subtitlePlain||("测一测你是哪位还没下班的设计大师 · 共 "+qCount+" 题 · 预计 "+estMin+" 分钟");
+      var txt=SHARE_CARD_SUBTITLE;
       // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
       //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=share-cover.png
       //  - 结果页（有 roleId）：指向 share-<roleId>.html 专属中转页，<head> og:image=角色图
@@ -3763,7 +3759,7 @@
     /* 进结果页时立刻把分享卡预置成「当前角色」：
        - 改 og:image / twitter:image → 角色图
        - 改 og:url → share-dX.html 中转页（微信爬虫只读 head 拿角色图，再 replace 回 quiz-h5.html，对用户无感）
-       - 改 title / description → 角色名 + tagline
+       - 改 title → 角色名；description 固定为 SHARE_CARD_SUBTITLE
        - 在微信里若 JSSDK 可用，也同步调 updateAppMessageShareData；不可用则静默跳过
        这样用户进结果页就**直接点右上角 …** 分享，卡片图也是角色图。 */
     function presetShareForResult(){
@@ -3774,9 +3770,8 @@
       var rImgEl=document.getElementById("rImg");
       var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
-      /* 分享卡片标题：AI时代我是「xxx」（副标题仍使用角色 tagline，保持不变） */
-      var title="AI时代我是「"+(role.name||"设计大师")+"」";
-      var desc=role.tagline||"测测你是哪位还没下班的设计大师";
+      var title=RESULT_SHARE_TITLE_PREFIX+"「"+(role.name||"设计大师")+"」";
+      var desc=SHARE_CARD_SUBTITLE;
       updateShareMeta({title:title,desc:desc,img:shareImg,link:shareLink});
       /* 关键：把地址栏 URL 改成 share-dX.html，但不跳转、不刷新、DOM 保持当前结果页。
          这样用户直接点微信右上角 … → 微信读取的 link = 当前 URL = share-dX.html →
@@ -3794,6 +3789,7 @@
 
     function updateShareMeta(opts){
       opts=opts||{};
+      opts.desc=SHARE_CARD_SUBTITLE;
       function set(selector,attr,val){
         var el=document.querySelector(selector);
         if(el&&val)el.setAttribute(attr,val);
@@ -3846,6 +3842,7 @@
     }
     function applyWxShare(share){
       try{
+        share=Object.assign({},share,{desc:SHARE_CARD_SUBTITLE});
         if(wx.updateAppMessageShareData){
           wx.updateAppMessageShareData({title:share.title,desc:share.desc,link:share.link,imgUrl:share.imgUrl});
         }

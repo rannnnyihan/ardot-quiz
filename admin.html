@@ -9,9 +9,11 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#f5f5fa;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;padding:24px}
-    .header{display:flex;justify-content:space-between;align-items:center;max-width:1260px;margin:0 auto 12px}
-    .header h1{font-size:20px;font-weight:800}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .header{display:grid;grid-template-columns:max-content 1fr;gap:16px;align-items:start;max-width:1260px;margin:0 auto 12px}
+    .header h1{font-size:20px;font-weight:800;line-height:34px;white-space:nowrap;flex:0 0 auto}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start;min-width:0}
+    .actions label{white-space:nowrap;margin-bottom:0}
+    .save-action{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
     .btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#333;font-size:13px;font-weight:600;cursor:pointer}
     .btn:hover{border-color:#bbb}
     .btn.primary{background:#1a1a2e;border-color:#1a1a2e;color:#fff}
@@ -73,14 +75,19 @@
     .chart-card{background:#fff;border:1px solid #ececf2;border-radius:12px;padding:14px}
     .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .img-preview{margin-top:8px;width:120px;height:120px;border-radius:10px;border:1px solid #e8e5e0;background:#fafafa;object-fit:cover;display:block;visibility:hidden}
-    .toolbar{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;margin-bottom:10px}
+    .toolbar{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
     .switch{display:flex;gap:8px}
     .switch .btn.active{background:#1a1a2e;border-color:#1a1a2e;color:#fff}
+    .stats-chart-grid{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(260px,.85fr);gap:14px;align-items:stretch;margin-top:8px}
+    .stats-chart-panel{min-width:0;background:#fbfbfd;border:1px solid #f0f0f4;border-radius:10px;padding:12px}
+    .stats-chart-title{font-size:12px;font-weight:800;color:#555;margin-bottom:8px}
     .chart-wrap{height:360px}
+    .chart-wrap-bar{height:380px}
+    .chart-wrap-pie{height:320px}
     table{width:100%;border-collapse:collapse;margin-top:12px}
     th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #f0f0f4;font-size:13px}
     th{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.04em}
-    .auto-save-hint{font-size:12px;color:#2d6a4a;margin-left:12px;font-weight:500}
+    .auto-save-hint{display:block;min-height:16px;font-size:12px;color:#2d6a4a;margin:0;font-weight:500;line-height:1.35;text-align:right;white-space:nowrap}
     /* 保存前弹窗 */
     .modal-mask{position:fixed;inset:0;background:rgba(10,10,20,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
     .modal-card{background:#fff;border-radius:14px;max-width:520px;width:100%;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -142,7 +149,7 @@
     .tier-row .tier-btn.restore{border:1px solid #2563eb;background:#eff6ff;color:#1d4ed8}
     .tier-row .tier-btn.restore:hover{background:#dbeafe}
     .tier-row .tier-tag{font-size:11px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 8px;border-radius:4px}
-    @media(max-width:980px){.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.chart-wrap{height:300px}.company-grid{grid-template-columns:1fr}}
+    @media(max-width:980px){.header{grid-template-columns:1fr}.header h1{line-height:1.2}.actions{justify-content:flex-end}.stats{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.stats-chart-grid{grid-template-columns:1fr}.chart-wrap,.chart-wrap-bar,.chart-wrap-pie{height:300px}.company-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -161,8 +168,10 @@
       <button class="btn" onclick="refreshData()">刷新统计</button>
       <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
       <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
-      <button class="btn primary" onclick="saveAll()">保存配置</button>
-      <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），也可手动点保存配置"></span>
+      <div class="save-action">
+        <button class="btn primary" onclick="saveAll()">保存配置</button>
+        <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），也可手动点保存配置"></span>
+      </div>
     </div>
   </div>
 
@@ -428,10 +437,6 @@
         </div>
         <select id="chartQuestionSelect"></select>
         <select id="chartStemSelect" class="hidden"></select>
-        <div class="switch">
-          <button class="btn active" id="barBtn" onclick="setChartType('bar')">柱状图</button>
-          <button class="btn" id="pieBtn" onclick="setChartType('pie')">饼图</button>
-        </div>
       </div>
       <div class="weight-bar hidden" id="weightBar">
         <span style="font-weight:600;color:#444">样本视角</span>
@@ -443,7 +448,16 @@
         <span class="wm-info" id="weightInfo"></span>
         <span class="wm-warn hidden" id="weightWarn"></span>
       </div>
-      <div class="chart-wrap"><canvas id="statsChart"></canvas></div>
+      <div class="stats-chart-grid">
+        <div class="stats-chart-panel stats-chart-panel-bar">
+          <div class="stats-chart-title">柱状图</div>
+          <div class="chart-wrap chart-wrap-bar"><canvas id="statsBarChart"></canvas></div>
+        </div>
+        <div class="stats-chart-panel stats-chart-panel-pie">
+          <div class="stats-chart-title">饼图</div>
+          <div class="chart-wrap chart-wrap-pie"><canvas id="statsPieChart"></canvas></div>
+        </div>
+      </div>
       <div class="help" id="chartNote">-</div>
       <div class="help" id="chartMean">均分：-</div>
       <table>
@@ -456,9 +470,9 @@
 
   <script>
     const CFG_KEY="ardot_quiz_config_v2";
-    let chartType="bar";
     let statsMode="survey";
-    let statsChart=null;
+    let statsBarChart=null;
+    let statsPieChart=null;
     /* 公司维度两个独立 doughnut 图实例，重渲前 destroy，避免 Chart.js 复用 canvas 报错 */
     let companyDistChart=null;
     let companyTierChart=null;
@@ -2598,13 +2612,6 @@
       };
     }
 
-    function setChartType(type){
-      chartType=type;
-      document.getElementById("barBtn").classList.toggle("active",type==="bar");
-      document.getElementById("pieBtn").classList.toggle("active",type==="pie");
-      renderChart();
-    }
-
     function renderChartTable(labels,values,ds){
       const tbody=document.getElementById("chartTable");
       const valHead=document.getElementById("chartTableValHead");
@@ -2724,8 +2731,10 @@
             : `${displayQid(qid).toUpperCase()} 分项统计：${ds.stemLabel||"-"}（1~7 分布，均分 ${ds.mean}，${ds.scoreCount} 次打分）`;
         document.getElementById("chartMean").textContent=(ds.type==="scale"||ds.type==="score") ? `均分：${ds.mean}` : "均分：-";
       }
-      const ctx=document.getElementById("statsChart");
-      if(statsChart){statsChart.destroy();statsChart=null}
+      const barCanvas=document.getElementById("statsBarChart");
+      const pieCanvas=document.getElementById("statsPieChart");
+      if(statsBarChart){statsBarChart.destroy();statsBarChart=null}
+      if(statsPieChart){statsPieChart.destroy();statsPieChart=null}
       const isWeightedMulti=ds.type==="multi"&&ds.weighted&&!ds.weightedEmpty;
       /* 加权切换器旁边的辅助文字 / 警告 */
       const wInfoEl=document.getElementById("weightInfo");
@@ -2785,11 +2794,21 @@
       const yTicks=isWeightedMulti
         ? {callback:function(v){return v+" 人"}}
         : {precision:0,callback:function(v){return Number.isInteger(v)?v:null}};
-      statsChart=new Chart(ctx,{
-        type:chartType,
-        data:{labels,datasets:[{label:chartType==="bar"?(isWeightedMulti?"等效人数":"数值"):"占比",data:values,backgroundColor:palette(labels.length)}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}},scales:chartType==="bar"?{y:{beginAtZero:true,ticks:yTicks}}:{}}
-      });
+      const colors=palette(labels.length);
+      if(barCanvas){
+        statsBarChart=new Chart(barCanvas,{
+          type:"bar",
+          data:{labels,datasets:[{label:isWeightedMulti?"等效人数":"数值",data:values,backgroundColor:colors}]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:yTicks}}}
+        });
+      }
+      if(pieCanvas){
+        statsPieChart=new Chart(pieCanvas,{
+          type:"pie",
+          data:{labels,datasets:[{label:"占比",data:values,backgroundColor:colors,borderColor:"#fff",borderWidth:2}]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"bottom"}}}
+        });
+      }
     }
 
     let configAutoSaveTimer=null;
