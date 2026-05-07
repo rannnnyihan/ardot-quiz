@@ -1196,12 +1196,12 @@
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;position:relative;z-index:1}
 
-    /* ====== 滚动行为：暗格解读之上的「res-top」整块在结果页内 sticky 钉顶， 下面的 section 向上滑动 ====== */
+    /* ====== 滚动行为：结果页整体跟随滚动，不再 sticky 钉顶 ====== */
     body:has(#res.active) #res .res-top{
-      position:sticky!important;
-      top:0!important;
-      z-index:5!important;
-      /* 不透明背景：与 body 顶部视觉一致（顶部绿色渐变 → 浅灰 + 浅格纹），避免下方 section 滑过时穿透 */
+      position:relative!important;
+      top:auto!important;
+      z-index:1!important;
+      /* 顶部视觉背景（绿色渐变 + 浅格纹）保留，但跟随页面滚动 */
       background-color:#F6F6F6!important;
       background-image:
         linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
@@ -1210,15 +1210,14 @@
       background-size:32px 32px, 32px 32px, 100% 100%!important;
       background-position:center top, center top, top!important;
       background-repeat:repeat, repeat, no-repeat!important;
-      /* 视觉边界：底部一点淡淡的分隔阴影，区分固定区与滚动区 */
-      box-shadow:0 8px 16px -12px rgba(0,0,0,.12)!important;
+      box-shadow:none!important;
     }
-    /* 让滚动的下半部分（所有 section）位于 sticky 区下方层级，避免内容遮挡 */
+    /* section 正常文档流 */
     body:has(#res.active) #res .res-card > .res-section{
       position:relative!important;
       z-index:1!important;
     }
-    /* iOS Safari 在父级有 overflow 不为 visible 时 sticky 会失效；显式保证 res / res-card / wrap 不裁剪 */
+    /* 保持父级 overflow 不裁剪（避免影响子元素溢出渲染） */
     body:has(#res.active) .wrap,
     body:has(#res.active) #res,
     body:has(#res.active) #res .res-card{
