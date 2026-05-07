@@ -64,10 +64,25 @@ const ROLE_VERS = Object.fromEntries(
   Object.entries(ROLE_IMG).map(([id, name]) => [id, imgFingerprint(`img/${name}`)])
 );
 
+/* 立绘图（角色翻面海报实际使用）：role/d{1..6}-{A,B}.png 12 张
+   缓存生效路径：quiz-h5.html 中 const ROLE_LIVE_VER 表 */
+const ROLE_LIVE_IDS = ["d1", "d2", "d3", "d4", "d5", "d6"];
+const ROLE_LIVE_SIDES = ["A", "B"];
+const ROLE_LIVE_VERS = {};
+for (const id of ROLE_LIVE_IDS) {
+  for (const side of ROLE_LIVE_SIDES) {
+    ROLE_LIVE_VERS[id + side] = imgFingerprint(`role/${id}-${side}.png`);
+  }
+}
+
 console.log("[sync-share-version] 当前指纹：");
 console.log("  cover  =", COVER_VER);
 for (const [id, ver] of Object.entries(ROLE_VERS)) {
   console.log(`  ${id} (${ROLE_IMG[id]}) =`, ver);
+}
+console.log("  role/ 立绘：");
+for (const [k, v] of Object.entries(ROLE_LIVE_VERS)) {
+  console.log(`    ${k} =`, v);
 }
 
 /**
@@ -97,6 +112,23 @@ function bumpImgVerInHtml(html, imgName, ver) {
   return html;
 }
 
+/** 替换 quiz-h5.html 里 `const ROLE_LIVE_VER={...};` 这一行的内容 */
+function bumpRoleLiveVerInHtml(html, vers) {
+  // 把对象按固定顺序拼成 d1A/d1B/d2A/d2B/.../d6A/d6B
+  const parts = [];
+  for (const id of ROLE_LIVE_IDS) {
+    for (const side of ROLE_LIVE_SIDES) {
+      const k = id + side;
+      parts.push(`${k}:"${vers[k] || ""}"`);
+    }
+  }
+  const literal = `const ROLE_LIVE_VER={${parts.join(",")}};`;
+  // 匹配整行赋值（容忍空白）
+  const re = /const\s+ROLE_LIVE_VER\s*=\s*\{[^}]*\}\s*;?/;
+  if (re.test(html)) return html.replace(re, literal);
+  return html;
+}
+
 function processQuizH5() {
   const file = join(ROOT, "quiz-h5.html");
   let html = readFileSync(file, "utf8");
@@ -108,6 +140,8 @@ function processQuizH5() {
   for (const [id, name] of Object.entries(ROLE_IMG)) {
     html = bumpImgVerInHtml(html, name, ROLE_VERS[id]);
   }
+  // role/ 立绘 12 张：注入到 ROLE_LIVE_VER 常量
+  html = bumpRoleLiveVerInHtml(html, ROLE_LIVE_VERS);
 
   if (html !== before) {
     writeFileSync(file, html, "utf8");

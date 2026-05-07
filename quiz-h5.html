@@ -913,8 +913,17 @@
     /* 调色板：白 #ffffff / 选中黑框 #111 / 次灰 #f5f6f5 / 边框灰 #e5e7e5
               文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 主绿（按设计稿）#14CC52 */
 
-    /* 页面底色与进度条（纯白底，无渐变底纹） */
-    body.quiz-on-q{background:#ffffff!important;color:#1a1d1a!important}
+    /* 页面底色与进度条（白底 + 32px 网格底纹，与首屏同款） */
+    body.quiz-on-q{
+      background-color:#ffffff!important;
+      background-image:
+        linear-gradient(rgba(17,17,17,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17,17,17,.035) 1px, transparent 1px)!important;
+      background-size:32px 32px!important;
+      background-position:center top!important;
+      background-attachment:fixed!important;
+      color:#1a1d1a!important;
+    }
     body.quiz-on-q .bar{background:#eef0ee!important}
     body.quiz-on-q .bar-fill{background:#14CC52!important}
     /* 去掉底部绿色渐变底纹 */
@@ -1905,7 +1914,7 @@
     /** 题库默认与 admin.html 同步。仓库或对话里改题时两边一起改，并递增 meta.questionSchema / meta.roleSetVersion，
         避免旧 localStorage 里的题库盖住新版本。
         6 维 × 6 角色：
-          D1 草稿太多的毕加班索 / D2 还在抠图的原研灾 / D3 对不齐的蒙得里不安
+          D1 草稿太多的毕加班索 / D2 还在抠图的原研栽 / D3 对不齐的蒙得里不安
           D4 复制到崩溃的草间弥想鼠 / D5 风格断片的梵稿 / D6 睡莲迁移失败的莫奈何
         Q1–Q6 每题 4 个选项 ABCD → 痛点强度 1/2/3/4（Qn 对应 Dn）；Q7 六维完整排序给权重 6/21…1/21。
         计算由全局 window.computeDesignerPersonality(answers) 驱动，不再使用 mappings 映射表。 */
@@ -1962,7 +1971,7 @@
             }
           },
           {
-            id:"d2",name:"还在抠图的原研灾",real:"D2 · 图像与素材处理",img:"img/hara.png?v=6ae8715a",
+            id:"d2",name:"还在抠图的原研栽",real:"D2 · 图像与素材处理",img:"img/hara.png?v=6ae8715a",
             desc:"你不是不会设计，而是还没走到设计本身。",
             resultContent:{
               tagline:"你不是不会设计，而是还没走到设计本身。",
@@ -2423,7 +2432,7 @@
        结果页 res-name 与 wishTitle 都用此函数生成 HTML。*/
     const ROLE_NAME_HIGHLIGHT={
       "草稿太多的毕加班索":"加班",
-      "还在抠图的原研灾":"灾",
+      "还在抠图的原研栽":"灾",
       "对不齐的蒙得里不安":"不安",
       "复制到崩溃的草间弥想鼠":"想鼠",
       "风格断片的梵稿":"稿",
@@ -3132,6 +3141,15 @@
       d5:"img/风格断片的梵高 .png",
       d6:"img/睡莲迁移失败的莫奈 .png"
     };
+    /* role/d?-{A|B}.png 立绘指纹（由 scripts/sync-share-version.mjs 在 commit 时自动同步）。
+       作用：换图后 url 里的 ?v= 会跟着变，强制浏览器与分享卡片爬虫拉新图，避免命中旧缓存。 */
+    const ROLE_LIVE_VER={d1A:"8ab017d7",d1B:"d25b7814",d2A:"34a92655",d2B:"e541db8a",d3A:"c03199c2",d3B:"68288cb1",d4A:"31401f19",d4B:"4dda364a",d5A:"7b8d45f3",d5B:"02ec943e",d6A:"a67c178a",d6B:"80f57e60"};
+    /* 给候选 url 注入 ?v=ver。已带 ?v= 的不重复加。 */
+    function withRoleVer(url,ver){
+      if(!url||!ver)return url;
+      if(/[?&]v=[^&]+/.test(url))return url;
+      return url+(url.includes("?")?"&":"?")+"v="+ver;
+    }
     function uniqPaths(arr){
       const seen={};
       return (arr||[]).filter((src)=>{
@@ -3147,8 +3165,13 @@
       const frontNames=[`${id}-A.png`,`${id}-a.png`,`${id}-front.png`,`${id}.png`,`${alias}-A.png`,`${alias}-a.png`,`${alias}-front.png`,`${alias}.png`];
       const backNames=[`${id}-B.png`,`${id}-b.png`,`${id}-back.png`,`${id}-reverse.png`,`${alias}-B.png`,`${alias}-b.png`,`${alias}-back.png`,`${alias}-reverse.png`];
       const names=side==="back"?backNames:frontNames;
+      const ver=ROLE_LIVE_VER[id+(side==="back"?"B":"A")]||"";
       const out=[];
-      dirs.forEach((dir)=>names.forEach((name)=>out.push(dir+name)));
+      /* 仅给 role/ 主路径下的 d?-A/d?-B 加版本号；备用路径（img/role/、roles/ 等）保持原样兜底 */
+      dirs.forEach((dir)=>names.forEach((name)=>{
+        const u=dir+name;
+        out.push(dir==="role/"?withRoleVer(u,ver):u);
+      }));
       if(side==="back"){
         out.push(role&&role.backImg,role&&role.imgBack,role&&role.reverseImg,ROLE_BACK_FALLBACK[id],role&&role.img);
       }else{
@@ -4084,7 +4107,7 @@
     /* 角色 slogan 配置：分享海报上"角色名下方黑底白字横幅"用 */
     const ROLE_SHARE_SLOGAN={
       "草稿太多的毕加班索":"脑子: 再来一个方向, 现实: 一个都没交",
-      "还在抠图的原研灾":"已经放大到400%，但毛边还在嘲笑我",
+      "还在抠图的原研栽":"已经放大到400%，但毛边还在嘲笑我",
       "对不齐的蒙得里不安":"就差1px，但就是对不齐",
       "复制到崩溃的草间弥想鼠":"复制-对齐-间距，循环到怀疑人生",
       "风格断片的梵稿":"我记得有逻辑，但文件不记得我",
@@ -4094,7 +4117,7 @@
        未在表里的兜底：用最后一个"的"切分；找不到则整体作为主名。*/
     const ROLE_NAME_SPLIT={
       "草稿太多的毕加班索":{prefix:"草稿太多的",main:"毕加班索"},
-      "还在抠图的原研灾":{prefix:"还在抠图的",main:"原研灾"},
+      "还在抠图的原研栽":{prefix:"还在抠图的",main:"原研栽"},
       "对不齐的蒙得里不安":{prefix:"对不齐的",main:"蒙得里不安"},
       "复制到崩溃的草间弥想鼠":{prefix:"复制到崩溃的",main:"草间弥想鼠"},
       "风格断片的梵稿":{prefix:"风格断片的",main:"梵稿"},
@@ -4510,7 +4533,7 @@
       };
       const byName={
         "草稿太多的毕加班索":"毕加索",
-        "还在抠图的原研灾":"原研哉",
+        "还在抠图的原研栽":"原研哉",
         "对不齐的蒙得里不安":"蒙德里安",
         "复制到崩溃的草间弥想鼠":"草间弥生",
         "风格断片的梵稿":"梵高",
@@ -5027,7 +5050,7 @@
     (function(){
       var DIMENSIONS=[
         {id:"d1",name:"灵感发散",role:"草稿太多的毕加班索"},
-        {id:"d2",name:"图片处理",role:"还在抠图的原研灾"},
+        {id:"d2",name:"图片处理",role:"还在抠图的原研栽"},
         {id:"d3",name:"结构处理",role:"对不齐的蒙得里不安"},
         {id:"d4",name:"批量操作",role:"复制到崩溃的草间弥想鼠"},
         {id:"d5",name:"记忆管理",role:"风格断片的梵稿"},

@@ -68,11 +68,12 @@ node scripts/sync-share-version.mjs
 |---|---|
 | `img/share-cover.png` | 首页 / 答题中分享卡片 |
 | `img/picasso.png` | 结果 d1（草稿太多的毕加班索）分享卡片 |
-| `img/hara.png` | 结果 d2（还在抠图的原研灾）分享卡片 |
+| `img/hara.png` | 结果 d2（还在抠图的原研栽）分享卡片 |
 | `img/mondrian.png` | 结果 d3（对不齐的蒙得里不安）分享卡片 |
 | `img/kusama.png` | 结果 d4（复制到崩溃的草间弥死）分享卡片 |
 | `img/gogh.png` | 结果 d5（风格断片的梵稿）分享卡片 |
 | `img/monet.png` | 结果 d6（睡莲迁移失败的莫奈何）分享卡片 |
+| `role/d{1..6}-{A,B}.png` | 结果页角色立绘（正/反面）+ 长按生成的分享海报里的大图，自动注入 `quiz-h5.html` 中 `ROLE_LIVE_VER` 常量 |
 
 > 角色立绘和分享角色图共用同一个文件，所以换图是"立绘和分享卡片同时换"。
 
