@@ -274,7 +274,7 @@
     /* 截图瞬时类：强制结果区处于"完成态"，避免 html2canvas 拍到动画中态（全局发灰） */
     #res.capturing,#res.capturing *{animation:none!important;transition:none!important;opacity:1!important;filter:none!important}
     .res-card{border-radius:0;border:0;background:transparent;overflow:visible;margin-bottom:0;box-shadow:none}
-    .res-top{position:relative;padding:34px 20px 48px;text-align:center;overflow:visible;min-height:480px}
+    .res-top{position:relative;padding:34px 20px 32px;text-align:center;overflow:visible;min-height:460px}
     /* 结果页英雄标题：文字与图片层叠 */
     .res-kicker{font-size:clamp(34px,9.2vw,54px);color:#111;letter-spacing:-.04em;margin:0 auto 16px;font-weight:1000;text-align:center;line-height:1.05}
     /* 头像外框：无边框，图片整体缩小 */
@@ -291,7 +291,7 @@
     /* 角色名黑底大字块，压在图片上方 */
     .res-name{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;width:min(86vw,680px);min-height:76px;padding:10px 18px;margin:0 auto 0;background:#111;color:#fff;font-size:clamp(26px,7.2vw,56px);font-weight:1000;letter-spacing:-.045em;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;white-space:nowrap;overflow:hidden;line-height:1;text-align:center;box-sizing:border-box}
     .res-real{font-size:13px;color:#8a7658;margin-bottom:0;font-weight:500;letter-spacing:.04em}
-    .res-insight-overlay{position:absolute;right:8px;bottom:64px;z-index:4;width:min(70%,390px);text-align:left}
+    .res-insight-overlay{position:absolute;right:8px;bottom:48px;z-index:4;width:min(70%,390px);text-align:left}
     .res-insight-overlay .res-section-title{display:none}
     .res-insight-overlay .insight-box{border-radius:0;padding:18px 22px;background:rgba(17,17,17,.94);border:0;color:#fff;font-size:15px;line-height:1.65;font-weight:800;box-shadow:0 14px 32px rgba(0,0,0,.16)}
     .res-insight-overlay .insight-box::before{display:none}
@@ -355,7 +355,7 @@
     .company-modal-btn:not(:disabled):active{transform:scale(.98)}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
-    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:460px}.res-avatar-frame{width:72vw}.res-insight-overlay{right:0;bottom:54px;width:74%}.res-insight-overlay .insight-box{font-size:14.5px;padding:16px 18px;line-height:1.65}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
+    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:440px}.res-avatar-frame{width:72vw}.res-insight-overlay{right:0;bottom:40px;width:74%}.res-insight-overlay .insight-box{font-size:14.5px;padding:16px 18px;line-height:1.65}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
     /* ====== 桌面/平板响应式增强（≥768px 启用桌面布局） ====== */
     @media(min-width:768px){
       .wrap{max-width:780px;padding:40px 32px 96px}
@@ -392,9 +392,9 @@
       .btn-b{padding:0 22px}
       .btn-n{padding:0 28px}
       .res-card{border-radius:0}
-      .res-top{padding:44px 40px 60px;min-height:560px}
+      .res-top{padding:44px 40px 40px;min-height:540px}
       .res-avatar-frame{width:min(58vw,500px)}
-      .res-insight-overlay{right:56px;bottom:84px;width:min(50%,430px)}
+      .res-insight-overlay{right:56px;bottom:64px;width:min(50%,430px)}
       .res-section-title{font-size:17px}
       .res-desc{font-size:15px;max-width:520px}
       .wish-box{margin:0 40px 28px;padding:20px}
