@@ -2608,7 +2608,7 @@
 
       /* 你缺的工具（解锁建议） */
       const advEl=document.getElementById("rAdvice");
-      const advArr=Array.isArray(rc.advice)?rc.advice:[];
+      const advArr=(Array.isArray(rc.advice)?rc.advice:[]).slice(0,4);
       if(advEl)advEl.innerHTML=advArr.map(a=>`<li>${a}</li>`).join("");
 
       /* 结果页右下角"保存图片"悬浮按钮 + 绑定长按截图保存（兼容老交互） */
