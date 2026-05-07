@@ -274,7 +274,7 @@
     /* 截图瞬时类：强制结果区处于"完成态"，避免 html2canvas 拍到动画中态（全局发灰） */
     #res.capturing,#res.capturing *{animation:none!important;transition:none!important;opacity:1!important;filter:none!important}
     .res-card{border-radius:0;border:0;background:transparent;overflow:visible;margin-bottom:0;box-shadow:none}
-    .res-top{position:relative;padding:34px 20px 72px;text-align:center;overflow:visible;min-height:520px}
+    .res-top{position:relative;padding:34px 20px 48px;text-align:center;overflow:visible;min-height:480px}
     /* 结果页英雄标题：文字与图片层叠 */
     .res-kicker{font-size:clamp(34px,9.2vw,54px);color:#111;letter-spacing:-.04em;margin:0 auto 16px;font-weight:1000;text-align:center;line-height:1.05}
     /* 头像外框：无边框，图片整体缩小 */
@@ -291,7 +291,7 @@
     /* 角色名黑底大字块，压在图片上方 */
     .res-name{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;width:min(86vw,680px);min-height:76px;padding:10px 18px;margin:0 auto 0;background:#111;color:#fff;font-size:clamp(26px,7.2vw,56px);font-weight:1000;letter-spacing:-.045em;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;white-space:nowrap;overflow:hidden;line-height:1;text-align:center;box-sizing:border-box}
     .res-real{font-size:13px;color:#8a7658;margin-bottom:0;font-weight:500;letter-spacing:.04em}
-    .res-insight-overlay{position:absolute;right:8px;bottom:92px;z-index:4;width:min(70%,390px);text-align:left}
+    .res-insight-overlay{position:absolute;right:8px;bottom:64px;z-index:4;width:min(70%,390px);text-align:left}
     .res-insight-overlay .res-section-title{display:none}
     .res-insight-overlay .insight-box{border-radius:0;padding:18px 22px;background:rgba(17,17,17,.94);border:0;color:#fff;font-size:15px;line-height:1.65;font-weight:800;box-shadow:0 14px 32px rgba(0,0,0,.16)}
     .res-insight-overlay .insight-box::before{display:none}
@@ -355,7 +355,7 @@
     .company-modal-btn:not(:disabled):active{transform:scale(.98)}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
-    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:500px}.res-avatar-frame{width:72vw}.res-insight-overlay{right:0;bottom:82px;width:74%}.res-insight-overlay .insight-box{font-size:14.5px;padding:16px 18px;line-height:1.65}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
+    @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:460px}.res-avatar-frame{width:72vw}.res-insight-overlay{right:0;bottom:54px;width:74%}.res-insight-overlay .insight-box{font-size:14.5px;padding:16px 18px;line-height:1.65}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
     /* ====== 桌面/平板响应式增强（≥768px 启用桌面布局） ====== */
     @media(min-width:768px){
       .wrap{max-width:780px;padding:40px 32px 96px}
@@ -392,9 +392,10 @@
       .btn-b{padding:0 22px}
       .btn-n{padding:0 28px}
       .res-card{border-radius:0}
-      .res-top{padding:44px 40px 88px;min-height:620px}
+      .res-top{padding:44px 40px 60px;min-height:560px}
       .res-avatar-frame{width:min(58vw,500px)}
-      .res-insight-overlay{right:56px;bottom:116px;width:min(50%,430px)}
+      .res-insight-overlay{right:56px;bottom:84px;width:min(50%,430px)}
+      .res-section-title{font-size:17px}
       .res-desc{font-size:15px;max-width:520px}
       .wish-box{margin:0 40px 28px;padding:20px}
       .others-title{padding:0 40px}
@@ -407,7 +408,7 @@
     }
     /* ====== 新结果页模板样式（参考 IMG_2616 版式） ====== */
     .res-section{padding:0 20px 22px}
-    .res-section-title{font-size:12px;font-weight:700;color:#3a3428;letter-spacing:.04em;margin-bottom:10px}
+    .res-section-title{font-size:15px;font-weight:700;color:#3a3428;letter-spacing:.04em;margin-bottom:10px}
     /* 一句话诊断：米白圆角块 + 左上金色引号 */
     .res-tagline-wrap{padding:0 20px;margin-bottom:22px}
     .res-tagline{position:relative;padding:14px 16px 14px 34px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:13px;line-height:1.75;color:#5a5245}
@@ -478,14 +479,14 @@
     .save-card-preview{display:block;width:100%;margin:0;border-radius:10px;border:1px solid #ece4d2;background:#faf4e7;-webkit-touch-callout:default;user-select:none}
     .save-card-preview:not([src]),.save-card-preview[src=""]{min-height:180px}
     .save-card-hint{margin-top:10px;text-align:center;font-size:11.5px;color:#8f5d24;font-weight:600;letter-spacing:.02em}
-    /* 右下角悬浮"保存图片"按钮（仅结果页显示；放在 body 根节点，常驻不消失） */
-    .save-fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#f6a85e 0%,#c46a1a 100%);color:#fff;font-size:14px;font-weight:700;letter-spacing:.02em;border:0;cursor:pointer;box-shadow:0 10px 28px rgba(196,106,26,.38),0 2px 6px rgba(196,106,26,.24);z-index:9998;animation:saveTipIn .4s ease both;-webkit-tap-highlight-color:transparent;will-change:transform}
+    /* 右下角悬浮"探索 AI 设计"按钮（仅结果页显示；放在 body 根节点，常驻不消失） */
+    .save-fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:6px;padding:12px 22px;border-radius:999px;background:#00EC00;color:#111;font-size:14px;font-weight:700;letter-spacing:.02em;border:0;cursor:pointer;box-shadow:0 10px 28px rgba(0,236,0,.32),0 2px 6px rgba(0,236,0,.18);z-index:9998;animation:saveTipIn .4s ease both;-webkit-tap-highlight-color:transparent;will-change:transform;text-decoration:none}
     body.show-save-fab .save-fab{display:inline-flex}
-    .save-fab:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(196,106,26,.42),0 2px 6px rgba(196,106,26,.26)}
-    .save-fab:active{transform:translateY(0);box-shadow:0 6px 18px rgba(196,106,26,.3)}
+    .save-fab:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(0,236,0,.4),0 2px 6px rgba(0,236,0,.22);background:#00b800;color:#fff}
+    .save-fab:active{transform:translateY(0);box-shadow:0 6px 18px rgba(0,236,0,.3)}
     .save-fab.loading{pointer-events:none;opacity:.85}
-    .save-fab-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center}
-    .save-fab-ico svg{width:18px;height:18px;display:block}
+    .save-fab-ico{font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:transform .2s}
+    .save-fab:hover .save-fab-ico{transform:translate(2px,-2px)}
     @keyframes saveTipIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @media(max-width:640px){
       .save-fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:11px 16px;font-size:13px}
@@ -1242,7 +1243,6 @@
 
       </div>
       <div class="res-actions">
-        <a class="btn-explore" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer">探索 AI 设计<span class="arr" aria-hidden="true">↗</span></a>
         <button class="btn-share" onclick="share()">分享测试</button>
         <button class="btn-redo" onclick="location.reload()">再测一次</button>
       </div>
@@ -1251,13 +1251,11 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- 右下角常驻"保存图片"按钮（结果页可见；脱离 #res，避免父节点动画影响） -->
-  <button type="button" class="save-fab" id="saveFab" aria-label="保存页面为图片" onclick="saveToAlbum()">
-    <span class="save-fab-ico" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    </span>
-    <span class="save-fab-txt">保存图片</span>
-  </button>
+  <!-- 右下角常驻"探索 AI 设计"悬浮按钮（结果页可见；脱离 #res，避免父节点动画影响） -->
+  <a class="save-fab" id="saveFab" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer" aria-label="探索 AI 设计">
+    <span class="save-fab-txt">探索 AI 设计</span>
+    <span class="save-fab-ico" aria-hidden="true">↗</span>
+  </a>
 
   <!-- 截图预览层：放在 body 根节点，彻底脱离 #res 的 transform/动画影响，保证 position:fixed 相对视口定位 -->
   <div class="save-overlay" id="saveOverlay" hidden>
@@ -2660,11 +2658,8 @@
       if(fab)fab.classList.remove("visible");
     }
     function setSaveFabLoading(on,txt){
-      const fab=document.getElementById("saveFab");
-      if(!fab)return;
-      const t=fab.querySelector(".save-fab-txt");
-      fab.classList.toggle("loading",!!on);
-      if(t)t.textContent=on?(txt||"生成中…"):"保存图片";
+      /* 胶囊已替换为"探索 AI 设计"链接，不再随保存进度变文案；保留空函数以兼容老调用点 */
+      return;
     }
 
     /* 渲染"扫码测你"二维码：优先用 qrcodejs 本地 canvas 生成（html2canvas 能同源拍到），
