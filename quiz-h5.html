@@ -77,6 +77,11 @@
   <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
   <meta name="application-name" content="Ardot · 艺术家测试">
 
+  <!-- 首屏关键图片预加载：让浏览器在解析 HTML 时就并行下载，避免 down.png 等小图被大图排队挤掉 -->
+  <link rel="preload" as="image" href="img/home-head.png?v=20260506" fetchpriority="high">
+  <link rel="preload" as="image" href="img/home-poster.png?v=20260506" fetchpriority="high">
+  <link rel="preload" as="image" href="role/down.png?v=20260507" fetchpriority="high">
+
   <!-- 微信 JSSDK（需要后端签名才能真正调用 wx.config；未签名时仅作占位，不影响页面可用性） -->
   <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" onerror="window.__wxSDKFailed=true"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" onerror="window.__h2cFailed=true"></script>
@@ -122,8 +127,11 @@
       background-repeat:no-repeat;background-position:center center;
       background-size:contain;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
-    /* 底部标签图片 - 固定尺寸 */
-    .welcome-down-tag{display:block;width:166px;height:17px;margin:0 auto}
+    /* 底部标签图片 - 固定尺寸；改为 CSS 背景图，让它和 head/poster 在同一帧渲染（不再 DOM 末尾"最后才出来"） */
+    .welcome-down-tag{display:block;width:166px;height:17px;margin:0 auto;
+      background-image:url("role/down.png?v=20260507");
+      background-repeat:no-repeat;background-position:center center;background-size:contain;
+      user-select:none;-webkit-user-drag:none;pointer-events:none}
     .welcome-cover,
     .master-preview{display:none!important}
     /* 按钮样式 */
@@ -137,8 +145,6 @@
       background:#050505;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.16);outline:none}
     .btn-go:active{transform:translateY(1px)}
     .btn-go .btn-label{display:inline-flex;align-items:center;justify-content:center;width:77px;height:20px;padding:0;border-radius:0;line-height:20px;white-space:nowrap;font-weight:500;font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif}
-    .btn-go .arr{flex-shrink:0;display:inline-block;width:1.05em;height:1.05em;background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68;vertical-align:middle}
-    .btn-go .arr svg{display:none}
     .welcome-search-pill{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:0;height:34px;margin:14px auto calc(28px + env(safe-area-inset-bottom,0px));border:1.5px solid #444;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.35);font-size:13px;font-weight:700;color:#444;letter-spacing:-.01em}
     .welcome-search-brand{height:100%;display:flex;align-items:center;justify-content:center;background:#444;color:#fff;padding:0 14px;text-transform:lowercase}
     .welcome-search-text{display:flex;align-items:center;justify-content:center;padding:0 14px;white-space:nowrap}
@@ -637,10 +643,7 @@
     /* ===== 首页按钮（黑底胶囊 + 绿色纸飞机） ===== */
     .btn-go{background:#050505;color:#fff;border-color:#050505;box-shadow:none}
     .btn-go:hover,.btn-go:focus-visible{background:#050505;border-color:#050505;color:#fff;box-shadow:none}
-    .btn-go:hover .arr,.btn-go:focus-visible .arr{background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68}
     .btn-go:active{box-shadow:none}
-    .btn-go .arr{background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68;box-shadow:none}
-
     /* ===== 题目页：题号/题干/描述 ===== */
     .q-num{color:var(--gn-2);font-weight:700}
     .q-title{color:var(--tx)}
@@ -1670,7 +1673,7 @@
   <div class="wrap">
     <div class="welcome scene active" id="s0">
       <!-- 顶部：头部插画 -->
-      <img class="welcome-head-art" src="img/home-head.png?v=20260506" alt="好险，差点就成设计大师了。终于有人懂我做设计的苦了。测测你是什么类型的大师">
+      <img class="welcome-head-art" src="img/home-head.png?v=20260506" alt="好险，差点就成设计大师了。终于有人懂我做设计的苦了。测测你是什么类型的大师" fetchpriority="high" decoding="async">
       <!-- 人物头像组 -->
       <div class="welcome-poster" role="img" aria-label="还没下班的设计大师"></div>
       <!-- 按钮 -->
@@ -1679,8 +1682,8 @@
           <span class="btn-label">开始测试</span>
         </button>
       </div>
-      <!-- 底部标签图片 -->
-      <img class="welcome-down-tag" src="role/down.png?v=20260507" alt="设计大师人格测试">
+      <!-- 底部标签图片：改为 div + CSS 背景图，和 head/poster 同一帧渲染 -->
+      <div class="welcome-down-tag" role="img" aria-label="设计大师人格测试"></div>
     </div>
 
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
@@ -1938,7 +1941,7 @@
         },
         roles:[
           {
-            id:"d1",name:"草稿太多的毕加班索",real:"D1 · 灵感发散与筛选",img:"img/picasso.png?v=dd361e6f",
+            id:"d1",name:"草稿太多的毕加班索",real:"D1 · 灵感发散与筛选",img:"role/d1-B.png?v=d25b7814",
             desc:"你不是没灵感，而是灵感太多，每一张草稿都像有点道理。",
             resultContent:{
               tagline:"你不是没灵感，而是灵感太多，每一张草稿都像有点道理。",
@@ -1971,7 +1974,7 @@
             }
           },
           {
-            id:"d2",name:"还在抠图的原研栽",real:"D2 · 图像与素材处理",img:"img/hara.png?v=6ae8715a",
+            id:"d2",name:"还在抠图的原研栽",real:"D2 · 图像与素材处理",img:"role/d2-B.png?v=e541db8a",
             desc:"你不是不会设计，而是还没走到设计本身。",
             resultContent:{
               tagline:"你不是不会设计，而是还没走到设计本身。",
@@ -2004,7 +2007,7 @@
             }
           },
           {
-            id:"d3",name:"对不齐的蒙得里不安",real:"D3 · 版式与结构处理",img:"img/mondrian.png?v=c6c0db4b",
+            id:"d3",name:"对不齐的蒙得里不安",real:"D3 · 版式与结构处理",img:"role/d3-B.png?v=68288cb1",
             desc:"你不是没有结构感，而是总被规范、组件和间距拖住。",
             resultContent:{
               tagline:"你不是没有结构感，而是总被规范、组件和间距拖住。",
@@ -2037,7 +2040,7 @@
             }
           },
           {
-            id:"d4",name:"复制到崩溃的草间弥想鼠",real:"D4 · 重复执行与批量操作",img:"img/kusama.png?v=cf1cc87f",
+            id:"d4",name:"复制到崩溃的草间弥想鼠",real:"D4 · 重复执行与批量操作",img:"role/d4-B.png?v=4dda364a",
             desc:"你不是效率低，而是被重复劳动吞掉了。",
             resultContent:{
               tagline:"你不是效率低，而是被重复劳动吞掉了。",
@@ -2070,7 +2073,7 @@
             }
           },
           {
-            id:"d5",name:"风格断片的梵稿",real:"D5 · 项目上下文管理",img:"img/gogh.png?v=b4244665",
+            id:"d5",name:"风格断片的梵稿",real:"D5 · 项目上下文管理",img:"role/d5-B.png?v=02ec943e",
             desc:"你不是没有风格，而是每次都要重新找回它。",
             resultContent:{
               tagline:"你不是没有风格，而是每次都要重新找回它。",
@@ -2103,7 +2106,7 @@
             }
           },
           {
-            id:"d6",name:"睡莲迁移失败的莫奈何",real:"D6 · 工作流衔接",img:"img/monet.png?v=a5f7daa1",
+            id:"d6",name:"睡莲迁移失败的莫奈何",real:"D6 · 工作流衔接",img:"role/d6-B.png?v=80f57e60",
             desc:"你不是不会交付，而是被工具之间的缝隙卡住了。",
             resultContent:{
               tagline:"你不是不会交付，而是被工具之间的缝隙卡住了。",
@@ -4774,7 +4777,7 @@
 
     /* 把 roleId 映射成完整 /img/ 路径（与 share-d*.html 里的 og:image 一致；?v= 由 scripts/sync-share-version.mjs 自动维护） */
     function roleMetaImgName(roleId){
-      var map={d1:"img/picasso.png?v=dd361e6f",d2:"img/hara.png?v=6ae8715a",d3:"img/mondrian.png?v=c6c0db4b",d4:"img/kusama.png?v=cf1cc87f",d5:"img/gogh.png?v=b4244665",d6:"img/monet.png?v=a5f7daa1"};
+      var map={d1:"role/d1-B.png?v=d25b7814",d2:"role/d2-B.png?v=e541db8a",d3:"role/d3-B.png?v=68288cb1",d4:"role/d4-B.png?v=4dda364a",d5:"role/d5-B.png?v=02ec943e",d6:"role/d6-B.png?v=80f57e60"};
       return map[roleId]||"img/home-poster.png?v=20260507b";
     }
 

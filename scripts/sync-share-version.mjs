@@ -5,13 +5,15 @@
  * 作用：自动给微信/社交分享相关的图片 URL 加上一段基于"文件本身内容指纹"的版本号 (?v=...)，
  *      让每次 commit 后只要图片变了，分享卡片就被强制重抓；图片没变则版本号不变。
  *
- *   - 首页/答题中分享图：img/share-cover.png        →  指纹 cover
- *   - 6 个角色分享图：   img/{picasso,hara,...}.png →  各自独立指纹
+ *   - 首页/答题中分享图：img/share-cover.png      →  指纹 cover
+ *   - 6 个角色分享图：   role/d{1..6}-B.png       →  各自独立指纹
+ *     （已与立绘 B 图共用同一文件，分享卡缩略图与立绘版本同步）
  *
  * 改写的目标：
  *   - quiz-h5.html
  *       · <meta og:image / og:image:secure_url / twitter:image / itemprop=image / image_src / thumbnail>
  *       · 内嵌 JS 中 posterImg / roleShareImg 的拼装位置（在拼出后再加 ?v=...）
+ *       · const ROLE_LIVE_VER 表（用于 role/d{1..6}-{A,B}.png 的版本号）
  *   - share-d1..d6.html
  *       · 同样的 6 处 head meta
  *
@@ -33,16 +35,16 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(__filename), "..");
 
-/* 角色 id → 对应分享图文件名（与 quiz-h5.html 里 roleMetaImgName 保持一致） */
+/* 角色 id → 对应分享图相对路径（与 quiz-h5.html 里 roleMetaImgName 保持一致） */
 const ROLE_IMG = {
-  d1: "picasso.png",
-  d2: "hara.png",
-  d3: "mondrian.png",
-  d4: "kusama.png",
-  d5: "gogh.png",
-  d6: "monet.png",
+  d1: "role/d1-B.png",
+  d2: "role/d2-B.png",
+  d3: "role/d3-B.png",
+  d4: "role/d4-B.png",
+  d5: "role/d5-B.png",
+  d6: "role/d6-B.png",
 };
-const COVER_IMG = "share-cover.png";
+const COVER_IMG = "img/share-cover.png";
 
 /** 读取一张图片，返回基于 mtime+size 的 8 位短 hash */
 function imgFingerprint(relPath) {
@@ -59,13 +61,14 @@ function imgFingerprint(relPath) {
   return h.digest("hex").slice(0, 8);
 }
 
-const COVER_VER = imgFingerprint(`img/${COVER_IMG}`);
+const COVER_VER = imgFingerprint(COVER_IMG);
 const ROLE_VERS = Object.fromEntries(
-  Object.entries(ROLE_IMG).map(([id, name]) => [id, imgFingerprint(`img/${name}`)])
+  Object.entries(ROLE_IMG).map(([id, p]) => [id, imgFingerprint(p)])
 );
 
 /* 立绘图（角色翻面海报实际使用）：role/d{1..6}-{A,B}.png 12 张
-   缓存生效路径：quiz-h5.html 中 const ROLE_LIVE_VER 表 */
+   缓存生效路径：quiz-h5.html 中 const ROLE_LIVE_VER 表
+   注：B 图同时被 og:image 复用，这里仍重算一次，结果与 ROLE_VERS 一致 */
 const ROLE_LIVE_IDS = ["d1", "d2", "d3", "d4", "d5", "d6"];
 const ROLE_LIVE_SIDES = ["A", "B"];
 const ROLE_LIVE_VERS = {};
@@ -98,16 +101,19 @@ function withVer(url, ver) {
   return `${cleaned}${sep}v=${ver}`;
 }
 
-/** 替换一段 HTML 中"指向 imgName 的 URL"的版本号，覆盖各种 meta + image_src + thumbnail + 内嵌 JS 字面量 */
-function bumpImgVerInHtml(html, imgName, ver) {
+/**
+ * 替换一段 HTML 中"指向 imgPath 的 URL"的版本号。
+ * imgPath 是相对仓库根的完整相对路径，如 "role/d1-B.png" 或 "img/share-cover.png"。
+ * 覆盖各种 meta + image_src + thumbnail + 内嵌 JS 字面量。
+ */
+function bumpImgVerInHtml(html, imgPath, ver) {
   if (!ver) return html;
-  // 粗粒度策略：只要某行/属性值里出现 `img/<imgName>` 且后面带 ?v=xxx 或不带 ?v=，都替换
+  const escaped = imgPath.replace(/[\\.\/]/g, m => "\\" + m);
   // 1) 已经带 ?v= 的：直接替换其 v= 值
-  const reHasV = new RegExp(`(img\\/${imgName.replace(/\./g, "\\.")})\\?v=[a-z0-9]+`, "g");
+  const reHasV = new RegExp(`(${escaped})\\?v=[a-z0-9]+`, "g");
   html = html.replace(reHasV, `$1?v=${ver}`);
-  // 2) 没带 ?v= 的：补上 —— 但必须避免误伤"刚刚替换完"的，因为我们已经先处理了 ?v= 形式
-  //    所以这里的 (img/name)([)"' ]) 也只会匹配剩下没参数的
-  const reNoV = new RegExp(`(img\\/${imgName.replace(/\./g, "\\.")})(?!\\?v=)`, "g");
+  // 2) 没带 ?v= 的：补上
+  const reNoV = new RegExp(`(${escaped})(?!\\?v=)`, "g");
   html = html.replace(reNoV, `$1?v=${ver}`);
   return html;
 }
@@ -137,8 +143,8 @@ function processQuizH5() {
   // share-cover 通用版本
   html = bumpImgVerInHtml(html, COVER_IMG, COVER_VER);
   // 6 张角色图各自版本
-  for (const [id, name] of Object.entries(ROLE_IMG)) {
-    html = bumpImgVerInHtml(html, name, ROLE_VERS[id]);
+  for (const [id, p] of Object.entries(ROLE_IMG)) {
+    html = bumpImgVerInHtml(html, p, ROLE_VERS[id]);
   }
   // role/ 立绘 12 张：注入到 ROLE_LIVE_VER 常量
   html = bumpRoleLiveVerInHtml(html, ROLE_LIVE_VERS);
@@ -152,13 +158,13 @@ function processQuizH5() {
 }
 
 function processShareDx() {
-  for (const [id, name] of Object.entries(ROLE_IMG)) {
+  for (const [id, p] of Object.entries(ROLE_IMG)) {
     const file = join(ROOT, `share-${id}.html`);
     if (!existsSync(file)) continue;
     let html = readFileSync(file, "utf8");
     const before = html;
     // 中转页只引一张图：自身的角色图
-    html = bumpImgVerInHtml(html, name, ROLE_VERS[id]);
+    html = bumpImgVerInHtml(html, p, ROLE_VERS[id]);
     if (html !== before) {
       writeFileSync(file, html, "utf8");
       console.log(`[sync-share-version] 已更新 share-${id}.html`);

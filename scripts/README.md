@@ -11,7 +11,7 @@
 ## 它是怎么工作的？
 
 1. **`scripts/sync-share-version.mjs`**
-   读 `img/share-cover.png` 和 6 张角色图（`picasso.png` / `hara.png` / `mondrian.png` / `kusama.png` / `gogh.png` / `monet.png`）的 `mtime + size`，hash 出一段 8 位指纹。
+   读 `img/share-cover.png` 和 6 张角色图（`role/d1-B.png` ~ `role/d6-B.png`）的 `mtime + size`，hash 出一段 8 位指纹。
 
 2. 把指纹写入 `quiz-h5.html` 和 `share-d1.html ~ share-d6.html` 中所有指向分享图的 URL，作为 `?v=xxxxxxxx`。
    - `og:image` / `og:image:secure_url`
@@ -40,16 +40,16 @@ bash scripts/install-hooks.sh
 
 ```bash
 # 比如把毕加索的角色分享图换成新版
-cp ~/Downloads/new-picasso.png img/picasso.png
+cp ~/Downloads/new-picasso.png role/d1-B.png
 
-git add img/picasso.png
+git add role/d1-B.png
 git commit -m "更新毕加班索分享图"
 git push
 ```
 
 提交时 pre-commit 钩子会自动：
-- 重新计算 `picasso.png` 的指纹（旧 `dd361e6f` → 新指纹）
-- 把 `quiz-h5.html` 和 `share-d1.html` 里所有指向 `picasso.png` 的 URL 版本号同步更新
+- 重新计算 `role/d1-B.png` 的指纹（旧 `dd361e6f` → 新指纹）
+- 把 `quiz-h5.html` 和 `share-d1.html` 里所有指向 `role/d1-B.png` 的 URL 版本号同步更新
 - 把这些被自动改的 HTML 一并 `git add` 加入本次提交
 
 部署到 EdgeOne 之后，微信爬虫读到新 URL，缩略图自动换。
@@ -67,12 +67,12 @@ node scripts/sync-share-version.mjs
 | 图 | 用途 |
 |---|---|
 | `img/share-cover.png` | 首页 / 答题中分享卡片 |
-| `img/picasso.png` | 结果 d1（草稿太多的毕加班索）分享卡片 |
-| `img/hara.png` | 结果 d2（还在抠图的原研栽）分享卡片 |
-| `img/mondrian.png` | 结果 d3（对不齐的蒙得里不安）分享卡片 |
-| `img/kusama.png` | 结果 d4（复制到崩溃的草间弥死）分享卡片 |
-| `img/gogh.png` | 结果 d5（风格断片的梵稿）分享卡片 |
-| `img/monet.png` | 结果 d6（睡莲迁移失败的莫奈何）分享卡片 |
+| `role/d1-B.png` | 结果 d1（草稿太多的毕加班索）分享卡片 |
+| `role/d2-B.png` | 结果 d2（还在抠图的原研栽）分享卡片 |
+| `role/d3-B.png` | 结果 d3（对不齐的蒙得里不安）分享卡片 |
+| `role/d4-B.png` | 结果 d4（复制到崩溃的草间弥死）分享卡片 |
+| `role/d5-B.png` | 结果 d5（风格断片的梵稿）分享卡片 |
+| `role/d6-B.png` | 结果 d6（睡莲迁移失败的莫奈何）分享卡片 |
 | `role/d{1..6}-{A,B}.png` | 结果页角色立绘（正/反面）+ 长按生成的分享海报里的大图，自动注入 `quiz-h5.html` 中 `ROLE_LIVE_VER` 常量 |
 
 > 角色立绘和分享角色图共用同一个文件，所以换图是"立绘和分享卡片同时换"。
