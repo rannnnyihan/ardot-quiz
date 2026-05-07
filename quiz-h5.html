@@ -980,8 +980,9 @@
       font-family:"MiSans","PingFang SC","Helvetica Neue",Arial,sans-serif!important;
       font-variant-numeric:tabular-nums!important;font-feature-settings:"tnum"!important;
     }
-    /* 题目区域顶部空白（题号已脱离流，给适度顶距即可） */
-    body.quiz-on-q .qh{margin-bottom:24px!important;padding-top:140px!important}
+    /* 题目区域：q-num-global 是 position:fixed 已脱离流，无需顶部占位；
+       由 .wrap 的 flex 居中负责整体居中 */
+    body.quiz-on-q .qh{margin-bottom:24px!important;padding-top:0!important}
 
     /* 单选选项：白底 → hover 浅灰 → 选中绿色描边（按设计稿 1.5px / #14CC52） */
     body.quiz-on-q .opt{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important;border-radius:14px!important;box-shadow:none!important}
