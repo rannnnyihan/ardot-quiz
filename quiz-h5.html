@@ -4827,9 +4827,11 @@
       var SHARE_BUILD="20260427";
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var shareLink=baseDir+"share-"+encodeURIComponent(role.id)+".html?v="+SHARE_BUILD;
-      var rImgEl=document.getElementById("rImg");
       var posterImg=baseDir+"img/home-poster.png?v=20260507b";
-      var shareImg=(rImgEl&&rImgEl.src&&!/^https?:\/\/[^\/]+\/?$/.test(rImgEl.src))?rImgEl.src:posterImg;
+      /* 分享卡缩略图：固定使用类别 B 图（与 share-dX.html 里 og:image 一致），
+         避免拿到 #rImg 立绘（透明底 PNG，部分平台抓不到/显示空）。 */
+      var roleShareImg=baseDir+roleMetaImgName(role.id);
+      var shareImg=roleShareImg||posterImg;
       var title=RESULT_SHARE_TITLE_PREFIX+"「"+(role.name||"设计大师")+"」";
       var desc=SHARE_CARD_SUBTITLE;
       updateShareMeta({title:title,desc:desc,img:shareImg,link:shareLink});
