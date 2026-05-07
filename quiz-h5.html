@@ -1164,9 +1164,10 @@
     /* ============================================================ */
     /* ==========  结果态皮肤：白底 + 格纹 + 顶/底绿色渐变 ========== */
     /* ============================================================ */
-    /* 结果页：整屏统一浅绿底色 + 格纹（去掉原来的顶部/中段灰白渐变，避免视觉上分层） */
+    /* 结果页：整屏灰白底色 + 格纹（格纹固定在视口，作为底纹）；
+       绿色渐变 NOT 在 body 上，而是挂在 #res.active 上 → 会跟随页面滚动一起滑走 */
     body:has(#res.active){
-      background-color:#C5FFD9!important;
+      background-color:#F6F6F6!important;
       background-image:
         /* 格纹横线 */
         linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
@@ -1177,6 +1178,36 @@
       background-repeat:repeat, repeat!important;
       background-attachment:fixed, fixed!important;
       color:#1a1d1a!important
+    }
+    /* 顶部浅绿渐变：作为 #res 自身背景，随内容一起滚动；
+       用 ::before 伪元素 + 100vw 全屏宽 + 负 left 突破 .wrap 的 padding，
+       绝对定位到结果页顶部 0，会随页面滚动而向上滑走（不是 fixed） */
+    body:has(#res.active) #res.active{
+      position:relative!important;
+    }
+    body:has(#res.active) #res.active::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:100vw;             /* 全屏宽，无视外层 .wrap 的 padding */
+      height:480px;            /* 渐变只占顶部 480px 高度 */
+      background:linear-gradient(to bottom,
+        rgba(197,255,217,.92) 0px,        /* 顶部贴边，浅绿最饱满 */
+        rgba(197,255,217,.92) 200px,      /* 标题 + 立绘上半段保持浅绿 */
+        rgba(246,246,246,0) 360px         /* 立绘中部渐隐回灰白 */
+      );
+      pointer-events:none;     /* 不影响点击 */
+      z-index:0;               /* 在内容下方 */
+      /* 兼容 .wrap 的 padding-top:32px：让渐变向上突破 32px，从 viewport 真正顶部贴边起 */
+      margin-top:-32px;
+    }
+    /* 让结果内容压在伪元素之上 */
+    body:has(#res.active) #res.active > *{position:relative;z-index:1}
+    /* 手机端 .wrap 的 padding-top 是 20px（行 370），让伪元素同步上移 */
+    @media(max-width:640px){
+      body:has(#res.active) #res.active::before{margin-top:-20px}
     }
     body:has(#res.active) .bar{background:transparent!important}
     body:has(#res.active) .bar-fill{background:transparent!important}
@@ -1193,20 +1224,14 @@
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;position:relative;z-index:1}
 
-    /* ====== 滚动行为：结果页整体跟随滚动，不再 sticky 钉顶 ====== */
+    /* ====== 滚动行为：结果页整体跟随滚动，不再 sticky 钉顶 ======
+       注意：渐变背景统一交给 body:has(#res.active) 处理，全屏宽且从顶部贴边，
+       这里 .res-top 不再自己叠绿色，否则会因为有 padding 左右出现"内缩色块" */
     body:has(#res.active) #res .res-top{
       position:relative!important;
       top:auto!important;
       z-index:1!important;
-      /* 顶部视觉背景（绿色渐变 + 浅格纹）保留，但跟随页面滚动 */
-      background-color:#F6F6F6!important;
-      background-image:
-        linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(17,17,17,.05) 1px, transparent 1px),
-        linear-gradient(to bottom, #C5FFD9 0%, rgba(246,246,246,1) 380px)!important;
-      background-size:32px 32px, 32px 32px, 100% 100%!important;
-      background-position:center top, center top, top!important;
-      background-repeat:repeat, repeat, no-repeat!important;
+      background:transparent!important;
       box-shadow:none!important;
     }
     /* section 正常文档流 */
@@ -4193,17 +4218,19 @@
           const kickerY=kickerCenterY+kickerSize*0.36;
 
           /* ===== 第 1 行：前缀（如"还在抠图的"），粗体 26px =====
-             kicker 与前缀间距收紧（~12px） */
+             kicker 底部到下方角色名（前缀/主名）顶部的间距固定 40px */
+          const TITLE_GAP=40; /* 标题（kicker）与下方角色名的垂直间距 */
           const prefixSize=26;
           ctx.fillStyle="#111";
           ctx.textAlign="left";
           ctx.font="700 "+prefixSize+"px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
-          let prefixY=kickerY+12+prefixSize-2;
+          /* 文字顶部 = kickerY + 40，则 alphabetic 基线 y = 顶部 + 字高 */
+          let prefixY=kickerY+TITLE_GAP+prefixSize;
           if(split.prefix){
             ctx.fillText(split.prefix,padX,prefixY);
           }else{
-            /* 若无前缀，把主名整体上移，让首行紧跟 kicker */
-            prefixY=kickerY+12-4;
+            /* 若无前缀，主名首行顶部紧接 kicker+40 */
+            prefixY=kickerY+TITLE_GAP;
           }
 
           /* ===== 第 2 行：主名（粗体 64px，高亮字标绿，紧贴前缀） ===== */
@@ -4244,17 +4271,25 @@
           /* 底栏区域：QR 92 + 上 22 + 下 14 = 128，预留给底部
              （下边距收紧到 14，让 logo / 二维码更贴近画布底边） */
           const footerReserve=22+92+14; /* 22 上 + 92 QR + 14 下 = 128 */
-          const avatarTop=sloganY+sloganBoxH+8;
-          const avatarMaxH=H-footerReserve-avatarTop-2;
+          const avatarTop=sloganY+sloganBoxH+2;       /* slogan 黑条到立绘的间距收到 2px，给立绘更多空间 */
+          const avatarMaxH=H-footerReserve-avatarTop+8; /* 允许立绘下沿略微压入 footer 上方留白（+8） */
           if(img){
             const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-            /* 允许略微出血到画布边缘 */
-            let dw=W-8;
+            /* 立绘整体放大：先按宽 W 计算，再统一 ×1.18 让人物更撑画面 */
+            const SCALE=1.18;
+            const MIN_AVATAR_W=290; /* 立绘最小宽度兜底 */
+            let dw=W*SCALE;
             let dh=ih*(dw/iw);
             if(dh>avatarMaxH){
               dh=avatarMaxH;
               dw=iw*(dh/ih);
             }
+            /* 最小宽度兜底：缩小后若 dw < 290，强制放大到 290（按比例计算 dh） */
+            if(dw<MIN_AVATAR_W){
+              dw=MIN_AVATAR_W;
+              dh=ih*(dw/iw);
+            }
+            /* 居中（允许 dw 大于 W → 左右各出血一点，画布外部分自动裁掉） */
             const dx=(W-dw)/2;
             const dy=avatarTop;
             ctx.drawImage(img,dx,dy,dw,dh);
