@@ -389,7 +389,7 @@
       .chip-grid.chip-grid-v .chip-name{font-size:15px}
       .chip{min-height:66px;padding:12px 14px;border-radius:14px}
       .chip-name{font-size:15px}
-      body.quiz-on-q .wrap{padding-top:32px;padding-bottom:80px}
+      body.quiz-on-q .wrap{padding-top:80px;padding-bottom:80px}
       body.quiz-on-q .q-title{font-size:22px}
       body.quiz-on-q .opt{padding:18px 22px}
       body.quiz-on-q .opt-t{font-size:15px}
@@ -803,12 +803,13 @@
       min-height:100vh;                 /* 回退：老浏览器用 100vh */
       min-height:100dvh;                /* 动态视口：地址栏显隐时居中更稳 */
       display:flex;flex-direction:column;justify-content:center;
-      padding-top:80px;padding-bottom:80px;   /* 顶/底各留 80px 避开 nav、按钮 */
+      padding-top:80px;padding-bottom:80px;   /* 顶/底对称，确保视觉居中 */
       box-sizing:border-box;
     }
     body.quiz-on-q .scene.active{width:100%}  /* 场景铺满 wrap 宽度 */
     @media(max-width:640px){
-      body.quiz-on-q .wrap{padding-top:18px;padding-bottom:72px}
+      /* 顶部 padding 需要把 nav(56) + 进度条/题号 的视觉占位算进去，与底部 .qa 按钮区(72) 对称 */
+      body.quiz-on-q .wrap{padding-top:72px;padding-bottom:72px}
     }
 
     /* ============================================================ */
