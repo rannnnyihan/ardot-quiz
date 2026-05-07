@@ -117,7 +117,7 @@
     .welcome-note{display:block;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(20px,5.2vw,34px);color:#111;
       background:transparent;border:0;padding:0;border-radius:0;
       margin:0 auto 28px;letter-spacing:-.025em;font-weight:500;text-align:center;line-height:1.18;max-width:18em}
-    .welcome-head-art{display:block;width:min(86vw,660px);height:auto;margin:0 auto 18px;user-select:none;-webkit-user-drag:none;pointer-events:none}
+    .welcome-head-art{display:block;width:min(86vw,660px);height:auto;margin:-10px auto 18px;user-select:none;-webkit-user-drag:none;pointer-events:none}
     /* 底部封面插画：用背景图而不是 <img>，这样：
        · 容器宽度 = 100vw（不限制 max-width），居中
        · background-size: auto 100% —— 图高铺满容器，宽度保持原比例
@@ -141,7 +141,7 @@
       display:flex;flex-direction:column;align-items:center;
       width:100%;max-width:520px;margin:10px auto 0;padding:0 20px;box-sizing:border-box}
     .welcome.quiz-started .welcome-cta{display:none}
-    .btn-go{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;
+    .btn-go{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
       width:min(64vw,380px);height:clamp(56px,11.5vw,76px);padding:0 28px;border-radius:999px;
       border:0;background:#050505;color:#fff;
       font-size:clamp(20px,4.8vw,30px);font-weight:300;letter-spacing:-.035em;cursor:pointer;
@@ -150,10 +150,10 @@
     .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
       background:#050505;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.16);outline:none}
     .btn-go:active{transform:translateY(1px)}
-    .btn-go .btn-label{display:inline-flex;align-items:center;line-height:1;white-space:nowrap;font-weight:300;font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif}
-    .btn-go .arr{flex-shrink:0;display:inline-flex;width:clamp(38px,7.4vw,56px);height:clamp(38px,7.4vw,56px);align-items:center;justify-content:center;background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68}
+    .btn-go .btn-label{display:inline-flex;align-items:center;line-height:1;white-space:nowrap;font-weight:300;font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;transform:translateY(1px)}
+    .btn-go .arr{flex-shrink:0;display:inline-block;width:1.05em;height:1.05em;background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68;vertical-align:middle}
     .btn-go .arr svg{display:none}
-    .welcome-search-pill{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:0;height:34px;margin:14px auto 0;border:1.5px solid #444;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.35);font-size:13px;font-weight:700;color:#444;letter-spacing:-.01em}
+    .welcome-search-pill{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:0;height:34px;margin:14px auto calc(28px + env(safe-area-inset-bottom,0px));border:1.5px solid #444;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.35);font-size:13px;font-weight:700;color:#444;letter-spacing:-.01em}
     .welcome-search-brand{height:100%;display:flex;align-items:center;justify-content:center;background:#444;color:#fff;padding:0 14px;text-transform:lowercase}
     .welcome-search-text{display:flex;align-items:center;justify-content:center;padding:0 14px;white-space:nowrap}
     /* 兼容旧 class，不破坏其他页面 */
@@ -363,7 +363,7 @@
       .welcome{min-height:calc(100vh - 140px);padding-bottom:36px}
       .welcome-cta{max-width:440px;padding:0 24px}
       .btn-go{height:clamp(56px,11.5vw,76px);font-size:clamp(20px,4vw,30px)}
-      .btn-go .arr{width:clamp(30px,5vw,44px);height:clamp(30px,5vw,44px)}
+      .btn-go .arr{width:1.05em;height:1.05em}
       .q-title{font-size:26px;line-height:1.3}
       .q-desc{font-size:15px}
       .opts{gap:14px}
@@ -527,14 +527,20 @@
     /* 解锁建议 */
     .advice-intro{font-size:13px;color:#5a5245;line-height:1.7;margin-bottom:10px}
     .advice-intro em{font-style:normal;color:#8f5d24;font-weight:700}
-    .advice-list{list-style:none;display:grid;gap:8px;padding:0;margin:0 0 10px}
-    .advice-list li{padding:10px 14px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#3a3428;line-height:1.5;font-weight:500;display:flex;align-items:center;gap:10px}
+    .advice-list{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0;margin:0 0 10px}
+    .advice-list li{padding:10px 10px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12px;color:#3a3428;line-height:1.35;font-weight:500;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;min-width:0;word-break:break-word;hyphens:auto}
     .advice-list li::before{content:"\2713";display:inline-flex;width:18px;height:18px;border-radius:50%;background:#c89a4a;color:#fff;font-size:11px;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
     .advice-outro{font-size:12.5px;color:#8a7658;line-height:1.7}
     @media(max-width:640px){
       .res-avatar-frame{width:72vw;aspect-ratio:1/1}
       .substat-val{font-size:30px}
       .radar-svg{max-width:280px}
+      .advice-list{gap:6px}
+      .advice-list li{padding:8px 6px;font-size:11px;line-height:1.3;gap:5px}
+      .advice-list li::before{width:16px;height:16px;font-size:10px}
+    }
+    @media(max-width:380px){
+      .advice-list{grid-template-columns:repeat(2,1fr)}
     }
     @media(min-width:768px){
       .res-section{padding:0 32px 24px}
@@ -783,7 +789,7 @@
       min-height:calc(100vh - 56px);     /* 兜底 */
       min-height:calc(100dvh - 56px);    /* 现代浏览器：动态视口，地址栏收起也能贴底 */
       width:100%;
-      padding:24px 0 0;
+      padding:0 0 calc(28px + env(safe-area-inset-bottom,0px));
       border-radius:0;
       background:transparent;
       overflow:visible;                  /* 关键：让底部插画的 100vw 溢出可见，不被裁 */
@@ -791,7 +797,7 @@
     }
     /* 顶部文字容器 */
     body:has(#s0.welcome.active) .welcome-head{
-      padding:22px 28px 0;
+      padding:0 28px 0;
       width:100%;
       max-width:700px;
       margin:0 auto;
@@ -1053,8 +1059,15 @@
     #res .advice-intro{color:#1a1d1a!important}
     #res .advice-intro em{color:#00EC00!important;font-weight:700}
     #res .advice-outro{color:#6b7280!important}
-    #res .advice-list li{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .advice-list li{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important;border-radius:0!important}
     #res .advice-list li::before{background:#00EC00!important;color:#111!important}  /* 勾选圆点：绿底黑字 */
+
+    /* 结果页：所有信息卡片去圆角（保留头像/勾点等真正圆形元素） */
+    #res .why-box,
+    #res .gap-item,
+    #res .gap-item.master,
+    #res .dim-table,
+    #res .insight-box{border-radius:0!important}
 
     /* 口头禅 */
     #res .mantra-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
@@ -1098,6 +1111,17 @@
     #res .btn-redo{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
     #res .btn-redo:hover{border-color:#111!important;color:#111!important}
 
+    /* === TWEAK_SAVED_START === 由元素微调工具写入，手动编辑这一段也可以 === */
+    span.arr{
+      width: 38px !important;
+      height: 38px !important;
+      transform: translate(-3px,0px) !important;
+    }
+    div#s0.welcome.scene.active{
+      width: 402px !important;
+      height: 818px !important;
+    }
+    /* === TWEAK_SAVED_END === */
   </style>
 </head>
 <body>
@@ -4186,6 +4210,278 @@
         imgUrl:location.origin+location.pathname.replace(/[^\/]*$/,"")+"img/picasso.png?v=2"
       };
       tryUpdateWxShare(defaultShare);
+    })();
+
+    /* ============================================================
+     * 元素微调工具（仅在 URL 带 ?tweak=1 时启用）
+     * 使用：
+     *   1) 在地址栏后加 ?tweak=1（已有参数则用 &tweak=1）
+     *   2) 鼠标移到任意元素上会出现蓝色虚线框，点击即选中
+     *   3) 右下角面板拖滑块/输入数值即可微调宽度、左右位移、上下位移、缩放
+     *   4) 点"复制 CSS"得到该元素的 CSS 片段，粘到样式表里持久化
+     *   5) ESC 取消选中，点面板右上角 ✕ 关闭工具
+     * ============================================================ */
+    (function tweakTool(){
+      try{
+        var qs=new URLSearchParams(location.search);
+        if(qs.get("tweak")!=="1") return;
+      }catch(e){ return; }
+
+      var STYLE_ID="__tweak_tool_style__";
+      var PANEL_ID="__tweak_tool_panel__";
+      var HOVER_CLS="__tweak_hover__";
+      var SELECTED_CLS="__tweak_selected__";
+      var IGNORE_ATTR="data-tweak-ui";
+
+      // 注入样式
+      var style=document.createElement("style");
+      style.id=STYLE_ID;
+      style.textContent=[
+        "."+HOVER_CLS+"{outline:2px dashed #3b82f6 !important;outline-offset:2px !important;cursor:crosshair !important}",
+        "."+SELECTED_CLS+"{outline:2px solid #ef4444 !important;outline-offset:2px !important}",
+        "#"+PANEL_ID+"{position:fixed;right:12px;bottom:12px;z-index:2147483647;width:280px;max-width:92vw;",
+        "  background:#111;color:#fff;font:12px/1.5 -apple-system,Helvetica,Arial,sans-serif;",
+        "  border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:10px 12px;user-select:none}",
+        "#"+PANEL_ID+" h4{margin:0 0 6px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}",
+        "#"+PANEL_ID+" .tw-tag{font-size:11px;background:#27272a;color:#a1a1aa;padding:2px 6px;border-radius:4px;font-family:Menlo,Consolas,monospace;word-break:break-all;display:block;margin-bottom:8px;max-height:60px;overflow:auto}",
+        "#"+PANEL_ID+" .tw-row{display:flex;align-items:center;gap:6px;margin:4px 0}",
+        "#"+PANEL_ID+" .tw-row label{flex:0 0 56px;color:#d4d4d8;font-size:11px}",
+        "#"+PANEL_ID+" .tw-row input[type=range]{flex:1;min-width:0}",
+        "#"+PANEL_ID+" .tw-row input[type=number]{width:60px;background:#27272a;color:#fff;border:1px solid #3f3f46;border-radius:4px;padding:2px 4px;font-size:11px;font-family:Menlo,Consolas,monospace}",
+        "#"+PANEL_ID+" .tw-btns{display:flex;gap:6px;margin-top:8px}",
+        "#"+PANEL_ID+" .tw-btns button{flex:1;background:#3b82f6;color:#fff;border:0;border-radius:5px;padding:6px 0;font-size:12px;cursor:pointer}",
+        "#"+PANEL_ID+" .tw-btns button.sec{background:#3f3f46}",
+        "#"+PANEL_ID+" .tw-btns button:active{transform:translateY(1px)}",
+        "#"+PANEL_ID+" .tw-close{background:transparent;color:#a1a1aa;border:0;font-size:16px;cursor:pointer;padding:0 4px;line-height:1}",
+        "#"+PANEL_ID+" .tw-hint{color:#a1a1aa;font-size:11px;margin-top:6px}"
+      ].join("\n");
+      document.head.appendChild(style);
+
+      // 创建面板
+      var panel=document.createElement("div");
+      panel.id=PANEL_ID;
+      panel.setAttribute(IGNORE_ATTR,"1");
+      panel.innerHTML=[
+        '<h4><span>🎯 元素微调</span><button class="tw-close" type="button" data-act="close" aria-label="关闭">✕</button></h4>',
+        '<div class="tw-tag" id="twSel">未选中元素 · 在页面上点击即可选择</div>',
+        '<div class="tw-row"><label>宽度</label><input type="range" id="twW" min="20" max="2000" step="1"><input type="number" id="twWn" step="1"></div>',
+        '<div class="tw-row"><label>高度</label><input type="range" id="twH" min="20" max="2000" step="1"><input type="number" id="twHn" step="1"></div>',
+        '<div class="tw-row"><label>左右</label><input type="range" id="twX" min="-300" max="300" step="1" value="0"><input type="number" id="twXn" step="1" value="0"></div>',
+        '<div class="tw-row"><label>上下</label><input type="range" id="twY" min="-300" max="300" step="1" value="0"><input type="number" id="twYn" step="1" value="0"></div>',
+        '<div class="tw-row"><label>缩放</label><input type="range" id="twS" min="0.2" max="2" step="0.01" value="1"><input type="number" id="twSn" step="0.01" value="1"></div>',
+        '<div class="tw-btns"><button data-act="reset" class="sec" type="button">还原</button><button data-act="copy" type="button">复制 CSS</button><button data-act="save" type="button" style="background:#10b981">💾 保存</button></div>',
+        '<div class="tw-hint">提示：H 切换 hover 模式 · ESC 取消选中</div>'
+      ].join("");
+      // 防止面板被工具自身选中
+      panel.querySelectorAll("*").forEach(function(el){ el.setAttribute(IGNORE_ATTR,"1"); });
+      document.body.appendChild(panel);
+
+      // 状态
+      var hoverEl=null, selectedEl=null, original=null, hoverEnabled=true;
+
+      function isUI(el){
+        if(!el) return true;
+        return !!(el.closest && el.closest("["+IGNORE_ATTR+"]"));
+      }
+      function describe(el){
+        if(!el) return "(none)";
+        var t=el.tagName.toLowerCase();
+        var id=el.id?"#"+el.id:"";
+        var cls=(el.className&&typeof el.className==="string")?"."+el.className.trim().split(/\s+/).filter(function(c){return c&&c!==HOVER_CLS&&c!==SELECTED_CLS;}).join("."):"";
+        return t+id+cls;
+      }
+      function snapshot(el){
+        var cs=getComputedStyle(el);
+        return {
+          width: el.style.width || "",
+          height: el.style.height || "",
+          marginLeft: el.style.marginLeft || "",
+          marginTop: el.style.marginTop || "",
+          transform: el.style.transform || "",
+          cw: parseFloat(cs.width)||0,
+          ch: parseFloat(cs.height)||0
+        };
+      }
+      function restore(el,o){
+        if(!el||!o) return;
+        el.style.width=o.width;
+        el.style.height=o.height;
+        el.style.marginLeft=o.marginLeft;
+        el.style.marginTop=o.marginTop;
+        el.style.transform=o.transform;
+      }
+
+      // 事件：hover 高亮
+      document.addEventListener("mouseover",function(e){
+        if(!hoverEnabled) return;
+        var el=e.target;
+        if(isUI(el)) return;
+        if(el===selectedEl) return;
+        if(hoverEl && hoverEl!==el) hoverEl.classList.remove(HOVER_CLS);
+        hoverEl=el;
+        el.classList.add(HOVER_CLS);
+      },true);
+      document.addEventListener("mouseout",function(e){
+        var el=e.target;
+        if(el && el.classList) el.classList.remove(HOVER_CLS);
+      },true);
+
+      // 点击选中（捕获阶段拦截，避免触发原页面 onclick）
+      document.addEventListener("click",function(e){
+        var el=e.target;
+        if(isUI(el)) return; // 面板内点击放行
+        if(!hoverEnabled) return;
+        e.preventDefault();
+        e.stopPropagation();
+        select(el);
+      },true);
+
+      function select(el){
+        if(selectedEl){
+          selectedEl.classList.remove(SELECTED_CLS);
+        }
+        if(hoverEl) hoverEl.classList.remove(HOVER_CLS);
+        selectedEl=el;
+        el.classList.add(SELECTED_CLS);
+        original=snapshot(el);
+        // 初始化面板
+        document.getElementById("twSel").textContent=describe(el);
+        setSlider("twW","twWn", Math.round(original.cw));
+        setSlider("twH","twHn", Math.round(original.ch));
+        setSlider("twX","twXn", 0);
+        setSlider("twY","twYn", 0);
+        setSlider("twS","twSn", 1);
+      }
+      function setSlider(rid,nid,val){
+        var r=document.getElementById(rid), n=document.getElementById(nid);
+        // 自适应 range 上限
+        if(rid==="twW"||rid==="twH"){
+          r.max=Math.max(2000, val*2);
+        }
+        r.value=val; n.value=val;
+      }
+
+      function applyTweak(){
+        if(!selectedEl) return;
+        var w=parseFloat(document.getElementById("twWn").value);
+        var h=parseFloat(document.getElementById("twHn").value);
+        var x=parseFloat(document.getElementById("twXn").value)||0;
+        var y=parseFloat(document.getElementById("twYn").value)||0;
+        var s=parseFloat(document.getElementById("twSn").value)||1;
+        if(!isNaN(w)) selectedEl.style.width=w+"px";
+        if(!isNaN(h)) selectedEl.style.height=h+"px";
+        var tr=[];
+        if(x||y) tr.push("translate("+x+"px,"+y+"px)");
+        if(s!==1) tr.push("scale("+s+")");
+        selectedEl.style.transform=tr.join(" ");
+      }
+
+      // 滑块/数值联动
+      [["twW","twWn"],["twH","twHn"],["twX","twXn"],["twY","twYn"],["twS","twSn"]].forEach(function(pair){
+        var r=document.getElementById(pair[0]), n=document.getElementById(pair[1]);
+        r.addEventListener("input",function(){ n.value=r.value; applyTweak(); });
+        n.addEventListener("input",function(){ r.value=n.value; applyTweak(); });
+      });
+
+      // 按钮
+      panel.addEventListener("click",function(e){
+        var act=e.target&&e.target.getAttribute&&e.target.getAttribute("data-act");
+        if(!act) return;
+        if(act==="close"){
+          cleanup();
+        }else if(act==="reset"){
+          if(selectedEl&&original){
+            restore(selectedEl,original);
+            setSlider("twW","twWn", Math.round(original.cw));
+            setSlider("twH","twHn", Math.round(original.ch));
+            setSlider("twX","twXn", 0);
+            setSlider("twY","twYn", 0);
+            setSlider("twS","twSn", 1);
+          }
+        }else if(act==="copy"){
+          if(!selectedEl){ alert("请先选择一个元素"); return; }
+          var w=document.getElementById("twWn").value;
+          var h=document.getElementById("twHn").value;
+          var x=parseFloat(document.getElementById("twXn").value)||0;
+          var y=parseFloat(document.getElementById("twYn").value)||0;
+          var s=parseFloat(document.getElementById("twSn").value)||1;
+          var sel=describe(selectedEl);
+          var lines=[sel+"{"];
+          lines.push("  width: "+w+"px;");
+          lines.push("  height: "+h+"px;");
+          var tr=[];
+          if(x||y) tr.push("translate("+x+"px,"+y+"px)");
+          if(s!==1) tr.push("scale("+s+")");
+          if(tr.length) lines.push("  transform: "+tr.join(" ")+";");
+          lines.push("}");
+          var css=lines.join("\n");
+          if(navigator.clipboard&&navigator.clipboard.writeText){
+            navigator.clipboard.writeText(css).then(function(){
+              flashBtn(e.target,"已复制");
+            },function(){ promptFallback(css); });
+          }else{
+            promptFallback(css);
+          }
+        }else if(act==="save"){
+          if(!selectedEl){ alert("请先选择一个元素"); return; }
+          var sel2=describe(selectedEl);
+          var w2=document.getElementById("twWn").value;
+          var h2=document.getElementById("twHn").value;
+          var x2=parseFloat(document.getElementById("twXn").value)||0;
+          var y2=parseFloat(document.getElementById("twYn").value)||0;
+          var s2=parseFloat(document.getElementById("twSn").value)||1;
+          var props={};
+          if(w2) props["width"]=w2+"px";
+          if(h2) props["height"]=h2+"px";
+          var tr2=[];
+          if(x2||y2) tr2.push("translate("+x2+"px,"+y2+"px)");
+          if(s2!==1) tr2.push("scale("+s2+")");
+          if(tr2.length) props["transform"]=tr2.join(" ");
+          var btn=e.target;
+          btn.disabled=true; var oldTxt=btn.textContent; btn.textContent="保存中…";
+          fetch("/__tweak_save__",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({selector:sel2,props:props})
+          }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
+            .then(function(res){
+              btn.disabled=false;
+              if(res.ok){ btn.textContent="✅ 已保存"; setTimeout(function(){ btn.textContent=oldTxt; },1500); }
+              else{ btn.textContent=oldTxt; alert("保存失败："+(res.j&&res.j.error||"未知错误")+"\n请确认你是用 node tweak-server.js 启动的服务"); }
+            })
+            .catch(function(err){
+              btn.disabled=false; btn.textContent=oldTxt;
+              alert("保存失败：无法连接到保存服务。\n请用 node tweak-server.js 启动。\n\n"+err.message);
+            });
+        }
+      });
+      function flashBtn(btn,txt){
+        var old=btn.textContent;
+        btn.textContent=txt;
+        setTimeout(function(){ btn.textContent=old; },1200);
+      }
+      function promptFallback(css){
+        window.prompt("复制下面的 CSS：",css);
+      }
+
+      // 键盘：ESC 取消，H 切 hover
+      document.addEventListener("keydown",function(e){
+        if(e.key==="Escape"){
+          if(selectedEl){ selectedEl.classList.remove(SELECTED_CLS); selectedEl=null; original=null; document.getElementById("twSel").textContent="未选中元素 · 在页面上点击即可选择"; }
+        }else if(e.key==="h"||e.key==="H"){
+          hoverEnabled=!hoverEnabled;
+          if(!hoverEnabled && hoverEl){ hoverEl.classList.remove(HOVER_CLS); hoverEl=null; }
+        }
+      });
+
+      function cleanup(){
+        if(hoverEl) hoverEl.classList.remove(HOVER_CLS);
+        if(selectedEl) selectedEl.classList.remove(SELECTED_CLS);
+        var s=document.getElementById(STYLE_ID); if(s) s.remove();
+        var p=document.getElementById(PANEL_ID); if(p) p.remove();
+      }
+
+      console.log("%c[元素微调工具已开启] hover 高亮，点击选中，ESC 取消，H 切换 hover","color:#3b82f6;font-weight:bold");
     })();
   </script>
 </body>
