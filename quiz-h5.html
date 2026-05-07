@@ -82,6 +82,14 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" onerror="window.__h2cFailed=true"></script>
   <!-- 二维码库：纯本地 canvas 生成（html2canvas 能直接拍到），<10KB，失败时降级到在线 API -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" onerror="window.__qrLibFailed=true"></script>
+  <!-- MiSans 字体（小米开源中文字体，jsDelivr 官方 npm 包；用于加载页 96% 大数字、答题进度 01/09 等数字展示）
+       使用官方 .min.css 入口，浏览器会按需加载对应 unicode 分片（仅数字时只会加载 latin 分片，约 12KB）。
+       任意一种字重失败都不影响布局，会自动回落到 PingFang SC / 系统字体。 -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Regular.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Medium.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Semibold.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Bold.min.css">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC',sans-serif;background:#faf9f7;color:#1a1a2e;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -91,57 +99,37 @@
     .nav-logo-icon svg{width:12px;height:12px}
     .nav-back{display:flex;align-items:center;gap:4px;color:#999;text-decoration:none;font-size:13px;transition:color .2s}
     .nav-back:hover{color:#333}
-    .bar{position:fixed;top:0;left:0;right:0;height:3px;background:#e8e5e0;z-index:999}
-    .bar-fill{height:100%;width:0;background:#c46a1a;transition:width .5s cubic-bezier(.4,0,.2,1)}
+    .bar{position:fixed;top:0;left:0;right:0;height:3px;background:transparent;z-index:999}
+    .bar-fill{height:100%;width:0;background:#14cc52;transition:width .5s cubic-bezier(.4,0,.2,1)}
     .wrap{max-width:720px;margin:0 auto;padding:32px 20px 80px}
     .scene{display:none;animation:fadeUp .45s ease}
     .scene.active{display:block}
     .welcome.scene.active{display:flex}
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    /* ===== 首页（新版）：顶部文字 + 底部插画，背景白 ===== */
-    .welcome{position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;
+    /* ===== 首页（新版）：垂直排列 ===== */
+    .welcome{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
       min-height:calc(100vh - 120px);
-      padding:28px 0 0;margin:-12px 0 0;
-      border-radius:0;overflow:hidden;
-      background:#ffffff;
-      box-shadow:none}
-    /* 顶部文字区（标题 / 副标题 / 预计时间 / 按钮） */
-    .welcome-head{position:relative;padding:14px 18px 0;text-align:center;width:100%;max-width:700px;margin:0 auto}
-    .welcome-badge{display:none}
-    .welcome-title{position:relative;z-index:1;font-family:"Arial Black","PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(46px,13.2vw,92px);line-height:.92;color:#050505;font-weight:1000;
-      letter-spacing:-.09em;margin:0 auto 0;max-width:8.2em;text-align:center;text-shadow:1px 0 0 #050505,-1px 0 0 #050505,0 1px 0 #050505}
-    .welcome-title em{display:block;font-style:normal;color:#050505;font-weight:1000}
-    .welcome-sub{position:relative;z-index:2;font-family:"Kaiti SC","STKaiti","Marker Felt","Comic Sans MS",cursive;font-size:clamp(26px,7.8vw,50px);line-height:1;color:#56c764;margin:-8px auto 22px;
-      max-width:16em;padding:0 8px;font-weight:700;letter-spacing:-.035em;text-align:center;transform:rotate(-2deg)}
-    .welcome-note{display:block;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(20px,5.2vw,34px);color:#111;
-      background:transparent;border:0;padding:0;border-radius:0;
-      margin:0 auto 28px;letter-spacing:-.025em;font-weight:500;text-align:center;line-height:1.18;max-width:18em}
-    .welcome-head-art{display:block;width:min(86vw,460px);height:auto;margin:-10px auto 18px;user-select:none;-webkit-user-drag:none;pointer-events:none}
-    /* 底部封面插画：用背景图而不是 <img>，这样：
-       · 容器宽度 = 100vw（不限制 max-width），居中
-       · background-size: auto 100% —— 图高铺满容器，宽度保持原比例
-       · background-position: center bottom —— 居中对齐底部
-       · 窄屏只露中间人物群，宽屏自动向两侧展开更多画面内容 */
+      padding:0;margin:-12px 0 0;
+      background:#ffffff}
+    .welcome-head{display:none}
+    .welcome-head-art{display:block;width:100%;height:auto;margin:0}
+    /* 按钮 */
+    .welcome-cta{display:flex;justify-content:center;margin:28px 0 0}
+    /* 人物头像组 */
     .welcome-poster{position:relative;display:block;
-      width:100vw;                           /* 铺满视口宽度 */
-      margin-left:calc(50% - 50vw);          /* 抵消外层 .wrap 的 padding，让图真正贴到视口边 */
-      margin-right:calc(50% - 50vw);
+      width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
       height:392px;
       background-image:url("img/home-poster.png?v=20260506");
-      background-repeat:no-repeat;
-      background-position:center bottom;     /* 居中 + 底部对齐 */
-      background-size:auto 100%;             /* 高度 100%，宽度按原图比例 */
+      background-repeat:no-repeat;background-position:center bottom;
+      background-size:auto 100%;
       user-select:none;-webkit-user-drag:none;pointer-events:none}
-    /* 旧结构仅隐藏 .welcome-cover / .master-preview；其余交给新 class 控制 */
+    /* 底部标签图片 - 固定尺寸 */
+    .welcome-down-tag{display:block;width:166px;height:17px;margin:51px auto calc(20px + env(safe-area-inset-bottom,0px))}
     .welcome-cover,
     .master-preview{display:none!important}
-    /* 按钮：正常文档流，在文字区内居中 */
-    .welcome-cta{position:static;left:auto;bottom:auto;transform:none;
-      display:flex;flex-direction:column;align-items:center;
-      width:100%;max-width:520px;margin:10px auto 0;padding:0 20px;box-sizing:border-box}
-    .welcome.quiz-started .welcome-cta{display:none}
-    .btn-go{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
-      width:min(64vw,380px);height:clamp(56px,11.5vw,76px);padding:0 28px;border-radius:999px;
+    /* 按钮样式 */
+    .btn-go{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      width:205px;height:50px;padding:6px 38px;border-radius:999px;line-height:24px;
       border:0;background:#050505;color:#fff;
       font-size:clamp(20px,4.8vw,30px);font-weight:300;letter-spacing:-.035em;cursor:pointer;
       transition:transform .15s ease,box-shadow .2s ease,background .2s ease;
@@ -149,7 +137,7 @@
     .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
       background:#050505;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.16);outline:none}
     .btn-go:active{transform:translateY(1px)}
-    .btn-go .btn-label{display:inline-flex;align-items:center;line-height:1;white-space:nowrap;font-weight:300;font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;transform:translateY(1px)}
+    .btn-go .btn-label{display:inline-flex;align-items:center;justify-content:center;width:77px;height:20px;padding:0;border-radius:0;line-height:20px;white-space:nowrap;font-weight:500;font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif}
     .btn-go .arr{flex-shrink:0;display:inline-block;width:1.05em;height:1.05em;background:url("role/arrow.png?v=20260506") center/contain no-repeat;color:#5cff68;vertical-align:middle}
     .btn-go .arr svg{display:none}
     .welcome-search-pill{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:0;height:34px;margin:14px auto calc(28px + env(safe-area-inset-bottom,0px));border:1.5px solid #444;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.35);font-size:13px;font-weight:700;color:#444;letter-spacing:-.01em}
@@ -248,18 +236,19 @@
     .btn-n{height:42px;padding:0 22px;border-radius:8px;border:none;background:#1a1a2e;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-left:auto}
     .btn-n:hover{background:#2d2d4a}
     .btn-n:disabled{opacity:.3;cursor:not-allowed}
-    .ld{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;position:relative;padding:0 32px;box-sizing:border-box}
+    .ld{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;position:relative;padding:0 32px;box-sizing:border-box;background:#ffffff}
     .ld.active{display:flex}
-    /* 大号百分比数字 */
-    .ld-pct{font-size:72px;line-height:1;font-weight:900;color:#111;letter-spacing:-2px;margin-bottom:28px;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif}
-    .ld-pct .ld-pct-sym{font-size:48px;font-weight:900;margin-left:2px}
-    /* 进度条 */
-    .ld-bar{width:min(360px,72vw);height:4px;border-radius:999px;background:#e5e7e5;overflow:hidden;margin-bottom:22px}
-    .ld-bar-inner{height:100%;width:0%;background:#00EC00;border-radius:999px;transition:width .3s linear}
-    /* 文案胶囊 */
-    .ld-tip{display:inline-block;padding:10px 22px;border-radius:8px;background:#00EC00;color:#111;font-size:14px;font-weight:700;letter-spacing:.5px}
-    /* 底部绿色渐变 */
-    .ld-grad{position:fixed;left:0;right:0;bottom:0;height:42vh;pointer-events:none;background:linear-gradient(to top,#C8F0DA 0%,rgba(200,240,218,0) 100%);z-index:0}
+    /* 大号百分比数字（按设计稿：96 MiSans Bold、超大、紧字距）
+       MiSans 官方 Bold 字重值为 630（非标准 700），精确写 630 可命中 Bold 分片，避免合成粗体 */
+    .ld-pct{font-size:96px;line-height:1;font-weight:630;color:#111;letter-spacing:-3px;margin-bottom:18px;font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+    .ld-pct .ld-pct-sym{font-size:64px;font-weight:630;margin-left:2px;letter-spacing:-1px;font-family:inherit}
+    /* 进度条：极简版隐藏（不显示） */
+    .ld-bar{display:none}
+    .ld-bar-inner{display:none}
+    /* 文案：14px 灰色小字，无背景胶囊（按设计稿） */
+    .ld-tip{display:inline-block;padding:0;border-radius:0;background:transparent;color:#6b7280;font-size:14px;font-weight:400;letter-spacing:0;font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+    /* 底部绿色渐变：极简版隐藏 */
+    .ld-grad{display:none}
     .ld>*{position:relative;z-index:1}
     /* 老的 spinner / 文字样式保留兼容性，但默认隐藏（新页面已不用） */
     .spinner{width:44px;height:44px;border-radius:50%;border:3px solid #e8e5e0;border-top-color:#c46a1a;animation:spin .7s linear infinite;margin-bottom:24px;display:none}
@@ -352,6 +341,31 @@
     .company-modal-btn{width:100%;margin-top:6px;border:none;border-radius:12px;background:#111;color:#fff;font-size:15px;font-weight:600;padding:13px 0;cursor:pointer;transition:opacity .15s,transform .1s}
     .company-modal-btn:disabled{background:#ccc;cursor:not-allowed}
     .company-modal-btn:not(:disabled):active{transform:scale(.98)}
+    /* 身份（昵称+头像）收集弹窗：复用 company-modal 的灰色蒙层风格 */
+    .id-modal{position:fixed;inset:0;z-index:100001;display:none;align-items:center;justify-content:center;padding:24px}
+    .id-modal.show{display:flex}
+    .id-modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+    .id-modal-card{position:relative;width:100%;max-width:360px;background:#fff;border-radius:18px;padding:22px 22px 18px;box-shadow:0 16px 48px rgba(0,0,0,.32);animation:companyModalIn .26s cubic-bezier(.2,.9,.3,1.1)}
+    .id-modal-title{font-size:18px;font-weight:700;color:#111;line-height:1.3;margin-bottom:6px}
+    .id-modal-desc{font-size:12.5px;color:#5a5a60;line-height:1.6;margin-bottom:14px}
+    .id-modal-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    .id-modal-avatar{width:64px;height:64px;border-radius:50%;background:#f1f2f4;flex:0 0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #ececec;cursor:pointer;position:relative;background-size:cover;background-position:center}
+    .id-modal-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .id-modal-avatar-empty{font-size:11px;color:#999;text-align:center;line-height:1.3;padding:0 6px}
+    .id-modal-avatar input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+    .id-modal-input{flex:1;box-sizing:border-box;border:1px solid #e0e0e4;background:#fafafa;border-radius:10px;padding:11px 12px;font-size:14px;color:#111;outline:none;transition:border-color .15s,background .15s;min-width:0}
+    .id-modal-input:focus{border-color:#111;background:#fff}
+    .id-modal-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .id-modal-preset{width:36px;height:36px;border-radius:50%;border:2px solid transparent;cursor:pointer;background-size:cover;background-position:center;transition:border-color .15s,transform .1s}
+    .id-modal-preset:hover{transform:scale(1.06)}
+    .id-modal-preset.is-active{border-color:#111}
+    .id-modal-actions{display:flex;gap:10px}
+    .id-modal-btn{flex:1;border:none;border-radius:12px;font-size:14px;font-weight:600;padding:11px 0;cursor:pointer;transition:opacity .15s,transform .1s}
+    .id-modal-btn-primary{background:#111;color:#fff}
+    .id-modal-btn-primary:disabled{background:#ccc;cursor:not-allowed}
+    .id-modal-btn-primary:not(:disabled):active{transform:scale(.98)}
+    .id-modal-btn-secondary{background:#f3f3f5;color:#333}
+    .id-modal-tip{min-height:16px;font-size:11.5px;color:#d83a3a;margin-top:-6px;margin-bottom:8px;line-height:1.4}
     .wx-hint.show{display:block}
     .wx-hint a{color:#c46a1a;text-decoration:underline;margin-left:4px}
     @media(max-width:640px){.wrap{padding:20px 16px 60px}.welcome h1{font-size:26px}.q-title{font-size:19px}.opts.c2{grid-template-columns:1fr}.scale-likert{grid-template-columns:56px 1fr 68px}.scale-dots{gap:6px}.scale-side{font-size:12px}.res-top{padding-left:10px;padding-right:10px;min-height:440px}.res-avatar-frame{width:72vw}.res-insight-overlay{right:0;bottom:40px;width:74%}.res-insight-overlay .insight-box{font-size:14.5px;padding:16px 18px;line-height:1.65}.others{padding:0 20px 20px}.others-title{padding:0 20px}body.quiz-on-q .wrap{padding-top:16px}body.quiz-on-q .q-title{font-size:16px}}
@@ -452,8 +466,8 @@
     .radar-svg .r-axis{stroke:#cdc5b5;stroke-width:.8;stroke-dasharray:2 2}
     .radar-svg .r-area{fill:rgba(200,154,74,.18);stroke:#1a1a2e;stroke-width:1.3;stroke-linejoin:round}
     .radar-svg .r-point{fill:#1a1a2e;stroke:#fff;stroke-width:1.5}
-    .radar-svg .r-label{font-size:10.5px;fill:#3a3428;font-weight:600}
-    .radar-svg .r-label-pct{font-size:10px;fill:#8a7658;font-weight:500}
+    .radar-svg .r-label{font-size:13px;fill:#3a3428;font-weight:600}
+    .radar-svg .r-label-pct{font-size:12px;fill:#8a7658;font-weight:500}
     /* 口头禅（2×2 胶囊 + 前置小引号） */
     .mantra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .mantra-pill{position:relative;padding:12px 14px 12px 28px;border-radius:10px;background:#fff;border:1px solid #ece4d2;font-size:12.5px;color:#5a5245;line-height:1.5}
@@ -478,17 +492,49 @@
     .save-card-preview{display:block;width:100%;margin:0;border-radius:10px;border:1px solid #ece4d2;background:#faf4e7;-webkit-touch-callout:default;user-select:none}
     .save-card-preview:not([src]),.save-card-preview[src=""]{min-height:180px}
     .save-card-hint{margin-top:10px;text-align:center;font-size:11.5px;color:#8f5d24;font-weight:600;letter-spacing:.02em}
-    /* 右下角悬浮"探索 AI 设计"按钮（仅结果页显示；放在 body 根节点，常驻不消失） */
-    .save-fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:6px;padding:12px 22px;border-radius:999px;background:#00EC00;color:#111;font-size:14px;font-weight:700;letter-spacing:.02em;border:0;cursor:pointer;box-shadow:0 10px 28px rgba(0,236,0,.32),0 2px 6px rgba(0,236,0,.18);z-index:9998;animation:saveTipIn .4s ease both;-webkit-tap-highlight-color:transparent;will-change:transform;text-decoration:none}
+    /* 右下角悬浮 Ardot 图标按钮（仅结果页显示；点击跳转 ardot.tencent.com） */
+    .save-fab{
+      position:fixed;
+      right:20px;
+      bottom:calc(20px + env(safe-area-inset-bottom,0px));
+      display:none;
+      align-items:center;
+      justify-content:center;
+      width:35px;
+      height:35px;
+      padding:0;
+      border-radius:16px;
+      background:transparent;
+      border:0;
+      cursor:pointer;
+      box-shadow:0 10px 28px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.10);
+      z-index:9998;
+      animation:saveTipIn .4s ease both;
+      -webkit-tap-highlight-color:transparent;
+      will-change:transform;
+      text-decoration:none;
+      overflow:hidden;
+      transition:transform .2s, box-shadow .2s;
+      font-size:16px;
+      line-height:19px;
+      color:#0000EE;
+    }
     body.show-save-fab .save-fab{display:inline-flex}
-    .save-fab:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(0,236,0,.4),0 2px 6px rgba(0,236,0,.22);background:#00b800;color:#fff}
-    .save-fab:active{transform:translateY(0);box-shadow:0 6px 18px rgba(0,236,0,.3)}
+    .save-fab:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(0,0,0,.22),0 2px 6px rgba(0,0,0,.12);background:transparent}
+    .save-fab:active{transform:translateY(0);box-shadow:0 6px 18px rgba(0,0,0,.18)}
     .save-fab.loading{pointer-events:none;opacity:.85}
-    .save-fab-ico{font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:transform .2s}
-    .save-fab:hover .save-fab-ico{transform:translate(2px,-2px)}
+    .save-fab-img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
     @keyframes saveTipIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @media(max-width:640px){
-      .save-fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:11px 16px;font-size:13px}
+      .save-fab{right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:35px;height:35px;border-radius:16px}
     }
     /* 长按截图预览层 */
     .save-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -497,12 +543,20 @@
     body.save-overlay-open .save-fab{display:none!important}
     body.save-overlay-open .wx-hint{display:none!important}
     .save-overlay-mask{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-    .save-overlay-inner{position:relative;max-width:94vw;width:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 18px 20px;border-radius:18px;background:#111;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.55);margin:auto}
-    .save-overlay-title{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em;opacity:.92}
-    .save-overlay-img{display:block;max-width:100%;max-height:76vh;width:auto;height:auto;border-radius:12px;background:#fff;-webkit-touch-callout:default;user-select:none;object-fit:contain;box-shadow:0 4px 18px rgba(0,0,0,.35)}
-    .save-overlay-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-    .save-overlay-btn{appearance:none;border:0;padding:10px 20px;border-radius:999px;background:#00EC00;color:#111;font-size:13px;font-weight:600;cursor:pointer}
-    .save-overlay-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.32);color:#fff}
+    .save-overlay-inner{position:relative;max-width:94vw;width:auto;display:flex;flex-direction:column;align-items:center;gap:17px;margin:auto;background:transparent;color:#fff}
+    /* 右上角关闭叉（脱离卡片，浮在屏幕右上） */
+    .save-overlay-close{position:fixed;top:16px;right:16px;z-index:2;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .2s}
+    .save-overlay-close:hover{background:rgba(255,255,255,.24)}
+    .save-overlay-img{display:block;max-width:100%;max-height:76vh;width:auto;height:auto;border-radius:14px;background:#fff;-webkit-touch-callout:default;user-select:none;object-fit:contain;box-shadow:0 12px 36px rgba(0,0,0,.45)}
+    /* 底部按钮：跟随图片布局（与图片底部 gap 17px 由 .save-overlay-inner 控制） */
+    .save-overlay-actions{display:flex;gap:14px;justify-content:center;align-items:center}
+    .save-overlay-btn{appearance:none;border:0;width:140px;height:40px;padding:0 16px;border-radius:999px;background:#fff;color:#111;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .15s,box-shadow .2s}
+    .save-overlay-btn:hover{box-shadow:0 8px 24px rgba(0,0,0,.32)}
+    .save-overlay-btn:active{transform:scale(.97)}
+    .save-overlay-btn svg{flex-shrink:0}
+    /* 海报弹窗内的"修改身份"链接按钮 */
+    .save-overlay-edit-id{appearance:none;background:transparent;border:0;color:rgba(255,255,255,.78);font-size:12.5px;cursor:pointer;padding:4px 10px;border-radius:6px;transition:color .15s,background .15s}
+    .save-overlay-edit-id:hover{color:#fff;background:rgba(255,255,255,.08)}
     /* 维度表格（保留但弱化） */
     .dim-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #ece4d2;margin-top:12px}
     .dim-table th,.dim-table td{padding:9px 12px;text-align:left;border-bottom:1px solid #f3ecde}
@@ -829,19 +883,14 @@
     /* ==========  做题态皮肤：白底 + 选中黑框 + 绿色点缀 ========== */
     /* ============================================================ */
     /* 调色板：白 #ffffff / 选中黑框 #111 / 次灰 #f5f6f5 / 边框灰 #e5e7e5
-              文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 绿点缀 #00EC00 */
+              文字主 #1a1d1a / 次 #6b7280 / 弱 #9aa0a6 / 主绿（按设计稿）#14CC52 */
 
-    /* 页面底色与进度条（与 loading 页统一：F3F3F3 底 + 底部 C8F0DA→0 渐变） */
-    body.quiz-on-q{background:#F3F3F3!important;color:#1a1d1a!important}
+    /* 页面底色与进度条（纯白底，无渐变底纹） */
+    body.quiz-on-q{background:#ffffff!important;color:#1a1d1a!important}
     body.quiz-on-q .bar{background:#eef0ee!important}
-    body.quiz-on-q .bar-fill{background:#00EC00!important}
-    /* 答题页底部绿色渐变（与加载页同款） */
-    body.quiz-on-q::before{
-      content:"";
-      position:fixed;left:0;right:0;bottom:0;height:42vh;
-      background:linear-gradient(to top,#C8F0DA 0%,rgba(200,240,218,0) 100%);
-      pointer-events:none;z-index:0;
-    }
+    body.quiz-on-q .bar-fill{background:#14CC52!important}
+    /* 去掉底部绿色渐变底纹 */
+    body.quiz-on-q::before{content:none!important;display:none!important}
     body.quiz-on-q .wrap{position:relative;z-index:1}
 
     /* 顶部 nav 跟随底色 */
@@ -850,52 +899,144 @@
     body.quiz-on-q .nav-logo-icon{background:#111!important}
     body.quiz-on-q .nav-logo-icon svg path{fill:#fff!important}
     body.quiz-on-q .nav-back{color:#6b7280!important}
-    body.quiz-on-q .nav-back:hover{color:#00EC00!important}
+    body.quiz-on-q .nav-back:hover{color:#14CC52!important}
 
     /* 题目文字 */
     body.quiz-on-q .q-title{color:#1a1d1a!important}
     body.quiz-on-q .q-desc{color:#6b7280!important}
-    body.quiz-on-q .q-num{color:#00EC00!important}         /* 题号用绿点缀 */
 
-    /* 单选选项：白底 → hover 浅灰 → 选中黑框 + 微黑底 */
-    body.quiz-on-q .opt{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
-    body.quiz-on-q .opt:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
+    /* ===== 答题页字体（按设计稿统一为苹方） =====
+       题干：SemiBold(600)；选项/芯片/排序/量表项/按钮：Medium(500) */
+    body.quiz-on-q,
+    body.quiz-on-q .q-title,
+    body.quiz-on-q .q-desc,
+    body.quiz-on-q .q-num,
+    body.quiz-on-q .q-num-global,
+    body.quiz-on-q .opt,
+    body.quiz-on-q .opt-t,
+    body.quiz-on-q .chip,
+    body.quiz-on-q .chip-name,
+    body.quiz-on-q .chip-counter,
+    body.quiz-on-q .rank-item,
+    body.quiz-on-q .rank-label,
+    body.quiz-on-q .scale-item,
+    body.quiz-on-q .scale-st,
+    body.quiz-on-q .scale-help,
+    body.quiz-on-q .qa .btn-b,
+    body.quiz-on-q .qa .btn-n{
+      font-family:"PingFang SC","PingFangSC-Regular","Helvetica Neue",Arial,"Microsoft YaHei",sans-serif!important;
+    }
+    body.quiz-on-q .q-title{font-weight:600!important}
+    body.quiz-on-q .opt-t,
+    body.quiz-on-q .chip-name,
+    body.quiz-on-q .rank-label,
+    body.quiz-on-q .scale-st,
+    body.quiz-on-q .qa .btn-b,
+    body.quiz-on-q .qa .btn-n{font-weight:500!important}
+    /* 选中态保持 Medium，不再额外加粗，避免抖动 */
+    body.quiz-on-q .opt.sel .opt-t,
+    body.quiz-on-q .chip.sel .chip-name{font-weight:500!important}
+    /* 全局题号节点：默认隐藏，答题态固定在进度条下方左侧（数字使用 MiSans Semibold=530） */
+    .q-num-global{display:none;position:fixed;top:14px;left:20px;z-index:1001;
+      color:#14CC52;font-size:14px;font-weight:530;letter-spacing:0;line-height:1;
+      font-family:"MiSans","PingFang SC","Helvetica Neue",Arial,sans-serif;
+      font-variant-numeric:tabular-nums;font-feature-settings:"tnum";pointer-events:none}
+    body.quiz-on-q .q-num-global{display:block}
+    /* 答题态隐藏每个场景里的 .q-num（改用全局题号，避免切换时闪烁漂移） */
+    body.quiz-on-q .qh .q-num{display:none!important}
+    /* 题号定位到进度条下方左侧（兼容性保留，但已被全局节点替代）—— 数字字体使用 MiSans Semibold=530 */
+    body.quiz-on-q .q-num{
+      position:fixed!important;top:14px!important;left:20px!important;
+      color:#14CC52!important;font-size:14px!important;font-weight:530!important;
+      letter-spacing:0!important;margin:0!important;z-index:1001;
+      font-family:"MiSans","PingFang SC","Helvetica Neue",Arial,sans-serif!important;
+      font-variant-numeric:tabular-nums!important;font-feature-settings:"tnum"!important;
+    }
+    /* 题目区域顶部空白（题号已脱离流，给适度顶距即可） */
+    body.quiz-on-q .qh{margin-bottom:24px!important;padding-top:140px!important}
+
+    /* 单选选项：白底 → hover 浅灰 → 选中绿色描边（按设计稿 1.5px / #14CC52） */
+    body.quiz-on-q .opt{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important;border-radius:14px!important;box-shadow:none!important}
+    body.quiz-on-q .opt:hover{border-color:#c9ccc9!important;background:#ffffff!important}
     body.quiz-on-q .opt:hover .opt-r{border-color:#9aa0a6!important}
     body.quiz-on-q .opt:hover .opt-t{color:#111!important}
     body.quiz-on-q .opt.sel{
-      border-color:#111!important;background:#111!important;
-      box-shadow:0 6px 18px rgba(0,0,0,.18)!important;
+      border:1.5px solid #14CC52!important;background:#ffffff!important;
+      box-shadow:none!important;
     }
-    body.quiz-on-q .opt.sel .opt-t{color:#ffffff!important;font-weight:600}
-    body.quiz-on-q .opt-r{border-color:#c9ccc9!important;background:transparent!important}
-    body.quiz-on-q .opt.sel .opt-r{border-color:#ffffff!important;background:#ffffff!important}
-    body.quiz-on-q .opt.sel .opt-r::after{background:#111!important}
+    body.quiz-on-q .opt.sel .opt-t{color:#1a1d1a!important;font-weight:500}
+    /* 左侧圆形指示器：默认 1.5px 灰描边空心；选中实心绿底+白色对勾 ✓ */
+    body.quiz-on-q .opt-r{
+      width:20px!important;height:20px!important;
+      border:1.5px solid #c9ccc9!important;background:transparent!important;
+      border-radius:50%!important;
+      display:flex;align-items:center;justify-content:center;
+    }
+    body.quiz-on-q .opt-r::after{content:none!important;display:none!important}
+    body.quiz-on-q .opt.sel .opt-r{
+      border-color:#14CC52!important;background:#14CC52!important;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.4 6.2 L4.9 8.6 L9.6 3.6' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>")!important;
+      background-repeat:no-repeat!important;background-position:center!important;background-size:12px 12px!important;
+    }
     body.quiz-on-q .opt-t{color:#1a1d1a!important}
 
     /* 多选芯片 */
     body.quiz-on-q .chip{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
     body.quiz-on-q .chip:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
     body.quiz-on-q .chip.sel{
-      border-color:#111!important;background:#111!important;color:#ffffff!important;font-weight:600;
-      box-shadow:0 4px 12px rgba(0,0,0,.18)!important;
+      border:1.5px solid #14CC52!important;background:#ffffff!important;color:#1a1d1a!important;font-weight:600;
+      box-shadow:none!important;
     }
     body.quiz-on-q .chip .chip-name{color:#1a1d1a!important}
-    body.quiz-on-q .chip.sel .chip-name{color:#ffffff!important;font-weight:600}
-    /* 右上角对勾徽章：静默绿色→选中时换白底黑勾，与黑底搭配 */
-    body.quiz-on-q .chip .chip-check{background:#00EC00!important;color:#111!important}
-    body.quiz-on-q .chip.sel .chip-check{background:#ffffff!important;color:#111!important}
-    body.quiz-on-q .chip-counter{background:#f5f6f5!important;border-color:#e5e7e5!important}
-    body.quiz-on-q .chip-counter-txt{color:#1a1d1a!important}
-    body.quiz-on-q .chip-counter-txt b{color:#00EC00!important}          /* 计数数字绿色点缀 */
-    body.quiz-on-q .chip-counter-hint{color:#6b7280!important}
-    body.quiz-on-q .chip-counter.full,body.quiz-on-q .chip-counter.ok{background:#e3ffe3!important;border-color:#00EC00!important}
-    body.quiz-on-q .chip-counter.full .chip-counter-txt b,body.quiz-on-q .chip-counter.ok .chip-counter-txt b{color:#00EC00!important}
-    body.quiz-on-q .chip-counter.full .chip-counter-hint,body.quiz-on-q .chip-counter.ok .chip-counter-hint{color:#00EC00!important}
+    body.quiz-on-q .chip.sel .chip-name{color:#1a1d1a!important;font-weight:600}
+    /* 答题态 chip 选中态布局（按设计稿）：
+       - 文字水平居中（chip 内部 justify-content:center）
+       - 选中时绿色对勾以「绝对定位」贴在文字左侧（left:10px、垂直居中），不挤压文字位置
+       - 未选中时勾隐藏（opacity:0），文字保持居中
+       - 选中文字保持黑色 */
+    body.quiz-on-q .chip{
+      position:relative!important;
+      display:flex!important;flex-direction:row!important;
+      align-items:center!important;justify-content:center!important;
+      gap:0!important;text-align:center!important;
+      padding:14px 16px!important;
+    }
+    body.quiz-on-q .chip .chip-name{
+      text-align:center!important;line-height:1.3!important;
+    }
+    body.quiz-on-q .chip .chip-check{
+      position:absolute!important;top:50%!important;left:10px!important;right:auto!important;
+      transform:translateY(-50%)!important;
+      width:18px!important;height:18px!important;border-radius:50%!important;
+      flex-shrink:0!important;
+      display:inline-flex!important;align-items:center!important;justify-content:center!important;
+      background:transparent!important;border:none!important;color:transparent!important;
+      opacity:0!important;
+      font-size:0!important;line-height:1!important;
+      pointer-events:none!important;
+    }
+    body.quiz-on-q .chip.sel{padding:14px 16px!important}
+    body.quiz-on-q .chip.sel .chip-check{
+      opacity:1!important;transform:translateY(-50%)!important;
+      background:#14CC52!important;border-color:#14CC52!important;color:transparent!important;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.4 6.2 L4.9 8.6 L9.6 3.6' fill='none' stroke='%23ffffff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>")!important;
+      background-repeat:no-repeat!important;background-position:center!important;background-size:11px 11px!important;
+    }
+    /* 纵向布局（chip-grid-v）：保持原本的左对齐 + 右侧勾占位（已有规则继续生效）—— 这里也补一份兜底
+       由于上面 .chip 的规则用 absolute 把 chip-check 默认放到了 left:10px，
+       纵向布局里希望勾贴右侧时仍走原始 .chip-grid-v 的右侧绝对定位规则，下面强制覆盖 */
+    body.quiz-on-q .chip-grid.chip-grid-v .chip{justify-content:flex-start!important;text-align:left!important;padding:14px 44px 14px 16px!important}
+    body.quiz-on-q .chip-grid.chip-grid-v .chip .chip-name{text-align:left!important;width:100%!important}
+    body.quiz-on-q .chip-grid.chip-grid-v .chip .chip-check{left:auto!important;right:12px!important;transform:translateY(-50%)!important}
+    body.quiz-on-q .chip-grid.chip-grid-v .chip.sel .chip-check{transform:translateY(-50%)!important}
+    /* 答题态隐藏多选计数器（"已选 X（至少 N 项）"），按设计稿不展示 */
+    body.quiz-on-q .chip-counter{display:none!important}
+    body.quiz-on-q .chip-counter.full,body.quiz-on-q .chip-counter.ok{display:none!important}
 
     /* 排序题 rank */
     body.quiz-on-q .rank-item{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#1a1d1a!important}
     body.quiz-on-q .rank-item:hover{border-color:#c9ccc9!important;background:#f7f8f7!important}
-    body.quiz-on-q .rank-item:hover .rank-handle{color:#00EC00!important}
+    body.quiz-on-q .rank-item:hover .rank-handle{color:#14CC52!important}
     body.quiz-on-q .rank-item.press{background:#f0f2f0!important}
     body.quiz-on-q .rank-item.lift{
       border-color:#111!important;background:#111!important;color:#ffffff!important;
@@ -903,16 +1044,16 @@
     }
     body.quiz-on-q .rank-item.lift .rank-label{color:#ffffff!important}
     body.quiz-on-q .rank-item.lift .rank-handle{color:#ffffff!important}
-    body.quiz-on-q .rank-index{background:#e3ffe3!important;color:#00EC00!important}  /* 序号徽章绿色 */
+    body.quiz-on-q .rank-index{background:#e3ffe3!important;color:#14CC52!important}  /* 序号徽章绿色 */
     body.quiz-on-q .rank-label{color:#1a1d1a!important}
     body.quiz-on-q .rank-handle{color:#9aa0a6!important}
-    body.quiz-on-q .btn-rank{background:#e3ffe3!important;border:1px solid #00EC00!important;color:#00EC00!important}
+    body.quiz-on-q .btn-rank{background:#e3ffe3!important;border:1.5px solid #14CC52!important;color:#14CC52!important}
     body.quiz-on-q .btn-rank:hover{background:#c9ffc9!important}
 
     /* 排序题的 pickOrdered 变体（q7 点选自动编号） */
     .pick-wrap{display:grid;gap:10px}
     .pick-help{font-size:12px;color:#888;line-height:1.55}
-    .pick-help b{font-weight:700;color:#00EC00}
+    .pick-help b{font-weight:700;color:#14CC52}
     .pick-list{display:grid;gap:10px}
     .pick-item{display:grid;grid-template-columns:32px 1fr;align-items:center;gap:12px;
       padding:14px 16px;border-radius:12px;border:1.5px solid #e5e7e5;background:#fff;color:#1a1d1a;
@@ -926,7 +1067,7 @@
       font-size:13px;font-weight:700;
       background:transparent;border:1.5px solid #d4d7d4;color:transparent;
       transition:background .15s ease,border-color .15s ease,color .15s ease}
-    .pick-item.sel .pick-badge{background:#00EC00;border-color:#00EC00;color:#111}
+    .pick-item.sel .pick-badge{background:#14CC52;border-color:#14CC52;color:#fff}
     .pick-label{font-size:14px;line-height:1.5;color:#1a1d1a}
     @media(min-width:640px){
       .pick-item{padding:16px 20px}
@@ -941,25 +1082,46 @@
       box-shadow:0 6px 18px rgba(0,0,0,.18)!important;
     }
     body.quiz-on-q .scale-item.sel .scale-no{color:#ffffff!important}
-    body.quiz-on-q .scale-no{color:#00EC00!important}       /* 编号绿点缀 */
-    body.quiz-on-q .scale-side.agree{color:#00EC00!important}
+    body.quiz-on-q .scale-no{color:#14CC52!important}       /* 编号绿点缀 */
+    body.quiz-on-q .scale-side.agree{color:#14CC52!important}
     body.quiz-on-q .scale-side.disagree{color:#6b7280!important}
     body.quiz-on-q .scale-help{color:#9aa0a6!important}
 
     /* 底部按钮 */
-    body.quiz-on-q .qa .btn-b{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
-    body.quiz-on-q .qa .btn-b:hover{border-color:#111!important;color:#111!important}
-    body.quiz-on-q .qa .btn-n{background:#00EC00!important;color:#111!important;border:none!important}
-    body.quiz-on-q .qa .btn-n:hover{background:#00b800!important;color:#fff!important}
-    body.quiz-on-q .qa .btn-n:disabled{opacity:.35!important;background:#d4d7d4!important;color:#9aa0a6!important}
+    /* 底部"返回 / 下一题"按钮（按设计稿）
+       - 共同：flex-shrink:0 / padding 10px 16px / gap 10px / border-radius 10px
+              背景 rgba(17,17,17,.05) / 深色字 #1a1d1a / 字重 500
+       - 返回：恒定浅灰底 + 深字
+       - 下一题(disabled)：同浅灰底 + 同深字，仅 cursor 提示不可点
+       - 下一题(enabled)：黑底白字（强主操作） */
+    body.quiz-on-q .qa{gap:12px!important}
+    body.quiz-on-q .qa .btn-b,
+    body.quiz-on-q .qa .btn-n{
+      flex-shrink:0!important;height:auto!important;
+      display:flex!important;justify-content:center!important;align-items:center!important;
+      gap:10px!important;padding:10px 16px!important;
+      border:none!important;border-radius:10px!important;
+      background:rgba(17,17,17,.05)!important;color:#1a1d1a!important;
+      font-size:14px!important;font-weight:500!important;
+      font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif!important;
+      box-shadow:none!important;transition:background .2s,color .2s!important;
+    }
+    body.quiz-on-q .qa .btn-b:hover{background:rgba(17,17,17,.08)!important;color:#1a1d1a!important}
+    body.quiz-on-q .qa .btn-n:disabled{
+      background:rgba(17,17,17,.05)!important;color:#1a1d1a!important;
+      opacity:1!important;cursor:not-allowed!important;
+    }
+    /* 选中后可点击：黑底白字 */
+    body.quiz-on-q .qa .btn-n:not(:disabled){background:#111!important;color:#ffffff!important}
+    body.quiz-on-q .qa .btn-n:not(:disabled):hover{background:#000!important;color:#ffffff!important}
 
     /* Loading 旋转器 */
-    body.quiz-on-q .spinner{border-color:#e5e7e5!important;border-top-color:#00EC00!important}
+    body.quiz-on-q .spinner{border-color:#e5e7e5!important;border-top-color:#14CC52!important}
 
     /* ============================================================ */
     /* ==========  Loading 态皮肤：白底 + 绿色转圈 + 黑字 ========== */
     /* ============================================================ */
-    body:has(#ld.active){background:#F3F3F3!important;color:#1a1d1a!important}
+    body:has(#ld.active){background:#ffffff!important;color:#1a1d1a!important}
     body:has(#ld.active) .nav{background:rgba(243,243,243,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
     body:has(#ld.active) .nav-logo{color:#1a1d1a!important}
     body:has(#ld.active) .nav-logo-icon{background:#111!important}
@@ -971,155 +1133,447 @@
     body:has(#ld.active) .ld-s{color:#6b7280!important}
 
     /* ============================================================ */
-    /* ==========  结果态皮肤：白底 + 黑色高亮 + 绿色点缀 ========== */
+    /* ==========  结果态皮肤：白底 + 格纹 + 顶/底绿色渐变 ========== */
     /* ============================================================ */
-    /* 用 :has 锁定"结果场景激活"时的 body。
-       调色板同做题态：白 #ffffff / 主黑 #111 / 文字 #1a1d1a /
-       次灰 #6b7280 / 弱灰 #9aa0a6 / 边框 #e5e7e5 / 次底 #f7f8f7 /
-       绿点缀 #00EC00 / 浅绿底 #e3ffe3 */
-    body:has(#res.active){background:#ffffff!important;color:#1a1d1a!important}
-    body:has(#res.active) .bar{background:#eef0ee!important}
-    body:has(#res.active) .bar-fill{background:#00EC00!important}
+    /* 结果页：顶/底绿色渐变 + 全屏浅灰格纹（格纹始终在最上层显示） */
+    body:has(#res.active){
+      background-color:#F6F6F6!important;
+      background-image:
+        /* 1. 格纹横线（最上层，始终可见） */
+        linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
+        /* 2. 格纹竖线 */
+        linear-gradient(90deg, rgba(17,17,17,.05) 1px, transparent 1px),
+        /* 3. 顶部绿色渐变 → F6F6F6（到图片中间约 380px） */
+        linear-gradient(to bottom, #C5FFD9 0%, rgba(246,246,246,1) 380px),
+        /* 4. 底部绿色渐变（从底向上 220px） */
+        linear-gradient(to top, rgba(197,255,217,.85) 0%, rgba(197,255,217,0) 220px)!important;
+      background-size:32px 32px, 32px 32px, 100% 100%, 100% 100%!important;
+      background-position:center top, center top, top, bottom!important;
+      background-repeat:repeat, repeat, no-repeat, no-repeat!important;
+      background-attachment:fixed, fixed, fixed, fixed!important;
+      color:#1a1d1a!important
+    }
+    body:has(#res.active) .bar{background:transparent!important}
+    body:has(#res.active) .bar-fill{background:transparent!important}
     body:has(#res.active) .nav{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #e5e7e5!important;backdrop-filter:blur(10px)}
     body:has(#res.active) .nav-logo{color:#1a1d1a!important}
-    body:has(#res.active) .nav-logo-icon{background:#111!important}
+    body:has(#res.active) .nav-logo-icon{background:#00b800!important}
     body:has(#res.active) .nav-logo-icon svg path{fill:#fff!important}
     body:has(#res.active) .nav-back{color:#6b7280!important}
-    body:has(#res.active) .nav-back:hover{color:#00EC00!important}
+    body:has(#res.active) .nav-back:hover{color:#00b800!important}
 
-    /* 答题区 / 结果区：浅色小网格底纹 */
-    body.quiz-on-q,
-    body:has(#res.active){
-      background-color:#fff!important;
-      background-image:
-        linear-gradient(rgba(17,17,17,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(17,17,17,.035) 1px, transparent 1px)!important;
-      background-size:32px 32px!important;
-      background-position:center top!important;
-      background-attachment:fixed!important;
-    }
+    /* 让结果内容自然显示在 body 背景之上 */
+    #res{position:relative}
 
     /* 主卡 & 头部 */
-    #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+    #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;position:relative;z-index:1}
+
+    /* ====== 滚动行为：暗格解读之上的「res-top」整块在结果页内 sticky 钉顶， 下面的 section 向上滑动 ====== */
+    body:has(#res.active) #res .res-top{
+      position:sticky!important;
+      top:0!important;
+      z-index:5!important;
+      /* 不透明背景：与 body 顶部视觉一致（顶部绿色渐变 → 浅灰 + 浅格纹），避免下方 section 滑过时穿透 */
+      background-color:#F6F6F6!important;
+      background-image:
+        linear-gradient(rgba(17,17,17,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17,17,17,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, #C5FFD9 0%, rgba(246,246,246,1) 380px)!important;
+      background-size:32px 32px, 32px 32px, 100% 100%!important;
+      background-position:center top, center top, top!important;
+      background-repeat:repeat, repeat, no-repeat!important;
+      /* 视觉边界：底部一点淡淡的分隔阴影，区分固定区与滚动区 */
+      box-shadow:0 8px 16px -12px rgba(0,0,0,.12)!important;
+    }
+    /* 让滚动的下半部分（所有 section）位于 sticky 区下方层级，避免内容遮挡 */
+    body:has(#res.active) #res .res-card > .res-section{
+      position:relative!important;
+      z-index:1!important;
+    }
+    /* iOS Safari 在父级有 overflow 不为 visible 时 sticky 会失效；显式保证 res / res-card / wrap 不裁剪 */
+    body:has(#res.active) .wrap,
+    body:has(#res.active) #res,
+    body:has(#res.active) #res .res-card{
+      overflow:visible!important;
+    }
     #res .res-avatar-frame{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
     #res .res-avatar{background:transparent!important;object-fit:contain!important}
-    #res .res-kicker{color:#111!important;text-align:center!important}
-    #res .res-name{color:#fff!important;background:#111!important}
-    #res .res-real{color:#6b7280!important}                /* 副标题：次灰 */
-    #res .res-desc{color:#6b7280!important}
+    /* 标题"你的设计大师人格是" —— MiSans Bold 37/38，纯黑 */
+    #res .res-kicker{
+      color:#000000!important;
+      text-align:center!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:630!important;
+      font-size:37px!important;
+      line-height:38px!important;
+      height:38px!important;
+      letter-spacing:-1px!important;
+      margin-bottom:14px!important;
+    }
+    /* 角色名"「草稿太多的毕加班索」"：MiSans Bold 28px 纯黑，无背景 */
+    #res .res-name{
+      color:#000!important;
+      background:transparent!important;
+      border-radius:0!important;
+      box-shadow:none!important;
+      text-shadow:none!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:630!important;
+      font-size:28px!important;
+      letter-spacing:-.01em!important;
+      padding:0!important;
+      width:auto!important;
+      min-height:auto!important;
+      margin:8px auto 6px!important;
+      display:block!important;
+      text-align:center!important;
+      white-space:normal!important;
+    }
+    /* 角色名内的高亮字（如"加班"、"奈何"、"想鼠"）：用品牌绿 #14CC52 突出显示。
+       因外层 #res .res-name 用了 color:#000!important，子元素必须 !important 才能覆盖。
+       wishTitle 内同名角色也用同一个高亮 class。 */
+    #res .res-name .hl-green,
+    #res .wish-title .hl-green{color:#14CC52!important}
+    /* 细字人格描述（rReal）：MiSans Light 14/24，纯黑，宽度对齐下方副属性卡片 */
+    #res .res-real{
+      display:block!important;
+      color:#000!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-size:14px!important;
+      line-height:24px!important;
+      font-weight:300!important;
+      letter-spacing:0!important;
+      text-align:center!important;
+      box-sizing:border-box!important;
+      width:100%!important;
+      max-width:none!important;
+      margin:0 auto 0!important;
+      padding:0 20px!important;
+      white-space:normal!important;
+    }
+    /* 暗格解读（rReal）与下方第一个 section 之间的间距收窄到 18px */
+    #res .res-top{padding-bottom:18px!important}
+    /* 既然描述已显示在角色名下，隐藏覆盖在图片上的"暗格解读"浮层 */
+    #res .res-insight-overlay{display:none!important}
+    #res .res-desc{color:#4a8f4b!important}
 
-    /* 金句 tagline */
-    #res .res-tagline{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .res-tagline::before{color:#00EC00!important}     /* 引号绿点缀 */
+    /* 金句 tagline：深绿色背景 + 白字 + 引号 */
+    #res .res-tagline{
+      background:#2d4a2e!important;
+      border:0!important;
+      color:#ffffff!important;
+      border-radius:12px!important;
+      padding:18px 18px 18px 38px!important;
+      font-size:14px!important;
+      line-height:1.75!important;
+      box-shadow:0 4px 14px rgba(45,74,46,.18)!important;
+    }
+    #res .res-tagline::before{
+      color:#C5FFD9!important;
+      font-size:30px!important;
+      top:10px!important;
+      left:14px!important;
+    }
 
     /* section 小标题 */
-    #res .res-section-title{color:#6b7280!important}
+    #res .res-section-title{color:#2d5a27!important;font-weight:700!important}
 
     /* 性格标签 */
-    #res .tag-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
+    #res .tag-pill{background:#ffffff!important;border:1px solid #b8e6c0!important;color:#2d5a27!important}
 
-    /* 暗格解读 insight-box：黑底白字 + 绿引号 */
-    #res .insight-box{background:#111!important;border:1px solid #111!important;color:#ffffff!important}
+    /* 暗格解读 insight-box：绿色底 + 深绿字 + 绿引号 */
+    #res .insight-box{background:#2d5a27!important;border:1px solid #2d5a27!important;color:#C5FFD9!important}
     #res .insight-box::before{color:#00EC00!important}
-    #res .res-insight-overlay .res-section-title{display:none!important}
-    #res .res-insight-overlay .insight-box{border:0!important;border-radius:0!important;padding:12px 14px!important;font-size:12.5px!important;line-height:1.55!important;box-shadow:0 10px 24px rgba(0,0,0,.12)!important}
-    #res .res-insight-overlay .insight-box::before{display:none!important}
+    #res .res-insight-overlay .res-section-title{color:#2d5a27!important}
+    #res .res-insight-overlay .insight-box{border:0!important;border-radius:12px!important;padding:16px 18px!important;font-size:13px!important;line-height:1.7!important;box-shadow:0 4px 16px rgba(45,90,39,.2)!important}
+    #res .res-insight-overlay .insight-box::before{color:#C5FFD9!important;font-size:28px!important;top:8px!important;left:12px!important;display:block!important}
 
     /* 选择解读 reading-box */
-    #res .reading-box{background:#f7f8f7!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .reading-box b,#res .reading-box strong{color:#00EC00!important}
+    #res .reading-box{background:#ffffff!important;border:1px solid #b8e6c0!important;color:#2d5a27!important}
+    #res .reading-box b,#res .reading-box strong{color:#00b800!important}
 
-    /* 副属性 */
-    #res .substat-card{background:#ffffff!important;border:1px solid #e5e7e5!important;text-align:left!important}
-    /* 第 1 张：大师的状态 —— 黑底白字 */
-    #res .substat-grid>.substat-card:nth-child(1){background:#111!important;border-color:#111!important}
+    /* 副属性：两张卡片白底黑字，无描边（统一风格，MiSans） */
+    /* 隐藏"你的两个副属性"区块标题 */
+    #res .res-section:has(.substat-grid) > .res-section-title{display:none!important}
+    #res .substat-card{
+      background:#ffffff!important;
+      border:0!important;
+      border-radius:12px!important;
+      text-align:left!important;
+      padding:16px 16px!important;
+      box-shadow:none!important;
+    }
+    #res .substat-grid>.substat-card:nth-child(1),
+    #res .substat-grid>.substat-card:nth-child(2){
+      background:#ffffff!important;
+      border:0!important;
+      box-shadow:none!important;
+    }
+    /* 标题：MiSans Bold + SVG icon */
     #res .substat-grid>.substat-card:nth-child(1) .substat-label,
+    #res .substat-grid>.substat-card:nth-child(2) .substat-label{
+      color:#000!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:630!important;
+      font-size:14px!important;
+      line-height:1.4!important;
+      letter-spacing:0!important;
+      margin-bottom:8px!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:6px!important;
+      flex-wrap:nowrap!important;
+      word-break:keep-all!important;
+      overflow-wrap:normal!important;
+      white-space:nowrap!important;
+    }
+    /* SVG icon：18×18，黑色描边，跟随文字色 */
+    #res .substat-icon{
+      width:18px!important;
+      height:18px!important;
+      flex-shrink:0!important;
+      color:#000!important;
+      display:inline-block!important;
+      vertical-align:middle!important;
+    }
+    #res .substat-label-text{
+      display:inline-block!important;
+      word-break:keep-all!important;
+      overflow-wrap:normal!important;
+      white-space:nowrap!important;
+    }
+    /* 内容：MiSans Regular，避免单字成行 */
     #res .substat-grid>.substat-card:nth-child(1) .substat-state,
-    #res .substat-grid>.substat-card:nth-child(1) .substat-val{color:#fff!important}
-    /* 第 2 张：你的下班阻碍 —— 绿底黑字 */
-    #res .substat-grid>.substat-card:nth-child(2){background:#00EC00!important;border-color:#00EC00!important}
-    #res .substat-grid>.substat-card:nth-child(2) .substat-label,
     #res .substat-grid>.substat-card:nth-child(2) .substat-state,
-    #res .substat-grid>.substat-card:nth-child(2) .substat-val{color:#111!important}
-    #res .substat-label{color:#111!important}
-    #res .substat-val{color:#111!important}                /* 大数字：主黑 */
-    #res .substat-state{color:#111!important}           /* 状态句：主黑 */
-    #res .substat-desc{color:#6b7280!important}
+    #res .substat-grid>.substat-card:nth-child(1) .substat-val,
+    #res .substat-grid>.substat-card:nth-child(2) .substat-val{
+      color:#000!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:400!important;
+      font-size:13px!important;
+      line-height:1.65!important;
+      letter-spacing:0!important;
+      word-break:break-word!important;
+      overflow-wrap:break-word!important;
+      hyphens:auto!important;
+      text-wrap:pretty!important;
+    }
+    #res .substat-label{color:#000!important}
+    #res .substat-val{color:#000!important}
+    #res .substat-state{color:#000!important}
+    #res .substat-desc{color:#000!important}
 
-    /* 魅力雷达 */
-    #res .radar-wrap{background:#ffffff!important;border:1px solid #e5e7e5!important}
-    #res .radar-svg .r-grid{stroke:#e5e7e5!important}
-    #res .radar-svg .r-axis{stroke:#d4d7d4!important}
-    #res .radar-svg .r-area{fill:rgba(0,236,0,.45)!important;stroke:#111!important}  /* 区域线：黑 / 填充：#00EC00 45% */
-    #res .radar-svg .r-point{fill:#111!important;stroke:#ffffff!important}
-    #res .radar-svg .r-label{fill:#1a1d1a!important}
-    #res .radar-svg .r-label-pct{fill:#6b7280!important}
+    /* 魅力雷达：白底 + 黑字 + #14CC52 描边/点 */
+    #res .radar-card{
+      background:#ffffff!important;
+      border:0!important;
+      border-radius:16px!important;
+      padding:18px 16px 14px!important;
+      box-shadow:none!important;
+    }
+    /* 雷达卡片标题：与"你的大师基因"一致：MiSans Bold 14 / 纯黑 / 加 SVG icon */
+    #res .radar-card-title{
+      display:flex!important;
+      align-items:center!important;
+      gap:6px!important;
+      color:#000!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:630!important;
+      font-size:14px!important;
+      line-height:1.4!important;
+      letter-spacing:0!important;
+      margin-bottom:10px!important;
+      white-space:nowrap!important;
+      word-break:keep-all!important;
+    }
+    #res .radar-card-icon{
+      width:18px!important;
+      height:18px!important;
+      flex-shrink:0!important;
+      color:#000!important;
+      display:inline-block!important;
+      vertical-align:middle!important;
+    }
+    /* 雷达图容器：白底无边框，居中 */
+    #res .radar-wrap,
+    #res .radar-wrap.radar-full{
+      background:#ffffff!important;
+      border:0!important;
+      box-shadow:none!important;
+      border-radius:0!important;
+      padding:0!important;
+      max-height:none!important;
+    }
+    /* SVG 外显宽 320px，配合 viewBox 320、半径 117 ⇒ 最大圈实显宽高 234px */
+    #res .radar-svg{
+      width:100%!important;
+      max-width:320px!important;
+      height:auto!important;
+      margin:0 auto!important;
+      display:block!important;
+      overflow:visible!important;
+    }
+    /* 网格圈/轴线：浅灰 */
+    #res .radar-svg .r-grid{stroke:#e5e7eb!important;fill:none!important;stroke-width:1!important}
+    #res .radar-svg .r-axis{stroke:#e5e7eb!important;stroke-width:1!important;stroke-dasharray:0!important}
+    /* 数据区域：#14CC52 描边 + 浅绿填充 */
+    #res .radar-svg .r-area{
+      fill:rgba(20,204,82,.18)!important;
+      stroke:#14CC52!important;
+      stroke-width:1.6!important;
+    }
+    /* 数据点：#14CC52 实心 */
+    #res .radar-svg .r-point{fill:#14CC52!important;stroke:#ffffff!important;stroke-width:1.5!important}
+    /* 维度名（12px Regular 纯黑） */
+    #res .radar-svg .r-label{
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-size:12px!important;
+      fill:#000!important;
+      font-weight:400!important;
+    }
+    /* 百分比（12px Regular #808080） */
+    #res .radar-svg .r-label-pct{
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-size:12px!important;
+      fill:#808080!important;
+      font-weight:400!important;
+    }
 
     /* 你缺的工具 */
-    #res .advice-intro{color:#1a1d1a!important}
-    #res .advice-intro em{color:#00EC00!important;font-weight:700}
-    #res .advice-outro{color:#6b7280!important}
-    #res .advice-list li{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important;border-radius:0!important}
-    #res .advice-list li::before{background:#00EC00!important;color:#111!important}  /* 勾选圆点：绿底黑字 */
+    /* 外层白色卡片，把 intro + 4 个 advice 一起包住 */
+    #res .advice-card{
+      background:#ffffff!important;
+      border:0!important;
+      border-radius:16px!important;
+      padding:18px 16px!important;
+      box-shadow:none!important;
+    }
+    #res .advice-intro{color:#000!important;margin-bottom:12px!important}
+    #res .advice-intro em{color:#14CC52!important;font-weight:700!important;font-style:normal!important}
+    #res .advice-outro{color:#4a8f4b!important}
+    /* 子项卡片：白底 + #F2F2F2 1px 描边，2×2 网格、左 icon 右文字、紧凑布局 */
+    #res .advice-list{
+      display:grid!important;
+      grid-template-columns:repeat(2,1fr)!important;
+      gap:10px!important;
+    }
+    #res .advice-list li{
+      background:#ffffff!important;
+      border:1px solid #F2F2F2!important;
+      color:#000!important;
+      border-radius:12px!important;
+      font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+      font-weight:400!important;        /* Regular */
+      font-size:13px!important;
+      line-height:1.45!important;
+      padding:12px 12px!important;
+      /* 横向：左 icon 右文字 */
+      flex-direction:row!important;
+      align-items:center!important;
+      text-align:left!important;
+      gap:10px!important;
+    }
+    /* 勾选圆点：低饱和浅灰底 + 深灰对勾，简洁不鲜艳 */
+    #res .advice-list li::before{
+      content:"\2713"!important;
+      background:#EFEFEF!important;
+      color:#666!important;
+      width:18px!important;
+      height:18px!important;
+      font-size:11px!important;
+      font-weight:600!important;
+      border-radius:50%!important;
+      flex-shrink:0!important;
+    }
 
-    /* 结果页：所有信息卡片去圆角（保留头像/勾点等真正圆形元素） */
+    /* 结果页：信息卡片圆角化 */
     #res .why-box,
     #res .gap-item,
     #res .gap-item.master,
     #res .dim-table,
-    #res .insight-box,
     #res .radar-wrap,
     #res .radar-wrap.radar-full,
-    #res .substat-card{border-radius:0!important}
+    #res .substat-card{border-radius:12px!important}
 
-    /* 结果页：雷达卡片 / 副属性卡片描边加粗 */
+    /* 结果页：雷达卡片描边（副属性已在上面定义为无边框） */
     #res .radar-wrap,
-    #res .radar-wrap.radar-full{border:2px solid #111!important}
-    #res .substat-card{border-width:2px!important}
-    #res .substat-grid>.substat-card:nth-child(1){border:2px solid #111!important}
-    #res .substat-grid>.substat-card:nth-child(2){border:2px solid #111!important}
+    #res .radar-wrap.radar-full{border:0!important}
 
     /* 口头禅 */
-    #res .mantra-pill{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .mantra-pill::before{color:#00EC00!important}
+    #res .mantra-pill{background:#ffffff!important;border:1px solid #b8e6c0!important;color:#2d5a27!important}
+    #res .mantra-pill::before{color:#00b800!important}
 
     /* 保存卡片 */
-    #res .save-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
-    #res .save-card-icon{background:#e3ffe3!important}
-    #res .save-card-title{color:#111!important}
-    #res .save-card-sub{color:#6b7280!important}
-    #res .save-card-preview{border:1px solid #e5e7e5!important;background:#f7f8f7!important}
-    #res .save-card-hint{color:#00EC00!important}
-    /* 二维码卡片（结果页统一浅灰底） */
-    #res .qr-card{background:#ffffff!important;border:1px solid #e5e7e5!important}
-    #res .qr-card-title{color:#111!important}
-    #res .qr-card-sub{color:#6b7280!important}
-    #res .qr-card-url{color:#00EC00!important}
-    #res .qr-card-img{background:#fff!important;border:1px solid #e5e7e5!important}
+    #res .save-card{background:#ffffff!important;border:1px solid #b8e6c0!important}
+    #res .save-card-icon{background:#C5FFD9!important}
+    #res .save-card-title{color:#2d5a27!important}
+    #res .save-card-sub{color:#4a8f4b!important}
+    #res .save-card-preview{border:1px solid #b8e6c0!important;background:#f0fff4!important}
+    #res .save-card-hint{color:#2d5a27!important;font-weight:600!important}
+    /* 二维码卡片 */
+    #res .qr-card{background:#ffffff!important;border:1px solid #b8e6c0!important}
+    #res .qr-card-title{color:#2d5a27!important}
+    #res .qr-card-sub{color:#4a8f4b!important}
+    #res .qr-card-url{color:#00b800!important}
+    #res .qr-card-img{background:#fff!important;border:1px solid #b8e6c0!important}
 
     /* 心愿抽奖卡 */
-    #res .wish-box{background:#e3ffe3!important;border:1px solid #00EC00!important}
-    #res .wish-title{color:#1a1d1a!important}
-    #res .wish-desc{color:#6b7280!important}
-    #res .wish-box textarea{background:#ffffff!important;border:1px solid #e5e7e5!important;color:#1a1d1a!important}
-    #res .wish-btn{background:#111!important;color:#ffffff!important}
-    #res .wish-btn:hover{background:#00EC00!important;color:#111!important}
-    #res .wish-btn:disabled,#res .wish-btn.is-done,#res .wish-btn.is-done:hover{background:#c9c6c0!important;color:#fff!important;cursor:not-allowed!important;opacity:.85;pointer-events:none}
-    #res .wish-result{color:#00EC00!important}
+    #res .wish-box{background:#ffffff!important;border:1px solid #2d5a27!important}
+    #res .wish-title{color:#000!important;font-weight:700!important}
+    #res .wish-desc{display:none!important}
+    #res .wish-box textarea{background:#ffffff!important;border:1px solid #b8e6c0!important;color:#000!important}
+    /* 按钮居中 */
+    #res .wish-actions{justify-content:center!important;align-items:center!important}
+    /* 默认（未输入文字）：参考答题区"下一题(disabled)"的浅灰样式 */
+    #res .wish-btn{
+      background:rgba(17,17,17,.05)!important;
+      color:#1a1d1a!important;
+      border:none!important;
+      transition:background .2s,color .2s!important;
+    }
+    #res .wish-btn:hover{background:rgba(17,17,17,.08)!important;color:#1a1d1a!important}
+    /* 已输入文字：黑底白字（参考答题区"下一题(enabled)"） */
+    #res .wish-btn.has-input{background:#111!important;color:#ffffff!important}
+    #res .wish-btn.has-input:hover{background:#000!important;color:#ffffff!important}
+    /* 已提交（待开奖）：与默认灰态一致，仅不可点 */
+    #res .wish-btn:disabled,#res .wish-btn.is-done,#res .wish-btn.is-done:hover{
+      background:rgba(17,17,17,.05)!important;
+      color:#1a1d1a!important;
+      cursor:not-allowed!important;
+      opacity:1!important;
+      pointer-events:none!important;
+    }
+    #res .wish-result{color:#000!important;font-weight:600!important}
 
     /* 相关角色列表 */
-    #res .others-title{color:#6b7280!important}
-    #res .other-card img{border-color:#e5e7e5!important}
-    #res .other-card .oc-name{color:#1a1d1a!important}
-    #res .other-card .oc-pct{color:#9aa0a6!important}
+    #res .others-title{color:#4a8f4b!important}
+    #res .other-card img{border-color:#b8e6c0!important}
+    #res .other-card .oc-name{color:#2d5a27!important}
+    #res .other-card .oc-pct{color:#4a8f4b!important}
 
     /* 底部操作按钮 */
-    #res .btn-explore{background:#00EC00!important;color:#111!important;box-shadow:0 4px 12px rgba(0,236,0,.25)!important}
-    #res .btn-explore:hover{background:#00b800!important;color:#fff!important;box-shadow:0 6px 16px rgba(0,236,0,.35)!important}
-    #res .btn-share{background:#111!important;border:none!important;color:#ffffff!important}
-    #res .btn-share:hover{background:#00EC00!important;color:#111!important}
-    #res .btn-redo{background:#ffffff!important;border:1.5px solid #e5e7e5!important;color:#6b7280!important}
-    #res .btn-redo:hover{border-color:#111!important;color:#111!important}
+    #res .btn-explore{background:#2d5a27!important;color:#C5FFD9!important;box-shadow:0 4px 12px rgba(45,90,39,.25)!important}
+    #res .btn-explore:hover{background:#00b800!important;color:#fff!important;box-shadow:0 6px 16px rgba(0,184,0,.35)!important}
+    #res .btn-share{background:#000000!important;border:1px solid #000000!important;color:#ffffff!important}
+    #res .btn-share:hover{background:#1a1a1a!important;border-color:#1a1a1a!important;color:#ffffff!important}
+    #res .btn-redo{background:#ffffff!important;border:1px solid #000000!important;color:#000000!important}
+    #res .btn-redo:hover{background:#f5f5f5!important;border-color:#000000!important;color:#000000!important}
+
+    /* why-box / gap-item / dim-table */
+    #res .why-box,
+    #res .gap-item{background:#ffffff!important;border:1px solid #b8e6c0!important}
+    #res .why-top,
+    #res .why-top b,
+    #res .gap-val{color:#2d5a27!important}
+    #res .why-list li{color:#4a8f4b!important}
+    #res .why-list li::before{background:#00b800!important}
+    #res .gap-item.master{background:#C5FFD9!important;border-color:#b8e6c0!important}
+    #res .gap-label{color:#4a8f4b!important}
+    #res .gap-item.master .gap-label{color:#2d5a27!important}
+    #res .dim-table{background:#ffffff!important;border:1px solid #b8e6c0!important}
+    #res .dim-table th{background:#f0fff4!important;border-bottom:1px solid #b8e6c0!important;color:#2d5a27!important}
+    #res .dim-table td{border-bottom:1px solid #b8e6c0!important;color:#2d5a27!important}
+    #res .dim-table tr.top td{background:#C5FFD9!important;color:#2d5a27!important}
 
     /* === TWEAK_SAVED_START === 由元素微调工具写入，手动编辑这一段也可以 === */
     span.arr{
@@ -1137,32 +1591,23 @@
   </div>
 
   <div class="bar"><div class="bar-fill" id="bar"></div></div>
+  <!-- 全局题号（仅答题态显示，避免随场景切换重排导致漂移） -->
+  <div class="q-num-global" id="qNumGlobal" aria-hidden="true"></div>
 
   <div class="wrap">
     <div class="welcome scene active" id="s0">
-      <!-- 顶部：标题 / 副标题 / 预计时间 / 开始按钮（正常文档流，从上到下排列） -->
-      <div class="welcome-head">
-        <img class="welcome-head-art" src="img/home-head.png?v=20260506" alt="好险，差点就成设计大师了。终于有人懂我做设计的苦了。测测你是什么类型的大师">
-        <div class="welcome-cta">
-          <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
-            <span class="arr" aria-hidden="true">
-              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 44.5C16.2 43.8 15.9 41.4 17.5 40.3L91.5 14.5C100.2 11.5 108.5 19.8 105.5 28.5L79.7 102.5C78.6 104.1 76.2 103.8 75.5 102L61.8 68.2L43.5 86.5L36.5 55.8L18 44.5Z" stroke="currentColor" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
-                <circle cx="56" cy="56" r="8" stroke="currentColor" stroke-width="8"/>
-              </svg>
-            </span>
-            <span class="btn-label">开始测试</span>
-          </button>
-        </div>
-      </div>
-      <!-- 底部：封面插画作为背景条带
-           · 宽度铺满视口、居中对齐
-           · 窄屏只露中间人物群，宽屏自动向两侧展开更多内容 -->
+      <!-- 顶部：头部插画 -->
+      <img class="welcome-head-art" src="img/home-head.png?v=20260506" alt="好险，差点就成设计大师了。终于有人懂我做设计的苦了。测测你是什么类型的大师">
+      <!-- 人物头像组 -->
       <div class="welcome-poster" role="img" aria-label="还没下班的设计大师"></div>
-      <div class="welcome-search-pill" aria-hidden="true">
-        <span class="welcome-search-brand">ardot</span>
-        <span class="welcome-search-text">设计大师人格测试</span>
+      <!-- 按钮 -->
+      <div class="welcome-cta">
+        <button type="button" class="btn-go" id="welcomeStart" onclick="start()" aria-label="开始测试">
+          <span class="btn-label">开始测试</span>
+        </button>
       </div>
+      <!-- 底部标签图片 -->
+      <img class="welcome-down-tag" src="role/down.png?v=20260507" alt="设计大师人格测试">
     </div>
 
     <!-- 题目场景由 applyConfigToPage() 根据 CFG.questions + QUESTION_ORDER 动态生成，避免静态 HTML 与题库不一致 -->
@@ -1170,16 +1615,15 @@
     <div class="ld" id="ld">
       <div class="ld-pct"><span id="ldPctNum">0</span><span class="ld-pct-sym">%</span></div>
       <div class="ld-bar"><div class="ld-bar-inner" id="ldBarInner"></div></div>
-      <div class="ld-tip">分析你的设计大师角色中…</div>
+      <div class="ld-tip">正在生成你的设计大师...</div>
       <div class="ld-grad"></div>
     </div>
 
     <div class="res" id="res">
       <div class="res-card">
-        <div class="res-top">
-          <div class="res-kicker">我的设计大师人格是</div>
-          <div class="res-name" id="rName">「草稿太多的毕加班索」</div>
-          <div class="res-avatar-frame">
+        <div class="res-top" style="padding-top:24px;min-height:0">
+          <div class="res-kicker" style="margin-bottom:18px">你的设计大师人格是</div>
+          <div class="res-avatar-frame" style="width:min(75vw,430px);margin:0 auto 14px">
             <button class="res-avatar-flip" id="rFlip" type="button" aria-label="点击翻看另一面">
               <span class="res-avatar-flip-inner">
                 <span class="res-avatar-face front"><img class="res-avatar" id="rImg" src="" alt="角色正面"></span>
@@ -1188,11 +1632,12 @@
               <span class="res-avatar-hint" id="rFlipHint">点击翻面</span>
             </button>
           </div>
-          <div class="res-insight-overlay">
+          <div class="res-name" id="rName" style="margin-bottom:8px">「草稿太多的毕加班索」</div>
+          <div class="res-insight-overlay" style="right:4px;bottom:36px;width:70%">
             <div class="res-section-title">暗格解读</div>
             <div class="insight-box" id="rComment"></div>
           </div>
-          <div class="res-real" id="rReal" style="display:none">D1 · 灵感发散与筛选</div>
+          <div class="res-real" id="rReal">D1 · 灵感发散与筛选</div>
         </div>
 
         <!-- 你的两个副属性 -->
@@ -1203,16 +1648,29 @@
 
         <!-- 下班困局来自（雷达，整行） -->
         <div class="res-section">
-          <div class="res-section-title">下班困局来自</div>
-          <div class="radar-wrap radar-full" id="rRadar"></div>
+          <div class="radar-card">
+            <div class="radar-card-title">
+              <svg class="radar-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <!-- 沙漏：时间困局的隐喻，简洁不像蜘蛛网 -->
+                <path d="M6 3h12"/>
+                <path d="M6 21h12"/>
+                <path d="M7 3v3.2c0 1.1.4 2.1 1.2 2.9L12 12l3.8-2.9c.8-.8 1.2-1.8 1.2-2.9V3"/>
+                <path d="M7 21v-3.2c0-1.1.4-2.1 1.2-2.9L12 12l3.8 2.9c.8.8 1.2 1.8 1.2 2.9V21"/>
+              </svg>
+              <span class="radar-card-title-text">下班困局来自</span>
+            </div>
+            <div class="radar-wrap radar-full" id="rRadar"></div>
+          </div>
         </div>
 
         <!-- 下班困局来自（雷达）已经合并到上面的横排 section -->
 
         <!-- 你缺的工具（解锁建议） -->
         <div class="res-section">
-          <div class="advice-intro">你最需要的不是<em>"更努力"</em>，而是一个能帮你的大师搭子：</div>
-          <ul class="advice-list" id="rAdvice"></ul>
+          <div class="advice-card">
+            <div class="advice-intro">你最需要的不是<em>"更努力"</em>，而是一个能帮你的大师搭子：</div>
+            <ul class="advice-list" id="rAdvice"></ul>
+          </div>
         </div>
 
         <!-- 扫码测你（二维码会被 html2canvas 一并拍进"保存图片"长图里） -->
@@ -1230,11 +1688,11 @@
         <!-- 底部心愿抽奖 -->
         <div class="res-section">
           <div class="wish-box" id="wishBox" style="margin:0">
-            <div class="wish-title" id="wishTitle">你是「草稿太多的毕加班索」，要成为大师「毕加索」</div>
-            <div class="wish-desc" id="wishDesc">分享一下你想要的 AI 设计技能，提交后可参与抽奖</div>
+            <div class="wish-title" id="wishTitle">你是「草稿太多的毕加班索」，要成为大师「毕加索」，你希望AI还能具备什么设计技能：</div>
+            <div class="wish-desc" id="wishDesc"></div>
             <textarea id="wishInput" placeholder="我希望 AI 能有这样的设计技能……"></textarea>
             <div class="wish-actions">
-              <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿并抽奖</button>
+              <button class="wish-btn" type="button" onclick="submitWishAndDraw()">提交心愿参与抽奖</button>
               <span class="wish-result" id="wishResult"></span>
             </div>
           </div>
@@ -1250,22 +1708,41 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- 右下角常驻"探索 AI 设计"悬浮按钮（结果页可见；脱离 #res，避免父节点动画影响） -->
-  <a class="save-fab" id="saveFab" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer" aria-label="探索 AI 设计">
-    <span class="save-fab-txt">探索 AI 设计</span>
-    <span class="save-fab-ico" aria-hidden="true">↗</span>
+  <!-- 右下角常驻 Ardot 图标悬浮按钮（结果页可见；脱离 #res，避免父节点动画影响） -->
+  <a class="save-fab" id="saveFab" href="https://ardot.tencent.com/" target="_blank" rel="noopener noreferrer" aria-label="探索 Ardot AI 设计">
+    <img class="save-fab-img" src="img/ardot.png" alt="Ardot" />
   </a>
 
   <!-- 截图预览层：放在 body 根节点，彻底脱离 #res 的 transform/动画影响，保证 position:fixed 相对视口定位 -->
   <div class="save-overlay" id="saveOverlay" hidden>
     <div class="save-overlay-mask" onclick="closeSaveOverlay()"></div>
     <div class="save-overlay-inner">
-      <div class="save-overlay-title">长按图片可转发给朋友 / 存入相册</div>
+      <button type="button" class="save-overlay-close" aria-label="关闭" onclick="closeSaveOverlay()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="18" y1="6" x2="6" y2="18"/>
+        </svg>
+      </button>
       <img class="save-overlay-img" id="saveOverlayImg" alt="我的大师人格 - 分享海报">
       <div class="save-overlay-actions">
-        <button type="button" class="save-overlay-btn" onclick="shareSaveImage()">分享</button>
-        <button type="button" class="save-overlay-btn ghost" onclick="downloadSaveImage()">下载</button>
-        <button type="button" class="save-overlay-btn ghost" onclick="closeSaveOverlay()">关闭</button>
+        <button type="button" class="save-overlay-btn" onclick="downloadSaveImage()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>保存海报</span>
+        </button>
+        <button type="button" class="save-overlay-btn" onclick="shareLinkOnly()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span>分享链接</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1289,6 +1766,29 @@
       <input class="company-modal-input" id="companyInput" type="text" maxlength="30" autocomplete="organization" placeholder="例如：腾讯 / 美团 / 字节跳动 / 独立设计师" />
       <div class="company-modal-tip" id="companyModalTip"></div>
       <button class="company-modal-btn" id="companyModalBtn" type="button" disabled>提交并查看我的大师人格</button>
+    </div>
+  </div>
+
+  <!-- 身份（昵称+头像）弹窗：在生成海报前收集用户昵称和头像 -->
+  <div class="id-modal" id="idModal" aria-hidden="true">
+    <div class="id-modal-mask" onclick="closeIdModal()"></div>
+    <div class="id-modal-card" role="dialog" aria-modal="true" aria-labelledby="idModalTitle">
+      <div class="id-modal-title" id="idModalTitle">把你印在海报上</div>
+      <div class="id-modal-desc">填一个昵称、选一个头像，海报顶部会显示。仅保存在你的浏览器，不上传服务器。</div>
+      <div class="id-modal-row">
+        <label class="id-modal-avatar" id="idAvatarPick" title="点击上传头像">
+          <span class="id-modal-avatar-empty" id="idAvatarEmpty">点击<br/>上传</span>
+          <img id="idAvatarPreview" alt="" style="display:none"/>
+          <input type="file" id="idAvatarFile" accept="image/*"/>
+        </label>
+        <input class="id-modal-input" id="idNameInput" type="text" maxlength="16" placeholder="昵称（如 Mimofang）" autocomplete="nickname"/>
+      </div>
+      <div class="id-modal-presets" id="idPresets" aria-label="预设头像"></div>
+      <div class="id-modal-tip" id="idModalTip"></div>
+      <div class="id-modal-actions">
+        <button type="button" class="id-modal-btn id-modal-btn-secondary" onclick="closeIdModal()">跳过</button>
+        <button type="button" class="id-modal-btn id-modal-btn-primary" id="idModalSaveBtn" onclick="saveIdAndContinue()">保存并继续</button>
+      </div>
     </div>
   </div>
 
@@ -1342,7 +1842,7 @@
         避免旧 localStorage 里的题库盖住新版本。
         6 维 × 6 角色：
           D1 草稿太多的毕加班索 / D2 还在抠图的原研灾 / D3 对不齐的蒙得里不安
-          D4 复制到崩溃的草间弥死 / D5 风格断片的梵稿 / D6 睡莲迁移失败的莫奈何
+          D4 复制到崩溃的草间弥想鼠 / D5 风格断片的梵稿 / D6 睡莲迁移失败的莫奈何
         Q1–Q6 每题 4 个选项 ABCD → 痛点强度 1/2/3/4（Qn 对应 Dn）；Q7 六维完整排序给权重 6/21…1/21。
         计算由全局 window.computeDesignerPersonality(answers) 驱动，不再使用 mappings 映射表。 */
     function defaultConfig(){
@@ -1464,7 +1964,7 @@
             }
           },
           {
-            id:"d4",name:"复制到崩溃的草间弥死",real:"D4 · 重复执行与批量操作",img:"img/kusama.png?v=cf1cc87f",
+            id:"d4",name:"复制到崩溃的草间弥想鼠",real:"D4 · 重复执行与批量操作",img:"img/kusama.png?v=cf1cc87f",
             desc:"你不是效率低，而是被重复劳动吞掉了。",
             resultContent:{
               tagline:"你不是效率低，而是被重复劳动吞掉了。",
@@ -1835,7 +2335,7 @@
       scene.className="scene";
       scene.id=id;
       scene.innerHTML=`<div class="qh"><div class="q-num"></div><h2 class="q-title"></h2><p class="q-desc"></p></div>
-      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b${index}" disabled onclick="nx()">继续</button></div>`;
+      <div class="qa"><button class="btn-b" onclick="bk()">返回</button><button class="btn-n" id="b${index}" disabled onclick="nx()">下一题</button></div>`;
       const wrap=document.querySelector(".wrap");
       const loader=document.getElementById("ld");
       if(wrap&&loader)wrap.insertBefore(scene,loader);
@@ -1854,6 +2354,35 @@
         return (tmp.textContent||tmp.innerText||"").replace(/\s+/g," ").trim();
       }catch(e){return String(s).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();}
     }
+
+    /* 角色名"标绿"映射：每个角色名内需要高亮的子串。
+       结果页 res-name 与 wishTitle 都用此函数生成 HTML。*/
+    const ROLE_NAME_HIGHLIGHT={
+      "草稿太多的毕加班索":"加班",
+      "还在抠图的原研灾":"灾",
+      "对不齐的蒙得里不安":"不安",
+      "复制到崩溃的草间弥想鼠":"想鼠",
+      "风格断片的梵稿":"稿",
+      "睡莲迁移失败的莫奈何":"奈何"
+    };
+    /* HTML 转义，避免角色名内若出现 < > & 等字符直接进 innerHTML 造成注入 */
+    function escapeHtml(s){
+      return String(s==null?"":s)
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
+    /* 把角色名生成带 .hl-green 高亮的 HTML 片段。
+       未在映射里的角色名，原样转义返回（不高亮）。*/
+    function roleNameHtml(name){
+      const safe=escapeHtml(name||"");
+      const hl=ROLE_NAME_HIGHLIGHT[name];
+      if(!hl)return safe;
+      const safeHl=escapeHtml(hl);
+      const idx=safe.indexOf(safeHl);
+      if(idx<0)return safe;
+      return safe.slice(0,idx)+'<span class="hl-green">'+safeHl+'</span>'+safe.slice(idx+safeHl.length);
+    }
+
     /* admin 里的主标题要同步到：① 浏览器 tab ② 微信/社交平台抓取的 head meta。
        分享卡片副标题固定为 SHARE_CARD_SUBTITLE，避免被首页副标题或结果 tagline 覆盖。
        注意：share-d1~d6.html 是"结果页角色专属"中转（标题是角色名，语义不同），不在此处统一。*/
@@ -1919,7 +2448,7 @@
         const qh=scene.querySelector(".qh");if(!qh)return;
         const n=qh.querySelector(".q-num"),t=qh.querySelector(".q-title"),d=qh.querySelector(".q-desc");
         const qDef=CFG.questions[qid]||{};
-        if(n)n.textContent=`${String(idx+1).padStart(2,"0")} / ${String(T).padStart(2,"0")}`;
+        if(n)n.textContent=`${String(idx+1).padStart(2,"0")}/${String(T).padStart(2,"0")}`;
         if(t)t.textContent=qDef.title||"";
         if(d){
           const desc=(qDef.desc||"");
@@ -1930,7 +2459,7 @@
         const nextBtn=document.getElementById("b"+(idx+1));
         if(nextBtn){
           nextBtn.onclick=idx===T-1?tryFinalSubmit:nx;
-          nextBtn.textContent=idx===T-1?"看我的生存角色":"继续";
+          nextBtn.textContent=idx===T-1?"看我的生存角色":"下一题";
           nextBtn.disabled=true;
         }
         renderSceneQuestion(scene,qid);
@@ -2166,6 +2695,15 @@
       e.classList.add("active");
       const idx=Number((id||"").replace("s",""));
       document.body.classList.toggle("quiz-on-q",Number.isFinite(idx)&&idx>=1&&idx<=T);
+      // 同步全局题号
+      const gNum=document.getElementById("qNumGlobal");
+      if(gNum){
+        if(Number.isFinite(idx)&&idx>=1&&idx<=T){
+          gNum.textContent=`${String(idx).padStart(2,"0")}/${String(T).padStart(2,"0")}`;
+        }else{
+          gNum.textContent="";
+        }
+      }
       const qid=QUESTION_ORDER[idx-1];
       if(qid&&CFG.questions[qid]&&CFG.questions[qid].type==="scale")refreshScaleUIState(qid,false);
     }
@@ -2590,19 +3128,22 @@
       latestResult={id:topRole.id,name:topRole.name||"",tagline:rc.shareLine||rc.tagline||topRole.desc||"",personality:personality};
       /* 顶部 */
       setupResultFlip(topRole);
-      document.getElementById("rName").textContent=`「${topRole.name}」`;
-      document.getElementById("rReal").textContent=topRole.real||personality.finalDimension||"";
+      document.getElementById("rName").innerHTML=`「${roleNameHtml(topRole.name)}」`;
+      document.getElementById("rReal").textContent=rc.masterComment||topRole.real||personality.finalDimension||"";
 
       /* 暗格解读（大师点评） */
       setText("rComment",rc.masterComment||"");
 
       /* 副属性（两张卡片：大师的状态 / 你的状态） */
       const subEl=document.getElementById("rSubStats");
+      // SVG icons：DNA 基因 / 门 下班阻碍（线性 1.6 描边，黑色 currentColor）
+      const SVG_DNA=`<svg class="substat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3c0 4 10 6 10 10s-10 4-10 8"/><path d="M17 3c0 4-10 6-10 10s10 4 10 8"/><path d="M8.5 6h7"/><path d="M8.5 18h7"/><path d="M10 9.5h4"/><path d="M10 14.5h4"/></svg>`;
+      const SVG_DOOR=`<svg class="substat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9a2 2 0 0 1 2 2v16H6z"/><path d="M6 21h13"/><circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"/></svg>`;
       const stateCards=[
-        {label:"你的大师基因",val:rc.masterState||"—"},
-        {label:"你的下班阻碍",val:rc.userState  ||"—"}
+        {icon:SVG_DNA, label:"你的大师基因",val:rc.masterState||"—"},
+        {icon:SVG_DOOR,label:"你的下班阻碍",val:rc.userState  ||"—"}
       ];
-      if(subEl)subEl.innerHTML=stateCards.map(s=>`<div class="substat-card"><div class="substat-label">${s.label}</div><div class="substat-state">${s.val}</div></div>`).join("");
+      if(subEl)subEl.innerHTML=stateCards.map(s=>`<div class="substat-card"><div class="substat-label">${s.icon}<span class="substat-label-text">${s.label}</span></div><div class="substat-state">${s.val}</div></div>`).join("");
 
       /* 魅力雷达 + 表格 */
       renderRadarSvg("rRadar",personality);
@@ -2624,21 +3165,35 @@
       /* 心愿抽奖区 */
       const wishBox=document.getElementById("wishBox");if(wishBox)wishBox.style.display="";
       const wishTitle=document.getElementById("wishTitle");
-      if(wishTitle)wishTitle.textContent=`你是「${topRole.name}」，要成为大师「${roleIdealName(topRole)}」`;
+      if(wishTitle)wishTitle.innerHTML=`你是「${roleNameHtml(topRole.name)}」，要成为大师「${escapeHtml(roleIdealName(topRole))}」，你希望AI还能具备什么设计技能：`;
       const wishDesc=document.getElementById("wishDesc");
       const hasWish=String(A.q12||"").trim().length>0;
-      if(wishDesc)wishDesc.textContent=hasWish?"你已分享想要的 AI 设计技能，可点击按钮参与抽奖":"分享一下你想要的 AI 设计技能，提交后可参与抽奖";
+      if(wishDesc)wishDesc.textContent="";
       const wishInput=document.getElementById("wishInput");
       if(wishInput){
         wishInput.style.display="";
         wishInput.value=String(A.q12||"");
-        wishInput.oninput=()=>{A.q12=wishInput.value;};
+        wishInput.oninput=()=>{
+          A.q12=wishInput.value;
+          const wb=document.querySelector("#wishBox .wish-btn");
+          if(wb&&!wb.classList.contains("is-done")){
+            if(wishInput.value.trim().length>0){wb.classList.add("has-input");}
+            else{wb.classList.remove("has-input");}
+          }
+        };
       }
 
       latestResult={id:topRole.id,name:topRole.name||"",tagline:rc.shareLine||rc.tagline||topRole.desc||"",personality:personality};
       const wishResult=document.getElementById("wishResult"); if(wishResult)wishResult.textContent="";
       const wishBtn=document.querySelector("#wishBox .wish-btn");
-      if(wishBtn){wishBtn.disabled=false;wishBtn.classList.remove("is-done");wishBtn.textContent="提交心愿并抽奖";}
+      if(wishBtn){
+        wishBtn.disabled=false;
+        wishBtn.classList.remove("is-done");
+        wishBtn.textContent="提交心愿参与抽奖";
+        /* 根据 textarea 当前内容初始化按钮颜色态 */
+        if(hasWish){wishBtn.classList.add("has-input");}
+        else{wishBtn.classList.remove("has-input");}
+      }
       const wishInputEl=document.getElementById("wishInput");
       if(wishInputEl)wishInputEl.style.display="";
       document.getElementById("res").classList.add("active");
@@ -2725,7 +3280,12 @@
       return new Promise((resolve,reject)=>{
         const role=resolveLatestRoleForShare();
         if(role){
-          buildShareImage(role,role.resultContent||{},getQuizEntryLink()).then((dataUrl)=>{
+          const link=getQuizEntryLink();
+          /* 缓存当前上下文，便于"修改身份"后即时重绘 overlay 内的海报 */
+          window.__currentTopRole=role;
+          window.__currentRc=role.resultContent||{};
+          window.__currentLink=link;
+          buildShareImage(role,role.resultContent||{},link).then((dataUrl)=>{
             resolve({dataUrl:dataUrl,blob:dataUrlToBlob(dataUrl)});
           }).catch(reject);
           return;
@@ -2784,31 +3344,35 @@
     }
     function captureAndShowSave(){
       if(__capturing)return;
-      __capturing=true;
-      setSaveFabLoading(true,"生成中…");
-      captureResult().then(({dataUrl})=>{
-        const overlay=document.getElementById("saveOverlay");
-        const img=document.getElementById("saveOverlayImg");
-        if(img)img.src=dataUrl;
-        if(overlay)overlay.hidden=false;
-        document.body.classList.add("save-overlay-open");
-        document.body.style.overflow="hidden";
-      }).catch((err)=>{
-        console.warn("截图失败",err);
-        alert(err&&err.message==="截图组件加载失败"?"截图组件加载失败，请检查网络后重试":"截图失败，请稍后再试");
-      }).finally(()=>{
-        __capturing=false;
-        setSaveFabLoading(false);
+      /* 先确保有身份（昵称+头像），方便海报顶部显示 */
+      ensureIdentity().then(()=>{
+        __capturing=true;
+        setSaveFabLoading(true,"生成中…");
+        captureResult().then(({dataUrl})=>{
+          const overlay=document.getElementById("saveOverlay");
+          const img=document.getElementById("saveOverlayImg");
+          if(img)img.src=dataUrl;
+          if(overlay)overlay.hidden=false;
+          document.body.classList.add("save-overlay-open");
+          document.body.style.overflow="hidden";
+        }).catch((err)=>{
+          console.warn("截图失败",err);
+          alert(err&&err.message==="截图组件加载失败"?"截图组件加载失败，请检查网络后重试":"截图失败，请稍后再试");
+        }).finally(()=>{
+          __capturing=false;
+          setSaveFabLoading(false);
+        });
       });
     }
 
     /* 点击右下角"保存图片"按钮：优先调起系统共享（可保存到相册），不支持则降级到 overlay */
     function saveToAlbum(){
       if(__capturing)return;
-      __capturing=true;
-      setSaveFabLoading(true,"生成中…");
-      const name=(document.getElementById("rName")&&document.getElementById("rName").textContent)||"AI设计师人格";
-      captureResult().then(({dataUrl,blob})=>{
+      ensureIdentity().then(()=>{
+        __capturing=true;
+        setSaveFabLoading(true,"生成中…");
+        const name=(document.getElementById("rName")&&document.getElementById("rName").textContent)||"AI设计师人格";
+        captureResult().then(({dataUrl,blob})=>{
         /* 优先 Web Share API：iOS Safari / 现代 Android Chrome 支持，
            用户可在共享菜单里选「存储图像 / 保存到相册」 */
         if(blob&&navigator.canShare){
@@ -2837,6 +3401,7 @@
       }).finally(()=>{
         __capturing=false;
         setSaveFabLoading(false);
+      });
       });
     }
     function fallbackOverlay(dataUrl){
@@ -2962,10 +3527,41 @@
       }
     }
 
+    /* "分享链接"按钮：仅分享/复制链接，不带图片
+       - 优先调用系统原生分享面板（iOS/Android 浏览器，可分享到微信/朋友圈/信息等）
+       - 不支持时退化为复制链接到剪贴板，并 toast 提示 */
+    function shareLinkOnly(){
+      var roleId=(latestResult&&latestResult.id)||"";
+      var cfgMeta=(typeof CFG!=="undefined"&&CFG&&CFG.meta)||{};
+      var title=(roleId&&latestResult&&latestResult.name)
+        ? (RESULT_SHARE_TITLE_PREFIX+"「"+latestResult.name+"」")
+        : (plainTextFromHtml(cfgMeta.mainTitle||"")||"《好险，差点就会做设计了》");
+      var txt=SHARE_CARD_SUBTITLE;
+      var SHARE_BUILD="20260427";
+      var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
+      var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
+      var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
+
+      /* ① 原生 Web Share（不带 files，纯链接分享） */
+      if(navigator.share){
+        navigator.share({title:title,text:txt,url:shareLink}).catch(function(e){
+          if(e&&e.name==="AbortError")return;
+          fallbackCopyLink(txt,shareLink);
+        });
+        return;
+      }
+      /* ② 退化为复制链接 */
+      fallbackCopyLink(txt,shareLink);
+    }
+
     function renderShareCard(topRole,rc){
       const imgEl=document.getElementById("rSaveImg");
       if(!imgEl)return;
       const link=getQuizEntryLink();
+      /* 缓存当前上下文，便于"修改身份"后即时重绘海报 */
+      window.__currentTopRole=topRole;
+      window.__currentRc=rc;
+      window.__currentLink=link;
       /* 异步生成 */
       buildShareImage(topRole,rc,link).then((dataUrl)=>{
         imgEl.src=dataUrl;
@@ -3248,24 +3844,234 @@
       }
     }
 
-    /* 构建分享图：Canvas -> dataURL。保留结果标题、角色图、人格 slogan、两个副属性和二维码列。 */
+    /* ========================================================
+     * 用户身份（昵称 + 头像）：海报顶部"圆头像 + 昵称"使用
+     * 优先级：
+     *   1) localStorage.ardot_wx_user_v1（微信授权拿到的真实头像/昵称）
+     *      —— 项目尚未接入后端 OAuth2，此分支当前不会有数据，但保留接入位
+     *   2) 兜底：头像 = img/ip.png，昵称 = "来自 {company} 的设计师"
+     *      其中 {company} 来自答题前公司弹窗收集的 A.company（或 localStorage 上次提交）
+     * ======================================================== */
+    const ID_STORAGE_KEY="ardot_user_v1";        /* 兼容老数据（手填昵称/头像） */
+    const WX_ID_STORAGE_KEY="ardot_wx_user_v1";  /* 微信授权后写入 */
+    const ID_PRESETS=[
+      "role/d1-A.png","role/d2-A.png","role/d3-A.png",
+      "role/d4-A.png","role/d5-A.png","role/d6-A.png"
+    ];
+    /* 取当前用户填写过的公司名（session 优先 → 上次提交） */
+    function getCurrentCompany(){
+      try{
+        const sessionCompany=(typeof A!=="undefined"&&A&&A.company)?String(A.company).trim():"";
+        if(sessionCompany)return sessionCompany;
+        if(typeof getLastSubmittedCompany==="function"){
+          const last=String(getLastSubmittedCompany()||"").trim();
+          if(last)return last;
+        }
+      }catch(e){}
+      return "";
+    }
+    function getMyIdentity(){
+      /* 1) 微信授权数据（若后端接入后写入） */
+      try{
+        const raw=localStorage.getItem(WX_ID_STORAGE_KEY);
+        if(raw){
+          const obj=JSON.parse(raw);
+          if(obj && typeof obj==="object"){
+            const name=String(obj.nickname||obj.name||"").trim();
+            const avatar=String(obj.headimgurl||obj.avatar||"").trim();
+            if(name||avatar){
+              return {name:name,avatar:avatar||"img/ip.png",source:"wx"};
+            }
+          }
+        }
+      }catch(e){}
+      /* 2) 兜底：默认头像 + "来自 XX 的设计师" */
+      const company=getCurrentCompany();
+      const name=company?("来自 "+company+" 的设计师"):"来自 ardot 的设计师";
+      return {name:name,avatar:"img/ip.png",source:"default"};
+    }
+    function setMyIdentity(name,avatar){
+      const v={name:String(name||"").trim().slice(0,16),avatar:String(avatar||"")};
+      try{localStorage.setItem(ID_STORAGE_KEY,JSON.stringify(v));}catch(e){}
+      return v;
+    }
+    function clearMyIdentity(){try{localStorage.removeItem(ID_STORAGE_KEY);}catch(e){}}
+
+    /* 身份弹窗：打开/关闭/提交 */
+    let __idModalCtx={pendingResolve:null};
+    function openIdModal(skipResolve){
+      const modal=document.getElementById("idModal");
+      if(!modal)return;
+      const cur=getMyIdentity()||{name:"",avatar:""};
+      const nameInput=document.getElementById("idNameInput");
+      const preview=document.getElementById("idAvatarPreview");
+      const empty=document.getElementById("idAvatarEmpty");
+      const presets=document.getElementById("idPresets");
+      const tip=document.getElementById("idModalTip");
+      if(tip)tip.textContent="";
+      if(nameInput)nameInput.value=cur.name||"";
+      /* 渲染头像预览 */
+      const setAvatarUI=(src)=>{
+        if(src){
+          preview.src=src;preview.style.display="block";
+          if(empty)empty.style.display="none";
+        }else{
+          preview.removeAttribute("src");preview.style.display="none";
+          if(empty)empty.style.display="block";
+        }
+      };
+      setAvatarUI(cur.avatar||"");
+      /* 渲染预设 */
+      if(presets){
+        presets.innerHTML=ID_PRESETS.map((p)=>(
+          '<button type="button" class="id-modal-preset'+(cur.avatar===p?" is-active":"")+'" data-src="'+p+'" style="background-image:url('+p+')" aria-label="预设头像"></button>'
+        )).join("");
+        presets.querySelectorAll(".id-modal-preset").forEach((btn)=>{
+          btn.onclick=()=>{
+            const src=btn.getAttribute("data-src")||"";
+            setAvatarUI(src);
+            presets.querySelectorAll(".id-modal-preset").forEach(b=>b.classList.remove("is-active"));
+            btn.classList.add("is-active");
+          };
+        });
+      }
+      /* 文件上传 */
+      const fileInput=document.getElementById("idAvatarFile");
+      if(fileInput){
+        fileInput.value="";
+        fileInput.onchange=(e)=>{
+          const f=(e.target.files&&e.target.files[0])||null;
+          if(!f)return;
+          if(!/^image\//.test(f.type)){tip.textContent="请选择图片文件";return;}
+          if(f.size>2*1024*1024){tip.textContent="图片超过 2MB，请换一张";return;}
+          /* 缩放到 192x192 后再 base64，节省 localStorage */
+          const fr=new FileReader();
+          fr.onload=()=>{
+            const im=new Image();
+            im.onload=()=>{
+              const S=192;
+              const cv=document.createElement("canvas");cv.width=S;cv.height=S;
+              const c=cv.getContext("2d");
+              /* 居中裁正方形 */
+              const r=Math.min(im.width,im.height);
+              const sx=(im.width-r)/2,sy=(im.height-r)/2;
+              c.drawImage(im,sx,sy,r,r,0,0,S,S);
+              const dataUrl=cv.toDataURL("image/jpeg",0.86);
+              setAvatarUI(dataUrl);
+              /* 取消所有预设的选中态 */
+              if(presets)presets.querySelectorAll(".id-modal-preset").forEach(b=>b.classList.remove("is-active"));
+            };
+            im.onerror=()=>{tip.textContent="图片加载失败";};
+            im.src=fr.result;
+          };
+          fr.readAsDataURL(f);
+        };
+      }
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      if(!skipResolve){
+        /* 默认情况下不挂 resolve；只有 ensureIdentity 走的路径才会挂 */
+      }
+    }
+    function closeIdModal(){
+      const modal=document.getElementById("idModal");
+      if(modal){modal.classList.remove("show");modal.setAttribute("aria-hidden","true");}
+      if(__idModalCtx.pendingResolve){
+        const r=__idModalCtx.pendingResolve;__idModalCtx.pendingResolve=null;
+        r(getMyIdentity());
+      }
+    }
+    function saveIdAndContinue(){
+      const nameInput=document.getElementById("idNameInput");
+      const preview=document.getElementById("idAvatarPreview");
+      const tip=document.getElementById("idModalTip");
+      const name=String((nameInput&&nameInput.value)||"").trim();
+      const avatar=(preview&&preview.style.display!=="none"&&preview.src)?preview.src:"";
+      if(!name && !avatar){
+        if(tip)tip.textContent="至少填一个昵称或选一个头像";
+        return;
+      }
+      setMyIdentity(name,avatar);
+      /* 如果当前结果页已生成，重新渲染海报让顶部显示新身份 */
+      const overlay=document.getElementById("saveOverlay");
+      const overlayOpen=overlay && !overlay.hidden;
+      closeIdModal();
+      if(overlayOpen){
+        /* 用户在保存海报弹窗里改的身份，立即重新生成 */
+        const role=window.__currentTopRole;
+        const rc=window.__currentRc;
+        const link=window.__currentLink;
+        if(role){
+          buildShareImage(role,rc||{},link||location.href).then((dataUrl)=>{
+            const img=document.getElementById("saveOverlayImg");
+            if(img)img.src=dataUrl;
+          });
+        }
+      }
+    }
+    /* 海报生成入口前调用：若没填过身份则先弹窗收集，填完/跳过后回调 */
+    function ensureIdentity(){
+      return new Promise((resolve)=>{
+        const cur=getMyIdentity();
+        if(cur)return resolve(cur);
+        __idModalCtx.pendingResolve=resolve;
+        openIdModal(true);
+      });
+    }
+
+    /* 角色 slogan 配置：分享海报上"角色名下方黑底白字横幅"用 */
+    const ROLE_SHARE_SLOGAN={
+      "草稿太多的毕加班索":"脑子: 再来一个方向, 现实: 一个都没交",
+      "还在抠图的原研灾":"已经放大到400%，但毛边还在嘲笑我",
+      "对不齐的蒙得里不安":"就差1px，但就是对不齐",
+      "复制到崩溃的草间弥想鼠":"复制-对齐-间距，循环到怀疑人生",
+      "风格断片的梵稿":"我记得有逻辑，但文件不记得我",
+      "睡莲迁移失败的莫奈何":"设计已经结束交付刚刚开始"
+    };
+    /* 角色名拆解：`<前缀的> + <主名>`，分别在海报第一行/第二行渲染。
+       未在表里的兜底：用最后一个"的"切分；找不到则整体作为主名。*/
+    const ROLE_NAME_SPLIT={
+      "草稿太多的毕加班索":{prefix:"草稿太多的",main:"毕加班索"},
+      "还在抠图的原研灾":{prefix:"还在抠图的",main:"原研灾"},
+      "对不齐的蒙得里不安":{prefix:"对不齐的",main:"蒙得里不安"},
+      "复制到崩溃的草间弥想鼠":{prefix:"复制到崩溃的",main:"草间弥想鼠"},
+      "风格断片的梵稿":{prefix:"风格断片的",main:"梵稿"},
+      "睡莲迁移失败的莫奈何":{prefix:"睡莲迁移失败的",main:"莫奈何"}
+    };
+    function splitRoleName(name){
+      const pre=ROLE_NAME_SPLIT[name];
+      if(pre)return pre;
+      const idx=String(name||"").lastIndexOf("的");
+      if(idx>0)return {prefix:String(name).slice(0,idx+1),main:String(name).slice(idx+1)};
+      return {prefix:"",main:String(name||"")};
+    }
+
+    /* 构建分享图（Canvas -> dataURL）：极简海报样式
+       - 顶部："你的设计大师人格是："
+       - 大角色名（拆为两行：前缀的 / 主名），主名内的高亮字标绿 #14CC52
+       - 角色名下方：黑底白字胶囊 slogan
+       - 中部：大角色立绘
+       - 底部：左下 ardot logo，右下 扫码测试 + 副标 + QR 码 */
     function buildShareImage(topRole,rc,link){
       return new Promise((resolve,reject)=>{
-        const W=900,H=1340;
+        /* 输出尺寸：海报实际像素 351×587，所有字号/控件尺寸都是最终像素值 */
+        const W=351,H=587;
         const canvas=document.createElement("canvas");
-        canvas.width=W;canvas.height=H;
+        /* 用 2 倍像素绘制保证高清，再用 css 维度回到 W/H */
+        const DPR=2;
+        canvas.width=W*DPR;canvas.height=H*DPR;
         const ctx=canvas.getContext("2d");
-        /* 格纹底纹 */
-        ctx.fillStyle="#f5f6f2";
-        ctx.fillRect(0,0,W,H);
-        ctx.strokeStyle="rgba(17,17,17,.075)";
-        ctx.lineWidth=1;
-        for(let x=0;x<=W;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-        for(let y=0;y<=H;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-        ctx.strokeStyle="rgba(0,236,0,.18)";
-        for(let x=16;x<=W;x+=128){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-        for(let y=16;y<=H;y+=128){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+        ctx.scale(DPR,DPR);
 
+        /* 白色网格底 */
+        ctx.fillStyle="#ffffff";
+        ctx.fillRect(0,0,W,H);
+        ctx.strokeStyle="rgba(17,17,17,.06)";
+        ctx.lineWidth=1;
+        for(let x=0;x<=W;x+=15){ctx.beginPath();ctx.moveTo(x+0.5,0);ctx.lineTo(x+0.5,H);ctx.stroke();}
+        for(let y=0;y<=H;y+=15){ctx.beginPath();ctx.moveTo(0,y+0.5);ctx.lineTo(W,y+0.5);ctx.stroke();}
+
+        /* 异步加载：角色立绘（B 面）+ brand logo + 用户头像 */
         const avatarCandidates=roleImageCandidates(topRole,"back");
         const loadFirstImg=(list)=>new Promise((res)=>{
           const arr=uniqPaths(list);
@@ -3273,119 +4079,206 @@
           const next=()=>{
             const src=arr[idx++];
             if(!src)return res(null);
-            const img=new Image();img.crossOrigin="anonymous";
-            img.onload=()=>res(img);
-            img.onerror=next;
-            img.src=src;
+            const im=new Image();im.crossOrigin="anonymous";
+            im.onload=()=>res(im);
+            im.onerror=next;
+            im.src=src;
           };
           next();
         });
-        loadFirstImg(avatarCandidates).then((img)=>{
-          /* 结果标题：保持页面样式，标题居中 + 黑底姓名块 */
-          ctx.fillStyle="#111";
-          ctx.textAlign="center";
-          ctx.font="900 50px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText(RESULT_SHARE_TITLE_PREFIX,W/2,88);
-          const nameText="「"+(topRole.name||"设计大师")+"」";
-          const nameW=Math.min(720,Math.max(520,ctx.measureText(nameText).width+72));
-          roundRect(ctx,(W-nameW)/2,118,nameW,82,0,"#111",null,0);
-          ctx.fillStyle="#fff";
-          ctx.font="900 48px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText(nameText,W/2,174);
+        const loadOne=(src)=>new Promise((res)=>{
+          if(!src)return res(null);
+          const im=new Image();im.crossOrigin="anonymous";
+          im.onload=()=>res(im);im.onerror=()=>res(null);
+          im.src=src;
+        });
 
-          /* B 面角色图 */
-          const imgX=50,imgY=210,imgW=560,imgH=540;
-          if(img){
-            const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-            const r=Math.min(imgW/iw,imgH/ih);
-            const dw=iw*r,dh=ih*r;
-            ctx.drawImage(img,imgX+(imgW-dw)/2,imgY+(imgH-dh)/2,dw,dh);
+        const me=getMyIdentity()||{name:"",avatar:"img/ip.png"};
+        const userAvatarSrc=me.avatar||"img/ip.png";
+
+        Promise.all([
+          loadFirstImg(avatarCandidates),
+          loadOne("img/brandlogo.png"),
+          loadOne(userAvatarSrc)
+        ]).then(([img,logoImg,userImg])=>{
+          const padX=24;
+          const split=splitRoleName(topRole.name||"");
+          const hl=ROLE_NAME_HIGHLIGHT[topRole.name||""]||"";
+          const slogan=ROLE_SHARE_SLOGAN[topRole.name||""]||(rc.shareLine||rc.tagline||"");
+
+          /* ===== 顶部用户身份区：圆头像 32 + 右侧两行文字（昵称 / kicker）整体垂直居中 ===== */
+          const headSize=32;
+          const headX=padX,headY=24;
+          /* 头像背景（淡蓝灰） */
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(headX+headSize/2,headY+headSize/2,headSize/2,0,Math.PI*2);
+          ctx.closePath();
+          ctx.fillStyle="#e9eef7";
+          ctx.fill();
+          ctx.clip();
+          if(userImg){
+            /* 居中裁剪 */
+            const iw=userImg.naturalWidth||userImg.width,ih=userImg.naturalHeight||userImg.height;
+            const r=Math.min(iw,ih);
+            const sx=(iw-r)/2,sy=(ih-r)/2;
+            ctx.drawImage(userImg,sx,sy,r,r,headX,headY,headSize,headSize);
+          }else{
+          /* 兜底图标字号根据头像调整 */
+            ctx.fillStyle="#aab2c0";
+            ctx.font="700 14px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+            const initial=(me.name||"?").trim().charAt(0).toUpperCase()||"?";
+            ctx.fillText(initial,headX+headSize/2,headY+headSize/2+1);
+            ctx.textBaseline="alphabetic";
+          }
+          ctx.restore();
+
+          /* 右侧两行文字：昵称 16px 粗 + kicker 14px 细，整体与头像垂直居中 */
+          const textX=headX+headSize+10;
+          const nameSize=16;
+          const kickerSize=14;
+          const lineGap=4;          /* 两行之间的留白 */
+          /* 用 middle 基线渲染，让两行视觉中线严格对齐头像中线 */
+          const headCenterY=headY+headSize/2;
+          const nameCenterY=headCenterY-(nameSize/2+lineGap/2);
+          const kickerCenterY=headCenterY+(kickerSize/2+lineGap/2);
+          const nameMaxW=W-padX-textX;
+
+          /* 第一行：昵称 */
+          ctx.fillStyle="#111";
+          ctx.textAlign="left";
+          ctx.textBaseline="middle";
+          ctx.font="700 "+nameSize+"px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          let displayName=me.name||"";
+          while(displayName && ctx.measureText(displayName).width>nameMaxW){
+            displayName=displayName.slice(0,-1);
+          }
+          if(displayName!==(me.name||"") && displayName.length>=1){
+            displayName=displayName.slice(0,-1)+"…";
+          }
+          ctx.fillText(displayName,textX,nameCenterY);
+
+          /* 第二行：kicker */
+          ctx.fillStyle="#9a9b95";
+          ctx.font="400 "+kickerSize+"px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          ctx.fillText("你的设计大师人格是：",textX,kickerCenterY);
+          ctx.textBaseline="alphabetic";
+          /* 用 alphabetic 下游一致的"kickerY"作为后续布局的锚点（kicker 文字底部基线） */
+          const kickerY=kickerCenterY+kickerSize*0.36;
+
+          /* ===== 第 1 行：前缀（如"还在抠图的"），粗体 26px =====
+             kicker 与前缀间距收紧（~12px） */
+          const prefixSize=26;
+          ctx.fillStyle="#111";
+          ctx.textAlign="left";
+          ctx.font="700 "+prefixSize+"px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          let prefixY=kickerY+12+prefixSize-2;
+          if(split.prefix){
+            ctx.fillText(split.prefix,padX,prefixY);
+          }else{
+            /* 若无前缀，把主名整体上移，让首行紧跟 kicker */
+            prefixY=kickerY+12-4;
           }
 
-          /* 分享二维码列 */
-          const qrColX=638,qrColY=248,qrColW=212,qrColH=460;
-          roundRect(ctx,qrColX,qrColY,qrColW,qrColH,0,"rgba(255,255,255,.9)","#e5e7e5",2);
-          ctx.fillStyle="#111";
-          ctx.textAlign="center";
-          ctx.font="800 30px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("扫码测试",qrColX+qrColW/2,qrColY+58);
-          const qrSize=164,qrX=qrColX+(qrColW-qrSize)/2,qrY=qrColY+90;
+          /* ===== 第 2 行：主名（粗体 64px，高亮字标绿，紧贴前缀） ===== */
+          const mainFontSize=64;
+          ctx.font='700 '+mainFontSize+'px -apple-system,BlinkMacSystemFont,"PingFang SC","MiSans",sans-serif';
+          /* 主名顶部紧贴前缀底部，行距收紧 */
+          const mainY=prefixY+mainFontSize-2;
+          let cursorX=padX;
+          const mainChars=split.main.split("");
+          const hlStart=hl?split.main.indexOf(hl):-1;
+          const hlEnd=hl?(hlStart+hl.length):-1;
+          for(let i=0;i<mainChars.length;i++){
+            const c=mainChars[i];
+            ctx.fillStyle=(hlStart>=0&&i>=hlStart&&i<hlEnd)?"#14CC52":"#111";
+            ctx.fillText(c,cursorX,mainY);
+            cursorX+=ctx.measureText(c).width;
+          }
+
+          /* ===== Slogan 横幅：黑底白字小方块（贴在主名下方 14px） ===== */
+          const sloganY=mainY+14;
+          let sloganBoxH=0;
+          if(slogan){
+            const sloganSize=14;
+            ctx.font="700 "+sloganSize+"px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+            const padTxtX=10,padTxtY=8;
+            const measureW=ctx.measureText(slogan).width;
+            const boxW=Math.min(W-padX*2,measureW+padTxtX*2);
+            sloganBoxH=sloganSize+padTxtY*2;
+            roundRect(ctx,padX,sloganY,boxW,sloganBoxH,2,"#111",null,0);
+            ctx.fillStyle="#fff";
+            ctx.textAlign="left";
+            ctx.textBaseline="middle";
+            ctx.fillText(slogan,padX+padTxtX,sloganY+sloganBoxH/2+1);
+            ctx.textBaseline="alphabetic";
+          }
+
+          /* ===== 角色立绘（尽量铺大，不与底栏重叠） ===== */
+          /* 底栏区域：QR 72 + 上下边距 27 = 126，预留给底部 */
+          const footerReserve=27+72+27; /* 27 上 + 72 QR + 27 下 = 126 */
+          const avatarTop=sloganY+sloganBoxH+8;
+          const avatarMaxH=H-footerReserve-avatarTop-2;
+          if(img){
+            const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+            /* 允许略微出血到画布边缘 */
+            let dw=W-8;
+            let dh=ih*(dw/iw);
+            if(dh>avatarMaxH){
+              dh=avatarMaxH;
+              dw=iw*(dh/ih);
+            }
+            const dx=(W-dw)/2;
+            const dy=avatarTop;
+            ctx.drawImage(img,dx,dy,dw,dh);
+          }
+
+          /* ===== 底部：左下 brand logo，右下 QR 码 + 文案 =====
+             二维码 72×72，距画布右边 27、下边 27 */
+          const qrSize=72;
+          const qrMargin=27;
+          const qrX=W-qrMargin-qrSize;
+          const qrY=H-qrMargin-qrSize;
+          /* logo 与 QR 在同一行，垂直对齐到 QR 中线 */
+          const logoH=36;
+          if(logoImg){
+            const lw=logoImg.naturalWidth||logoImg.width,lh=logoImg.naturalHeight||logoImg.height;
+            const lr=logoH/lh;
+            const logoY=qrY+(qrSize-logoH)/2;
+            ctx.drawImage(logoImg,padX,logoY,lw*lr,lh*lr);
+          }else{
+            const logoY=qrY+(qrSize-logoH)/2;
+            roundRect(ctx,padX,logoY,logoH,logoH,6,"#111",null,0);
+            ctx.fillStyle="#fff";
+            ctx.textAlign="center";
+            ctx.font="900 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+            ctx.fillText("a",padX+logoH/2,logoY+logoH-8);
+          }
+
           try{
             const qr=QR.encode(link);
             drawQrToCanvas(ctx,qr,qrX,qrY,qrSize,true);
           }catch(err){console.warn("QR encode 失败",err);}
-          ctx.fillStyle="#4b5563";
-          ctx.font="600 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          wrapTextLines(ctx,SHARE_CARD_SUBTITLE,qrColX+24,qrY+qrSize+48,qrColW-48,28,3,"center");
-          ctx.fillStyle="#00b900";
-          ctx.font="800 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("ardot-quiz.edgeone.dev",qrColX+qrColW/2,qrColY+qrColH-36);
-
-          /* 你的两个副属性 */
-          const slogan=(rc.tagline||topRole.desc||"").trim();
-          const sloganBoxX=50,sloganBoxY=770,sloganBoxW=800;
-          const sloganLineH=36;
-          ctx.font="600 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          /* 先估算行数，决定 slogan 块高度 */
-          let sloganLines=0;
-          if(slogan){
-            const tmp=(slogan).split("");
-            let line="";
-            for(let i=0;i<tmp.length;i++){
-              const test=line+tmp[i];
-              if(ctx.measureText(test).width>sloganBoxW-90&&line){sloganLines++;line=tmp[i];}
-              else{line=test;}
-              if(sloganLines>=3)break;
-            }
-            if(line&&sloganLines<3)sloganLines++;
-            if(sloganLines<1)sloganLines=1;
-          }
-          const sloganBoxH=slogan?Math.max(80,sloganLines*sloganLineH+44):0;
-          if(slogan){
-            roundRect(ctx,sloganBoxX,sloganBoxY,sloganBoxW,sloganBoxH,0,"#f7f8f7","#e5e7e5",2);
-            /* 左上角绿色引号 */
-            ctx.fillStyle="#00EC00";
-            ctx.textAlign="left";
-            ctx.font="900 48px Georgia,serif";
-            ctx.fillText("\u201C",sloganBoxX+22,sloganBoxY+50);
-            /* 金句正文 */
-            ctx.fillStyle="#1a1d1a";
-            ctx.font="600 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-            wrapTextLines(ctx,slogan,sloganBoxX+74,sloganBoxY+44,sloganBoxW-90,sloganLineH,3);
-          }
-
-          const subStatTitleY=(slogan?sloganBoxY+sloganBoxH:760)+50;
+          /* QR 左侧两行文案，整体与 QR 垂直居中：
+             第一行"扫码测试" 14px 粗
+             第二行"测测你是什么设计大师" 10px 细（避免左端被 logo 挤压） */
           ctx.fillStyle="#111";
-          ctx.textAlign="left";
-          ctx.font="900 34px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("你的两个副属性",56,subStatTitleY);
-          const cards=[
-            {label:"你的大师基因",val:rc.masterState||"—"},
-            {label:"你的下班阻碍",val:rc.userState||"—"}
-          ];
-          const cardY=subStatTitleY+36,cardW=386,cardH=236,gap=24;
-          cards.forEach((c,i)=>{
-            const x=56+i*(cardW+gap);
-            const isMaster=i===0;
-            roundRect(ctx,x,cardY,cardW,cardH,0,isMaster?"#111":"#00EC00",isMaster?"#111":"#00EC00",2);
-            ctx.fillStyle=isMaster?"#fff":"#111";
-            ctx.textAlign="left";
-            ctx.font="800 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-            ctx.fillText(c.label,x+24,cardY+44);
-            ctx.font="700 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-            wrapTextLines(ctx,c.val,x+24,cardY+86,cardW-48,32,4);
-          });
-
-          ctx.fillStyle="#111";
-          ctx.textAlign="center";
-          ctx.font="700 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("ARDOT · AI 设计大师人格测试",W/2,H-44);
+          ctx.textAlign="right";
+          ctx.textBaseline="alphabetic";
+          ctx.font="700 14px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          ctx.fillText("扫码测试",qrX-10,qrY+qrSize/2-2);
+          ctx.fillStyle="#9a9b95";
+          ctx.font="500 10px -apple-system,BlinkMacSystemFont,\"PingFang SC\",\"MiSans\",sans-serif";
+          ctx.fillText("测测你是什么设计大师",qrX-10,qrY+qrSize/2+16);
 
           try{resolve(canvas.toDataURL("image/png"));}
           catch(e){reject(e);}
         }).catch(reject);
       });
     }
+
 
     function roundRect(ctx,x,y,w,h,r,fill,stroke,strokeW){
       ctx.beginPath();
@@ -3446,7 +4339,8 @@
       if(!host)return;
       const dims=(personality&&personality.radarData)||[];
       if(!dims.length){host.innerHTML="";return;}
-      const SIZE=420,CX=SIZE/2,CY=SIZE/2,R=110;
+      /* 最大圈直径 234，半径 117；viewBox 320 留 86px 上下边给两行标签，外显宽 320px 时圈实显 234px */
+      const SIZE=320,CX=SIZE/2,CY=SIZE/2,R=117;
       const n=dims.length;
       /* 轴端点坐标（起点在正上方 -90°） */
       function axisPt(i,rr){
@@ -3475,20 +4369,19 @@
       const areaPts=dataPts.map(p=>p.join(",")).join(" ");
       /* 数据点 */
       const dots=dataPts.map((p)=>`<circle class="r-point" cx="${p[0]}" cy="${p[1]}" r="3.5"/>`).join("");
-      /* 轴标签（维度名 + 百分比） */
+      /* 轴标签（维度名 + 百分比，全部居中对齐） */
       const labels=dims.map((d,i)=>{
-        const [lx,ly]=axisPt(i,R+22);
+        const [lx,ly]=axisPt(i,R+26);
         const pct=Math.max(0,Math.min(100,Number(d.value)||0));
-        /* 根据方位调 text-anchor */
         const ang=-Math.PI/2 + (Math.PI*2*i)/n;
-        const cos=Math.cos(ang),sin=Math.sin(ang);
-        let anchor="middle";
-        if(cos>0.3)anchor="start";
-        else if(cos<-0.3)anchor="end";
+        const sin=Math.sin(ang);
+        /* 顶部/底部/侧面适当微调垂直位置，保证两行（名称+百分比）整体居中 */
         let dy=0;
-        if(sin<-0.5)dy=-4;else if(sin>0.5)dy=12;else dy=4;
-        return `<text class="r-label" x="${lx}" y="${ly+dy}" text-anchor="${anchor}">${d.dimension}</text>
-                <text class="r-label-pct" x="${lx}" y="${ly+dy+14}" text-anchor="${anchor}">${pct}%</text>`;
+        if(sin<-0.5)dy=-6;       /* 顶部：往上抬 */
+        else if(sin>0.5)dy=14;   /* 底部：往下推 */
+        else dy=4;               /* 两侧：略下 */
+        return `<text class="r-label" x="${lx}" y="${ly+dy}" text-anchor="middle">${d.dimension}</text>
+                <text class="r-label-pct" x="${lx}" y="${ly+dy+15}" text-anchor="middle">${pct}%</text>`;
       }).join("");
       host.innerHTML=`<svg class="radar-svg" viewBox="0 0 ${SIZE} ${SIZE}" aria-hidden="true">
         ${rings.join("")}
@@ -3543,7 +4436,7 @@
         "草稿太多的毕加班索":"毕加索",
         "还在抠图的原研灾":"原研哉",
         "对不齐的蒙得里不安":"蒙德里安",
-        "复制到崩溃的草间弥死":"草间弥生",
+        "复制到崩溃的草间弥想鼠":"草间弥生",
         "风格断片的梵稿":"梵高",
         "睡莲迁移失败的莫奈何":"莫奈"
       };
@@ -3588,11 +4481,11 @@
           postSurveyWithRetry(updated);
         }catch(e){}
       }
-      if(resultEl)resultEl.textContent=`已提交，抽奖结果：${reward}`;
+      if(resultEl)resultEl.textContent="";
       const input=document.getElementById("wishInput");
       if(input)input.style.display="none";
-      if(btn){btn.disabled=true;btn.classList.add("is-done");btn.textContent="已参与抽奖";}
-      toast("心愿提交成功，已完成抽奖");
+      if(btn){btn.disabled=true;btn.classList.add("is-done");btn.classList.remove("has-input");btn.textContent="已提交待开奖";}
+      toast("心愿提交成功，待开奖");
     }
 
     function gen(){
@@ -4028,7 +4921,7 @@
         {id:"d1",name:"灵感发散",role:"草稿太多的毕加班索"},
         {id:"d2",name:"图片处理",role:"还在抠图的原研灾"},
         {id:"d3",name:"结构处理",role:"对不齐的蒙得里不安"},
-        {id:"d4",name:"批量操作",role:"复制到崩溃的草间弥死"},
+        {id:"d4",name:"批量操作",role:"复制到崩溃的草间弥想鼠"},
         {id:"d5",name:"记忆管理",role:"风格断片的梵稿"},
         {id:"d6",name:"工作衔接",role:"睡莲迁移失败的莫奈何"}
       ];
