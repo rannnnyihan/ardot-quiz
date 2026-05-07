@@ -884,24 +884,24 @@
       min-height:0;                      /* 关键：允许 flex 子项收缩 */
       align-self:stretch;
     }
-    /* 按钮区：固定高度，海报与按钮间 16px */
+    /* 按钮区：海报与按钮间 28px */
     body:has(#s0.welcome.active) .welcome-cta{
       flex:0 0 auto;
       position:static;
-      margin:16px auto 0;
+      margin:28px auto 0;
       width:100%;
       max-width:440px;
       padding:0 20px;
       box-sizing:border-box;
       z-index:auto;
     }
-    /* 底部 down 标签：固定边距贴底 */
+    /* 底部 down 标签：与按钮固定 50px、与底部 16px */
     body:has(#s0.welcome.active) .welcome-down-tag{
       flex:0 0 auto;
       display:block;
       width:166px;
       height:17px;
-      margin:14px auto 16px;             /* 与按钮 14px、与底部 16px */
+      margin:50px auto 16px;
     }
     /* 旧的底部渐变遮罩关掉 */
     body:has(#s0.welcome.active) .welcome::after{display:none}
