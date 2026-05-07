@@ -3555,9 +3555,10 @@
       }
     }
 
-    /* "分享链接"按钮：仅分享/复制链接，不带图片
-       - 优先调用系统原生分享面板（iOS/Android 浏览器，可分享到微信/朋友圈/信息等）
-       - 不支持时退化为复制链接到剪贴板，并 toast 提示 */
+    /* "分享链接"按钮：统一引导用户点击右上角三个点进行分享
+       - 微信内：直接弹遮罩，提示用户点右上角"…" → 发送给朋友 / 分享到朋友圈
+                （此时微信会自动读取 head 里的 og:image —— 结果页是角色图，首页是 home-poster）
+       - 非微信：仍走原生分享/复制链接（系统面板里也能选微信） */
     function shareLinkOnly(){
       var roleId=(latestResult&&latestResult.id)||"";
       var cfgMeta=(typeof CFG!=="undefined"&&CFG&&CFG.meta)||{};
@@ -3569,8 +3570,19 @@
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
       var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
+      // 分享卡片缩略图：结果页用角色图，否则首页海报
+      var posterImg=baseDir+"img/home-poster.png?v=20260507b";
+      var roleShareImg=roleId?(baseDir+roleMetaImgName(roleId)):"";
+      var shareImg=roleShareImg||posterImg;
+      // 同步覆盖 head 里的 og:image / 标题，确保微信右上角"…"分享时拿到正确的卡片图
+      updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
-      /* ① 原生 Web Share（不带 files，纯链接分享） */
+      /* ① 微信内：直接弹引导遮罩，不再调原生 share / 复制链接 */
+      if(window.__IS_WX__){
+        showShareMask();
+        return;
+      }
+      /* ② 非微信，支持 Web Share：调起系统面板（含微信入口） */
       if(navigator.share){
         navigator.share({title:title,text:txt,url:shareLink}).catch(function(e){
           if(e&&e.name==="AbortError")return;
@@ -3578,7 +3590,7 @@
         });
         return;
       }
-      /* ② 退化为复制链接 */
+      /* ③ 退化为复制链接 */
       fallbackCopyLink(txt,shareLink);
     }
 
@@ -3874,14 +3886,13 @@
 
     /* ========================================================
      * 用户身份（昵称 + 头像）：海报顶部"圆头像 + 昵称"使用
-     * 优先级：
-     *   1) localStorage.ardot_wx_user_v1（微信授权拿到的真实头像/昵称）
-     *      —— 项目尚未接入后端 OAuth2，此分支当前不会有数据，但保留接入位
-     *   2) 兜底：头像 = img/ip.png，昵称 = "来自 {company} 的设计师"
-     *      其中 {company} 来自答题前公司弹窗收集的 A.company（或 localStorage 上次提交）
+     * 统一规则（已去掉微信授权头像/昵称分支，避免微信里卡顿）：
+     *   头像 = img/ip.png
+     *   昵称 = "来自 {company} 的设计师"
+     *   {company} 来自答题前公司弹窗收集的 A.company（或 localStorage 上次提交）
      * ======================================================== */
-    const ID_STORAGE_KEY="ardot_user_v1";        /* 兼容老数据（手填昵称/头像） */
-    const WX_ID_STORAGE_KEY="ardot_wx_user_v1";  /* 微信授权后写入 */
+    const ID_STORAGE_KEY="ardot_user_v1";        /* 兼容老数据（手填昵称/头像），保留以免破坏老存储 */
+    const WX_ID_STORAGE_KEY="ardot_wx_user_v1";  /* 历史保留：不再读取 */
     const ID_PRESETS=[
       "role/d1-A.png","role/d2-A.png","role/d3-A.png",
       "role/d4-A.png","role/d5-A.png","role/d6-A.png"
@@ -3899,21 +3910,8 @@
       return "";
     }
     function getMyIdentity(){
-      /* 1) 微信授权数据（若后端接入后写入） */
-      try{
-        const raw=localStorage.getItem(WX_ID_STORAGE_KEY);
-        if(raw){
-          const obj=JSON.parse(raw);
-          if(obj && typeof obj==="object"){
-            const name=String(obj.nickname||obj.name||"").trim();
-            const avatar=String(obj.headimgurl||obj.avatar||"").trim();
-            if(name||avatar){
-              return {name:name,avatar:avatar||"img/ip.png",source:"wx"};
-            }
-          }
-        }
-      }catch(e){}
-      /* 2) 兜底：默认头像 + "来自 XX 的设计师" */
+      /* 统一兜底：默认头像 + "来自 XX 的设计师"
+         （已去掉微信授权读取分支：微信内调用相关 API 会让页面卡顿，且本项目并未接入后端 OAuth2） */
       const company=getCurrentCompany();
       const name=company?("来自 "+company+" 的设计师"):"来自 ardot 的设计师";
       return {name:name,avatar:"img/ip.png",source:"default"};
@@ -4673,10 +4671,10 @@
       // 更新分享卡片 meta（社交平台/微信会重读）
       updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
-      // ① 微信内置浏览器：无法直接分享 dataURL/File，结果页点击后先生成这页的分享图片，引导长按转发
+      // ① 微信内置浏览器：head 里的 og:image 已被 updateShareMeta 覆盖（首页海报 / 结果角色图）
+      //    不再调 wx.config / tryUpdateWxShare（项目未接入 /api/wx-signature，会卡顿）
+      //    直接引导用户点右上角"…" → 微信会读取 head 的 og:image 作为分享卡片缩略图
       if(window.__IS_WX__){
-        tryUpdateWxShare({title:title,desc:txt,link:shareLink,imgUrl:shareImg});
-        if(isOnResult){captureAndShowSave();return;}
         showShareMask();
         return;
       }
@@ -4809,10 +4807,9 @@
       try{
         history.replaceState(null,"",shareLink);
       }catch(e){/* 某些内嵌 webview 不允许 replaceState：忽略，og 仍已生效 */}
-      /* 微信 JSSDK 能成功时顺带设一次；签名没接也无所谓，反正 og 已经改好了 */
-      if(window.__IS_WX__){
-        tryUpdateWxShare({title:title,desc:desc,link:shareLink,imgUrl:shareImg});
-      }
+      /* 注：不再调 tryUpdateWxShare（项目未接入 /api/wx-signature 后端，
+         调用会触发 fetch 失败/卡顿）。og:image 已经覆盖到当前角色图，
+         微信右上角"…"直接读 head 即可拿到正确的分享卡片。 */
     }
 
     function updateShareMeta(opts){
@@ -5226,17 +5223,10 @@
       window.AI_DESIGN_MAX_SCORE=MAX_SCORE;
     })();
 
-    /* 默认（进入即可分享）微信分享配置：首次加载时就让用户点右上角能分享出"邀请测试"的卡片 */
-    (function defaultWxShare(){
-      if(!window.__IS_WX__)return;
-      var defaultShare={
-        title:"AI时代，你活成了哪种艺术大师？",
-        desc:"11 道题 · 约 6 分钟，测测你在 AI 时代最像哪位被逼疯的艺术大师。",
-        link:location.href.split("#")[0],
-        imgUrl:location.origin+location.pathname.replace(/[^\/]*$/,"")+"img/picasso.png?v=dd361e6f"
-      };
-      tryUpdateWxShare(defaultShare);
-    })();
+    /* 默认（进入即可分享）微信分享配置：head 里的 og:image=home-poster.png 已经能让
+       微信右上角"…"分享出"邀请测试"的卡片。
+       不再调 tryUpdateWxShare：未接入 /api/wx-signature 时 fetch 会失败/卡顿，
+       且没有 wx.config 时 wx.updateAppMessageShareData 会静默失败，对结果无影响。 */
 
     /* ============================================================
      * 元素微调工具（仅在 URL 带 ?tweak=1 时启用）
