@@ -45,10 +45,10 @@
     }catch(e){/* 缓存损坏就算了，后面 applyConfigToPage 还会再刷一次 */}
   })();
   </script>
-  <link rel="icon" type="image/png" href="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
-  <link rel="apple-touch-icon" href="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <link rel="icon" type="image/png" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
+  <link rel="apple-touch-icon" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
 
-  <!-- 分享卡片元数据（统一：首页海报 home-poster.png，兼容微信聊天/朋友圈/电脑微信/老版客户端） -->
+  <!-- 分享卡片元数据（统一：分享封面 share-cover.png，兼容微信聊天/朋友圈/电脑微信/老版客户端/QQ/iMessage 等） -->
   <meta name="description" content="测一测你是什么类型的大师">
   <meta name="keywords" content="AI设计,设计师人格测试,还没下班的大师,Ardot">
   <!-- Open Graph（微信 / Facebook / 大部分社交平台主抓） -->
@@ -57,23 +57,23 @@
   <meta property="og:title" content="《好险，差点就会做设计了》">
   <meta property="og:description" content="测一测你是什么类型的大师">
   <meta property="og:url" content="https://ardot-quiz.edgeone.dev/quiz-h5.html">
-  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
-  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <meta property="og:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
+  <meta property="og:image:secure_url" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="《好险，差点就会做设计了》 — 测一测你是什么类型的大师">
   <!-- Twitter Card（部分抓取引擎 fallback） -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="《好险，差点就会做设计了》">
   <meta name="twitter:description" content="测一测你是什么类型的大师">
-  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <meta name="twitter:image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- Schema.org（部分场景 fallback） -->
   <meta itemprop="name" content="《好险，差点就会做设计了》">
   <meta itemprop="description" content="测一测你是什么类型的大师">
-  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <meta itemprop="image" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 电脑微信 / 老版 IE 认 image_src，朋友圈抓图补丁 -->
-  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <link rel="image_src" href="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 微信 / QQ 专属 thumbnail 提示（非官方但部分版本有效） -->
-  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/home-poster.png?v=20260507b">
+  <meta name="thumbnail" content="https://ardot-quiz.edgeone.dev/img/share-cover.png?v=767a2297">
   <!-- 首屏插一张 1×1 透明 + 正式大图到 DOM 顶部，微信"抓第一张合适图"的兜底 -->
   <meta name="application-name" content="Ardot · 艺术家测试">
 
@@ -1661,6 +1661,13 @@
   </style>
 </head>
 <body>
+  <!-- 分享缩略图静态兜底：保证 DOM 第一张"足够大"的 <img> 永远是 share-cover.png。
+       某些平台（QQ/iMessage/Twitter/老版微信）在 og:image 抓取失败时会扫描 DOM 第一张大图作为分享缩略图，
+       这里用 visibility:hidden + 0 占位 + 实际尺寸≥300×300，避免被爬虫忽略，又不影响布局。
+       注意：?v= 由 scripts/sync-share-version.mjs 统一维护。 -->
+  <img src="img/share-cover.png?v=767a2297" alt="《好险，差点就会做设计了》" width="600" height="600"
+       style="position:absolute;left:-9999px;top:-9999px;width:600px;height:600px;visibility:hidden;pointer-events:none"
+       aria-hidden="true" referrerpolicy="no-referrer-when-downgrade">
   <!-- 非微信环境提示条：仅在 ?force=wx 调试时显示 -->
   <div class="wx-hint" id="wxHint">
     当前为微信调试模式，请在微信内打开以体验完整分享功能。
@@ -3025,18 +3032,8 @@
     function bk(){
       if(S>1){S--;show("s"+S);upBar();snapToScene()}
       else if(S===1){
-        const s0=document.getElementById("s0");
-        if(s0.classList.contains("quiz-started")){
-          document.body.classList.remove("quiz-on-q");
-          window.location.href="index.html";
-          return;
-        }
-        S=0;
-        document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
-        s0.classList.add("active");
-        document.body.classList.remove("quiz-on-q");
-        upBar();
-        window.scrollTo(0,0);
+        // 第一题不允许返回（按钮已 disabled，这里再做一次兜底，防止键盘/脚本触发）
+        return;
       }
     }
 
@@ -3619,7 +3616,7 @@
 
     /* "分享链接"按钮：统一引导用户点击右上角三个点进行分享
        - 微信内：直接弹遮罩，提示用户点右上角"…" → 发送给朋友 / 分享到朋友圈
-                （此时微信会自动读取 head 里的 og:image —— 结果页是角色图，首页是 home-poster）
+                （此时微信会自动读取 head 里的 og:image —— 结果页是角色图，首页/答题中是 share-cover.png）
        - 非微信：仍走原生分享/复制链接（系统面板里也能选微信） */
     function shareLinkOnly(){
       var roleId=(latestResult&&latestResult.id)||"";
@@ -3632,8 +3629,8 @@
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var sharePath=roleId?("share-"+encodeURIComponent(roleId)+".html"):"quiz-h5.html";
       var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
-      // 分享卡片缩略图：结果页用角色图，否则首页海报
-      var posterImg=baseDir+"img/home-poster.png?v=20260507b";
+      // 分享卡片缩略图：结果页用角色图，否则统一用 share-cover.png（结果页之前所有分享卡都用这张）
+      var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       var roleShareImg=roleId?(baseDir+roleMetaImgName(roleId)):"";
       var shareImg=roleShareImg||posterImg;
       // 同步覆盖 head 里的 og:image / 标题，确保微信右上角"…"分享时拿到正确的卡片图
@@ -4142,14 +4139,22 @@
        - 底部：左下 ardot logo，右下 扫码测试 + 副标 + QR 码 */
     function buildShareImage(topRole,rc,link){
       return new Promise((resolve,reject)=>{
-        /* 输出尺寸：海报实际像素 351×587，所有字号/控件尺寸都是最终像素值 */
+        /* 海报"逻辑画板"：351×587（CSS 像素），所有字号/坐标/控件尺寸都按这个逻辑像素计算。
+           真实导出像素 = W*DPR × H*DPR。
+           DPR=4 → 输出 1404×2348（≈ 3.3MP），PNG ~600KB-1MB。
+             · 预览：<img id=saveOverlayImg> 用 CSS max-width:100% / max-height:76vh / object-fit:contain
+               限定显示尺寸，所以画布像素变大只会让 retina 屏预览更锐，不会撑大弹窗布局；
+             · 保存：用户保存到相册后，系统/微信/朋友圈预览会按屏幕尺寸放大，DPR 高 → 文字/二维码/立绘不糊。
+           ⚠️ 不要改下面 ctx.scale(DPR,DPR) 之后的任何数值，全部按逻辑像素继续画即可。 */
         const W=351,H=587;
         const canvas=document.createElement("canvas");
-        /* 用 2 倍像素绘制保证高清，再用 css 维度回到 W/H */
-        const DPR=2;
+        const DPR=4;
         canvas.width=W*DPR;canvas.height=H*DPR;
         const ctx=canvas.getContext("2d");
         ctx.scale(DPR,DPR);
+        /* 立绘 / 头像 / logo 等位图缩放时使用高质量插值，避免边缘锯齿；矢量文字/绘制不受影响 */
+        ctx.imageSmoothingEnabled=true;
+        if("imageSmoothingQuality" in ctx)ctx.imageSmoothingQuality="high";
 
         /* 白色网格底 */
         ctx.fillStyle="#ffffff";
@@ -4730,7 +4735,7 @@
       }
       var txt=SHARE_CARD_SUBTITLE;
       // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
-      //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=home-poster.png
+      //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=share-cover.png
       //  - 结果页（有 roleId）：指向 share-<roleId>.html 专属中转页，<head> og:image=角色图
       //    微信爬虫只读 head、不跟随跳转，所以微信里的分享卡片缩略图 = 对应角色图
       // v 参数是静态构建号，改版 meta/分享图时递增即可让微信/社交平台重新抓取缓存
@@ -4740,8 +4745,8 @@
       var shareLink=baseDir+sharePath+"?v="+SHARE_BUILD;
       // 分享卡片"公网可访问图"：
       //  - 结果页：用角色主题图（对应 share-<roleId>.html 里 og:image）
-      //  - 开头/过程中：用首页封面 home-poster.png
-      var posterImg=baseDir+"img/home-poster.png?v=20260507b";
+      //  - 开头/过程中：统一使用 share-cover.png（结果页之前所有分享场景的固定封面）
+      var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       var roleShareImg=roleId?(baseDir+roleMetaImgName(roleId)):"";
       var shareImg=isOnResult&&roleShareImg?roleShareImg:posterImg;
       // 更新分享卡片 meta（社交平台/微信会重读）
@@ -4757,7 +4762,7 @@
       }
 
       // ② 非结果页（首页/答题中）的微信里：没有海报可生成，直接引导点右上角分享
-      //    head 里的 og:image=home-poster.png 已就绪，微信会自动作为卡片缩略图
+      //    head 里的 og:image=share-cover.png 已就绪，微信会自动作为卡片缩略图
       if(window.__IS_WX__){
         showShareMask();
         return;
@@ -4778,7 +4783,7 @@
     /* 把 roleId 映射成完整 /img/ 路径（与 share-d*.html 里的 og:image 一致；?v= 由 scripts/sync-share-version.mjs 自动维护） */
     function roleMetaImgName(roleId){
       var map={d1:"role/d1-B.png?v=d25b7814",d2:"role/d2-B.png?v=e541db8a",d3:"role/d3-B.png?v=68288cb1",d4:"role/d4-B.png?v=4dda364a",d5:"role/d5-B.png?v=02ec943e",d6:"role/d6-B.png?v=80f57e60"};
-      return map[roleId]||"img/home-poster.png?v=20260507b";
+      return map[roleId]||"img/share-cover.png?v=767a2297";
     }
 
     /* 原生分享（结果页专用）：实时截一张"当前结果页"的长图，作为分享图 */
@@ -4801,11 +4806,11 @@
       });
     }
 
-    /* 原生分享：用传入的 shareImg 作为分享图（优先结果角色图，兜底首页海报） */
+    /* 原生分享：用传入的 shareImg 作为分享图（优先结果角色图，兜底统一封面 share-cover.png） */
     function tryShareWithImage(title,txt,shareLink,shareImg){
       return new Promise(function(resolve,reject){
         if(!navigator.canShare||!navigator.share)return reject();
-        var imgUrl=shareImg||"img/home-poster.png?v=20260507b";
+        var imgUrl=shareImg||"img/share-cover.png?v=767a2297";
         var tipToast=typeof toast==="function"?toast("正在准备分享…"):null;
         // 拉取分享图作为文件（同源 public 资源，fetch 无跨域问题）
         fetch(imgUrl,{cache:"force-cache"}).then(function(r){
@@ -4865,7 +4870,7 @@
       var SHARE_BUILD="20260427";
       var baseDir=location.origin+location.pathname.replace(/[^\/]*$/,"");
       var shareLink=baseDir+"share-"+encodeURIComponent(role.id)+".html?v="+SHARE_BUILD;
-      var posterImg=baseDir+"img/home-poster.png?v=20260507b";
+      var posterImg=baseDir+"img/share-cover.png?v=767a2297";
       /* 分享卡缩略图：固定使用类别 B 图（与 share-dX.html 里 og:image 一致），
          避免拿到 #rImg 立绘（透明底 PNG，部分平台抓不到/显示空）。 */
       var roleShareImg=baseDir+roleMetaImgName(role.id);
@@ -5332,7 +5337,7 @@
       window.AI_DESIGN_MAX_SCORE=MAX_SCORE;
     })();
 
-    /* 默认（进入即可分享）微信分享配置：head 里的 og:image=home-poster.png 已经能让
+    /* 默认（进入即可分享）微信分享配置：head 里的 og:image=share-cover.png 已经能让
        微信右上角"…"分享出"邀请测试"的卡片。
        不再调 tryUpdateWxShare：未接入 /api/wx-signature 时 fetch 会失败/卡顿，
        且没有 wx.config 时 wx.updateAppMessageShareData 会静默失败，对结果无影响。 */
