@@ -4673,35 +4673,31 @@
       // 更新分享卡片 meta（社交平台/微信会重读）
       updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
-      // ① 微信内置浏览器：head 里的 og:image 已被 updateShareMeta 覆盖（首页海报 / 结果角色图）
-      //    不再调 wx.config / tryUpdateWxShare（项目未接入 /api/wx-signature，会卡顿）
-      //    直接引导用户点右上角"…" → 微信会读取 head 的 og:image 作为分享卡片缩略图
+      // ① 结果页（任意环境，含微信）：直接生成海报并弹出 saveOverlay。
+      //    overlay 里有「保存海报」+「分享链接」两个按钮：
+      //      · 保存海报 → downloadSaveImage()  保存这张带角色立绘+二维码的图
+      //      · 分享链接 → shareLinkOnly()      在微信内会引导用户点右上角"…"
+      if(isOnResult){
+        captureAndShowSave();
+        return;
+      }
+
+      // ② 非结果页（首页/答题中）的微信里：没有海报可生成，直接引导点右上角分享
+      //    head 里的 og:image=home-poster.png 已就绪，微信会自动作为卡片缩略图
       if(window.__IS_WX__){
         showShareMask();
         return;
       }
 
-      // ② 非微信：直接调起手机系统原生分享面板（iOS/Android 都支持）
-      //    - 结果页：优先生成这页的专属分享图片
-      //    - 开头/过程中：用首页封面 home-poster.png
+      // ③ 非结果页 + 非微信：调起系统原生分享（带首页封面）
       if(navigator.share){
-        if(isOnResult){
-          tryShareWithLiveResultImage(title,txt,shareLink).catch(function(){
-            // 实时截图失败 → 退回角色主题图
-            tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
-              shareTextOnly(title,txt,shareLink);
-            });
-          });
-        }else{
-          tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
-            shareTextOnly(title,txt,shareLink);
-          });
-        }
+        tryShareWithImage(title,txt,shareLink,shareImg).catch(function(){
+          shareTextOnly(title,txt,shareLink);
+        });
         return;
       }
 
-      // ③ 完全不支持 Web Share：结果页展示分享图片；非结果页复制链接
-      if(isOnResult){captureAndShowSave();return;}
+      // ④ 完全不支持 Web Share：复制链接
       fallbackCopyLink(txt,shareLink);
     }
 
