@@ -245,7 +245,7 @@
     .ld-bar{display:none}
     .ld-bar-inner{display:none}
     /* 文案：14px 灰色小字，无背景胶囊（按设计稿） */
-    .ld-tip{display:inline-block;padding:0;border-radius:0;background:transparent;color:#6b7280;font-size:14px;font-weight:400;letter-spacing:0;font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+    .ld-tip{display:inline-block;padding:0;border-radius:0;background:transparent;color:#000;font-size:16px;font-weight:500;letter-spacing:0;font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
     /* 底部绿色渐变：极简版隐藏 */
     .ld-grad{display:none}
     .ld>*{position:relative;z-index:1}
@@ -1259,7 +1259,11 @@
       letter-spacing:-1px!important;
       margin-bottom:14px!important;
     }
-    /* 角色名"「草稿太多的毕加班索」"：MiSans Bold 28px 纯黑，无背景；强制单行不换行 */
+    /* 角色名"「草稿太多的毕加班索」"：MiSans Bold 28px 纯黑，无背景；强制单行不换行
+       关键：最长文本"「复制到崩溃的草间弥想鼠」"15 字 × 28px ≈ 420px，
+             窄屏（如 iPhone 360 viewport）会超出 .res-section 的左右 padding 限制，
+             因此用 width:max-content 让它按内容自然撑开，再用 transform 居中，
+             并允许横向溢出父容器（父容器的 overflow 也清掉）。 */
     #res .res-name{
       color:#000!important;
       background:transparent!important;
@@ -1269,10 +1273,11 @@
       font-family:"MiSans","PingFang SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
       font-weight:630!important;
       font-size:28px!important;
-      letter-spacing:-.01em!important;
+      letter-spacing:-.02em!important;
       padding:0!important;
-      width:auto!important;
+      width:max-content!important;
       max-width:none!important;
+      min-width:0!important;
       min-height:auto!important;
       margin:8px auto 6px!important;
       display:block!important;
@@ -1280,6 +1285,13 @@
       white-space:nowrap!important;
       overflow:visible!important;
       word-break:keep-all!important;
+      line-break:strict!important;
+      text-wrap:nowrap!important;
+    }
+    /* 让 .res-name 的祖先容器不要裁掉它的横向溢出 */
+    #res .res-section:has(> .res-name),
+    #res .res-card:has(.res-name){
+      overflow:visible!important;
     }
     /* 角色名内的高亮字（如"加班"、"奈何"、"想鼠"）：用品牌绿 #14CC52 突出显示。
        因外层 #res .res-name 用了 color:#000!important，子元素必须 !important 才能覆盖。
