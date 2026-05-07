@@ -1195,16 +1195,16 @@
           <div class="res-real" id="rReal" style="display:none">D1 · 灵感发散与筛选</div>
         </div>
 
-        <!-- 下班困局来自（雷达，整行） -->
-        <div class="res-section">
-          <div class="res-section-title">下班困局来自</div>
-          <div class="radar-wrap radar-full" id="rRadar"></div>
-        </div>
-
         <!-- 你的两个副属性 -->
         <div class="res-section">
           <div class="res-section-title">你的两个副属性</div>
           <div class="substat-grid" id="rSubStats"></div>
+        </div>
+
+        <!-- 下班困局来自（雷达，整行） -->
+        <div class="res-section">
+          <div class="res-section-title">下班困局来自</div>
+          <div class="radar-wrap radar-full" id="rRadar"></div>
         </div>
 
         <!-- 下班困局来自（雷达）已经合并到上面的横排 section -->
@@ -2723,6 +2723,13 @@
     /* 生成截图：返回 Promise<{dataUrl, blob}> */
     function captureResult(){
       return new Promise((resolve,reject)=>{
+        const role=resolveLatestRoleForShare();
+        if(role){
+          buildShareImage(role,role.resultContent||{},getQuizEntryLink()).then((dataUrl)=>{
+            resolve({dataUrl:dataUrl,blob:dataUrlToBlob(dataUrl)});
+          }).catch(reject);
+          return;
+        }
         if(typeof html2canvas!=="function"||window.__h2cFailed){
           reject(new Error("截图组件加载失败"));return;
         }
@@ -2963,6 +2970,23 @@
       buildShareImage(topRole,rc,link).then((dataUrl)=>{
         imgEl.src=dataUrl;
       }).catch((err)=>{console.warn("生成分享图失败",err);});
+    }
+
+    function resolveLatestRoleForShare(){
+      if(!latestResult||!latestResult.id)return null;
+      return (CFG.roles||[]).find((r)=>r.id===latestResult.id)||null;
+    }
+
+    function dataUrlToBlob(dataUrl){
+      try{
+        const arr=String(dataUrl||"").split(",");
+        const mime=(arr[0].match(/:(.*?);/)||[])[1]||"image/png";
+        const bstr=atob(arr[1]||"");
+        let n=bstr.length;
+        const u8=new Uint8Array(n);
+        while(n--){u8[n]=bstr.charCodeAt(n);}
+        return new Blob([u8],{type:mime});
+      }catch(e){return null;}
     }
 
     function getQuizEntryLink(){
@@ -3224,84 +3248,95 @@
       }
     }
 
-    /* 构建分享图：Canvas -> dataURL */
+    /* 构建分享图：Canvas -> dataURL。只保留结果标题、角色图、两个副属性和二维码列。 */
     function buildShareImage(topRole,rc,link){
       return new Promise((resolve,reject)=>{
-        const W=720,H=1040; /* 2x 分辨率 */
+        const W=900,H=1200;
         const canvas=document.createElement("canvas");
         canvas.width=W;canvas.height=H;
         const ctx=canvas.getContext("2d");
-        /* 背景（米色） */
-        ctx.fillStyle="#f6f1e7";
+        /* 格纹底纹 */
+        ctx.fillStyle="#f5f6f2";
         ctx.fillRect(0,0,W,H);
-        /* 顶部卡片 */
-        roundRect(ctx,24,24,W-48,H-48,28,"#fff","#ece4d2");
+        ctx.strokeStyle="rgba(17,17,17,.075)";
+        ctx.lineWidth=1;
+        for(let x=0;x<=W;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+        for(let y=0;y<=H;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+        ctx.strokeStyle="rgba(0,236,0,.18)";
+        for(let x=16;x<=W;x+=128){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+        for(let y=16;y<=H;y+=128){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
         const avatarSrc=topRole&&topRole.img?topRole.img:"";
-        const loadImg=(src)=>new Promise((res,rej)=>{
+        const loadImg=(src)=>new Promise((res)=>{
           if(!src)return res(null);
           const img=new Image();img.crossOrigin="anonymous";
           img.onload=()=>res(img);img.onerror=()=>res(null);
           img.src=src;
         });
         loadImg(avatarSrc).then((img)=>{
-          /* 头像相框 */
-          const afW=240,afH=240,afX=(W-afW)/2,afY=64;
-          roundRect(ctx,afX,afY,afW,afH,24,"#fff","#d9cdb3",2);
-          if(img){
-            ctx.save();
-            roundClip(ctx,afX+16,afY+16,afW-32,afH-32,16);
-            const iw=img.naturalWidth,ih=img.naturalHeight;
-            const r=Math.max((afW-32)/iw,(afH-32)/ih);
-            const dw=iw*r,dh=ih*r;
-            ctx.drawImage(img,afX+16+((afW-32)-dw)/2,afY+16+((afH-32)-dh)/2,dw,dh);
-            ctx.restore();
-          }
-          /* 名称 */
-          ctx.fillStyle="#1a1a2e";
-          ctx.textAlign="center";
-          ctx.font="900 56px Georgia,\"Times New Roman\",serif";
-          ctx.fillText(topRole.name||"",W/2,afY+afH+72);
-          /* 副标题 */
-          ctx.fillStyle="#8a7658";
-          ctx.font="500 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText(topRole.real||"",W/2,afY+afH+108);
-          /* tagline 卡 */
-          const tagY=afY+afH+144,tagH=120;
-          roundRect(ctx,56,tagY,W-112,tagH,18,"#faf4e7","#ece4d2");
-          /* 引号 */
-          ctx.fillStyle="#c89a4a";
-          ctx.font="700 44px Georgia,serif";
+          /* 结果标题 */
+          ctx.fillStyle="#111";
           ctx.textAlign="left";
-          ctx.fillText("\u201C",80,tagY+44);
-          /* 文案 */
-          ctx.fillStyle="#5a5245";
-          ctx.font="500 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          wrapText(ctx,rc.tagline||topRole.desc||"",120,tagY+42,W-180,32);
+          ctx.font="900 44px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText(RESULT_SHARE_TITLE_PREFIX,56,86);
+          ctx.font="900 66px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          wrapTextLines(ctx,"「"+(topRole.name||"设计大师")+"」",56,164,560,72,2);
 
-          /* 二维码区域（底部） */
-          const qrSize=220;
-          const qrX=64,qrY=H-qrSize-120;
+          /* 角色图 */
+          const imgX=54,imgY=230,imgW=540,imgH=520;
+          roundRect(ctx,imgX,imgY,imgW,imgH,28,"rgba(255,255,255,.72)","rgba(17,17,17,.12)",2);
+          if(img){
+            const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+            const r=Math.min((imgW-36)/iw,(imgH-36)/ih);
+            const dw=iw*r,dh=ih*r;
+            ctx.drawImage(img,imgX+(imgW-dw)/2,imgY+(imgH-dh)/2,dw,dh);
+          }
+
+          /* 分享二维码列 */
+          const qrColX=630,qrColY=250,qrColW=214,qrColH=470;
+          roundRect(ctx,qrColX,qrColY,qrColW,qrColH,24,"rgba(255,255,255,.84)","rgba(17,17,17,.12)",2);
+          ctx.fillStyle="#111";
+          ctx.textAlign="center";
+          ctx.font="800 30px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("扫码测试",qrColX+qrColW/2,qrColY+58);
+          const qrSize=164,qrX=qrColX+(qrColW-qrSize)/2,qrY=qrColY+90;
           try{
             const qr=QR.encode(link);
             drawQrToCanvas(ctx,qr,qrX,qrY,qrSize,true);
           }catch(err){console.warn("QR encode 失败",err);}
-          /* 二维码说明 */
-          ctx.fillStyle="#1a1a2e";
+          ctx.fillStyle="#4b5563";
+          ctx.font="600 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          wrapTextLines(ctx,SHARE_CARD_SUBTITLE,qrColX+24,qrY+qrSize+48,qrColW-48,28,3,"center");
+          ctx.fillStyle="#00b900";
+          ctx.font="800 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("ardot-quiz.edgeone.dev",qrColX+qrColW/2,qrColY+qrColH-36);
+
+          /* 你的两个副属性 */
+          ctx.fillStyle="#111";
           ctx.textAlign="left";
-          ctx.font="700 28px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("扫码测测你的本命大师",qrX+qrSize+24,qrY+60);
-          ctx.fillStyle="#8a7658";
-          ctx.font="500 20px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("6 个维度 · 2 分钟 · AI 解锁指数",qrX+qrSize+24,qrY+98);
-          ctx.fillStyle="#c89a4a";
-          ctx.font="700 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("长按识别二维码",qrX+qrSize+24,qrY+qrSize-20);
-          /* 底部 brand */
-          ctx.fillStyle="#8a7658";
+          ctx.font="900 34px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("你的两个副属性",56,830);
+          const cards=[
+            {label:"你的大师基因",val:rc.masterState||"—"},
+            {label:"你的下班阻碍",val:rc.userState||"—"}
+          ];
+          const cardY=866,cardW=386,cardH=236,gap=24;
+          cards.forEach((c,i)=>{
+            const x=56+i*(cardW+gap);
+            roundRect(ctx,x,cardY,cardW,cardH,22,"rgba(255,255,255,.86)","rgba(17,17,17,.12)",2);
+            ctx.fillStyle="#00b900";
+            ctx.textAlign="left";
+            ctx.font="800 22px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+            ctx.fillText(c.label,x+24,cardY+44);
+            ctx.fillStyle="#111";
+            ctx.font="700 24px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+            wrapTextLines(ctx,c.val,x+24,cardY+86,cardW-48,32,4);
+          });
+
+          ctx.fillStyle="#111";
           ctx.textAlign="center";
-          ctx.font="500 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
-          ctx.fillText("ARDOT · 你的 AI 设计本命诊断",W/2,H-58);
+          ctx.font="700 18px -apple-system,BlinkMacSystemFont,\"PingFang SC\",sans-serif";
+          ctx.fillText("ARDOT · AI 设计大师人格测试",W/2,H-44);
 
           try{resolve(canvas.toDataURL("image/png"));}
           catch(e){reject(e);}
@@ -3333,6 +3368,31 @@
         }else{line=test;}
       }
       if(line)ctx.fillText(line,x,yy);
+    }
+    function wrapTextLines(ctx,text,x,y,maxW,lineH,maxLines,align){
+      const prevAlign=ctx.textAlign;
+      if(align)ctx.textAlign=align;
+      const drawX=align==="center"?x+maxW/2:x;
+      const chars=(text||"").split("");
+      const lines=[];
+      let line="",truncated=false;
+      for(let i=0;i<chars.length;i++){
+        const test=line+chars[i];
+        if(ctx.measureText(test).width>maxW&&line){
+          lines.push(line);line=chars[i];
+          if(lines.length>=maxLines){truncated=i<chars.length;break;}
+        }else{line=test;}
+      }
+      if(line&&lines.length<maxLines)lines.push(line);
+      if(lines.length>maxLines){lines.length=maxLines;truncated=true;}
+      if(truncated&&lines.length){
+        let last=lines[lines.length-1];
+        while(last&&ctx.measureText(last+"…").width>maxW)last=last.slice(0,-1);
+        lines[lines.length-1]=last?last+"…":lines[lines.length-1];
+      }
+      lines.forEach((l,i)=>ctx.fillText(l,drawX,y+i*lineH));
+      ctx.textAlign=prevAlign;
+      return y+lines.length*lineH;
     }
 
     function setText(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt||"";}
@@ -3627,6 +3687,9 @@
          读不到配置时回退到历史默认文案，确保老缓存/首次加载也能分享。*/
       var cfgMeta=(typeof CFG!=="undefined"&&CFG&&CFG.meta)||{};
       var title=plainTextFromHtml(cfgMeta.mainTitle||"")||"《好险，差点就会做设计了》";
+      if(isOnResult&&latestResult&&latestResult.name){
+        title=RESULT_SHARE_TITLE_PREFIX+"「"+latestResult.name+"」";
+      }
       var txt=SHARE_CARD_SUBTITLE;
       // 分享链接策略（为了让微信右上角分享卡片缩略图正确）：
       //  - 首页/答题中（无 roleId）：指向 quiz-h5.html，其 <head> og:image=share-cover.png
@@ -3646,16 +3709,16 @@
       // 更新分享卡片 meta（社交平台/微信会重读）
       updateShareMeta({title:title,desc:txt,img:shareImg,link:shareLink});
 
-      // ① 微信内置浏览器：Web Share API 被屏蔽，只能用 JSSDK + 引导右上角
-      //    微信 JSSDK 的 imgUrl 只能是公网 URL（不支持 dataURL），所以仍然走 meta/role 图
+      // ① 微信内置浏览器：无法直接分享 dataURL/File，结果页点击后先生成这页的分享图片，引导长按转发
       if(window.__IS_WX__){
         tryUpdateWxShare({title:title,desc:txt,link:shareLink,imgUrl:shareImg});
+        if(isOnResult){captureAndShowSave();return;}
         showShareMask();
         return;
       }
 
       // ② 非微信：直接调起手机系统原生分享面板（iOS/Android 都支持）
-      //    - 结果页：优先实时截取"当前这份结果"的长图作为分享图
+      //    - 结果页：优先生成这页的专属分享图片
       //    - 开头/过程中：用首页封面 share-cover.png
       if(navigator.share){
         if(isOnResult){
@@ -3673,7 +3736,8 @@
         return;
       }
 
-      // ③ 完全不支持 Web Share：复制链接到剪贴板 + 提示粘贴到微信
+      // ③ 完全不支持 Web Share：结果页展示分享图片；非结果页复制链接
+      if(isOnResult){captureAndShowSave();return;}
       fallbackCopyLink(txt,shareLink);
     }
 
