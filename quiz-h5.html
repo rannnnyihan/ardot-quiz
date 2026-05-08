@@ -1247,6 +1247,30 @@
       /* res-top 的头像组在桌面端给一个稍大但仍受 max-width 约束的尺寸，避免立绘相对卡片过大 */
       #res .res-avatar-frame{max-width:320px!important}
     }
+    /* ====== 大屏桌面（≥1024px）结果页放大版 ======
+       在更宽的浏览器窗口下，把整组结果页"等比放大"到一个固定的桌面尺寸——
+       这样既不会像 H5 那么挤、也不会像之前那样"卡片被撑宽但内容仍是 320px 雷达"留白。
+       关键：所有数值都是按 440 → 580（≈1.32x）等比放大，保持手机端的视觉比例不变。
+       不需要动手机端的任何字号/间距，仅在这一档生效。 */
+    @media(min-width:1024px){
+      #res .res-card{max-width:580px!important}
+      /* 立绘头像：320 → 420，雷达：320 → 440，与卡片宽度等比 */
+      #res .res-avatar-frame{max-width:420px!important}
+      #res .radar-svg{max-width:440px!important}
+      /* 字号微提升（不动间距以避免触发竖向重排） */
+      #res .res-name{font-size:26px!important}
+      #res .res-real{font-size:14px!important}
+      #res .res-section-title,
+      #res .radar-card-title-text{font-size:17px!important}
+      #res .substat-grid>.substat-card .substat-label{font-size:15px!important}
+      #res .substat-grid>.substat-card .substat-state,
+      #res .substat-grid>.substat-card .substat-val,
+      #res .reading-box,
+      #res .advice-list li,
+      #res .advice-intro{font-size:14.5px!important;line-height:1.75!important}
+      #res .radar-svg .r-label{font-size:13px!important}
+      #res .radar-svg .r-label-pct{font-size:12px!important}
+    }
 
     /* ====== 滚动行为：结果页整体跟随滚动，不再 sticky 钉顶 ======
        注意：渐变背景统一交给 body:has(#res.active) 处理，全屏宽且从顶部贴边，
