@@ -380,11 +380,18 @@
       .wx-hint{display:none !important} /* 桌面端隐藏"请在微信打开"提示条 */
       .welcome{min-height:calc(100vh - 140px);padding-bottom:36px}
       .welcome-cta{max-width:440px;padding:0 24px}
-      /* ====== 桌面/平板按钮：等比放大版（不再用 clamp+vw，避免拉宽时\"字大胶囊变粗\"非等比形变） ======
-         手机基线：205×50 / font 20px（比例 0.4）。
-         平板：260×64 / 24px（比例 0.375，胶囊视觉与手机一致）。
-         同时解除 .btn-label 的 77×20 宽高死锁——那是手机精修像素，桌面放大后会把字裁掉。 */
-      .btn-go{width:260px;height:64px;padding:0 38px;font-size:24px;line-height:1}
+      /* ====== 桌面/平板按钮：连续插值，避免断点跳变 ======
+         设计两个锚点：视口 600px → 205×50/20px（H5 视觉），视口 1440px → 300×72/28px。
+         三个数值用同一进度的 clamp 公式 → 始终等比，胶囊形状不变，画幅拖动平滑。
+         超出 1440px 触顶不再变大，避免按钮过大。
+         同时解除 .btn-label 的 77×20 宽高死锁，让字自然居中。 */
+      .btn-go{
+        width:clamp(205px, calc(137.1px + 11.31vw), 300px);
+        height:clamp(50px, calc(34.3px + 2.62vw), 72px);
+        padding:0 clamp(38px, calc(33.4px + .77vw), 44px);
+        font-size:clamp(20px, calc(14.3px + .95vw), 28px);
+        line-height:1;
+      }
       .btn-go .btn-label{width:auto!important;height:auto!important;line-height:1!important}
       .btn-go .arr{width:1.05em;height:1.05em}
       .q-title{font-size:26px;line-height:1.3}
@@ -428,8 +435,6 @@
     @media(min-width:1024px){
       .wrap{max-width:860px}
       .welcome h1{font-size:50px}
-      /* 大屏首页按钮：260→300 / 64→72 / 24→28，比例不变（约 0.39） */
-      .btn-go{width:300px;height:72px;font-size:28px}
     }
     /* ====== 新结果页模板样式（参考 IMG_2616 版式） ====== */
     .res-section{padding:0 20px 22px}
@@ -1243,28 +1248,28 @@
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;position:relative;z-index:1}
 
-    /* ====== 网页端（≥768px）结果页约束 ======
-       手机端整套尺寸（字号/间距/雷达 320px/卡片视觉 ≈400px 宽）已经定型，不要动。
-       桌面/平板下 .wrap 最大宽 780~860px，会把 #res 内的 substat-card / radar-card / advice-card
-       连带撑宽，但里面的雷达 SVG 仍是 max-width:320px、"下班阻碍"卡片文案才一行 → 卡片右侧大段留白。
-       做法：把 #res 主卡限到接近 H5 视觉宽度（440px，含两侧 padding），居中。
-       这样所有内层卡片宽度自动回到手机视觉，不再出现"卡片宽但内容小"的尴尬。 */
-    @media(min-width:768px){
-      #res .res-card{max-width:440px!important;margin-left:auto!important;margin-right:auto!important}
-      /* res-top 的头像组在桌面端给一个稍大但仍受 max-width 约束的尺寸，避免立绘相对卡片过大 */
-      #res .res-avatar-frame{max-width:320px!important}
+    /* ====== 网页端结果页：连续插值，画幅拖动平滑过渡 ======
+       设计两个锚点：视口 600px 以下 → H5 基线（主卡 100% 自适应、雷达 320、立绘 320）；
+                    视口 1440px 以上 → 桌面顶（主卡 580、雷达 440、立绘 420）。
+       中间用 clamp(min, calc(基线 + 视口比例 vw), max) 让数值跟着窗口线性变化，
+       不再出现"宽到某档就跳一下"的断点感。
+       手机端（≤600px）下 clamp 触底取最小值，与原 H5 视觉一致。
+       字号变化幅度太小（±2~3px），对眼睛是亚感知，仍用一档媒体查询，避免公式过于琐碎。 */
+    @media(min-width:601px){
+      #res .res-card{
+        max-width:clamp(440px, calc(340px + 16.67vw), 580px) !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+      }
+      #res .res-avatar-frame{
+        max-width:clamp(320px, calc(248.6px + 11.9vw), 420px) !important;
+      }
+      #res .radar-svg{
+        max-width:clamp(320px, calc(234.3px + 14.29vw), 440px) !important;
+      }
     }
-    /* ====== 大屏桌面（≥1024px）结果页放大版 ======
-       在更宽的浏览器窗口下，把整组结果页"等比放大"到一个固定的桌面尺寸——
-       这样既不会像 H5 那么挤、也不会像之前那样"卡片被撑宽但内容仍是 320px 雷达"留白。
-       关键：所有数值都是按 440 → 580（≈1.32x）等比放大，保持手机端的视觉比例不变。
-       不需要动手机端的任何字号/间距，仅在这一档生效。 */
+    /* 大屏字号微提升（一档即可，跨度小不卡顿） */
     @media(min-width:1024px){
-      #res .res-card{max-width:580px!important}
-      /* 立绘头像：320 → 420，雷达：320 → 440，与卡片宽度等比 */
-      #res .res-avatar-frame{max-width:420px!important}
-      #res .radar-svg{max-width:440px!important}
-      /* 字号微提升（不动间距以避免触发竖向重排） */
       #res .res-name{font-size:26px!important}
       #res .res-real{font-size:14px!important}
       #res .res-section-title,
