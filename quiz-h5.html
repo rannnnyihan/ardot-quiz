@@ -1236,6 +1236,18 @@
     /* 主卡 & 头部 */
     #res .res-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;position:relative;z-index:1}
 
+    /* ====== 网页端（≥768px）结果页约束 ======
+       手机端整套尺寸（字号/间距/雷达 320px/卡片视觉 ≈400px 宽）已经定型，不要动。
+       桌面/平板下 .wrap 最大宽 780~860px，会把 #res 内的 substat-card / radar-card / advice-card
+       连带撑宽，但里面的雷达 SVG 仍是 max-width:320px、"下班阻碍"卡片文案才一行 → 卡片右侧大段留白。
+       做法：把 #res 主卡限到接近 H5 视觉宽度（440px，含两侧 padding），居中。
+       这样所有内层卡片宽度自动回到手机视觉，不再出现"卡片宽但内容小"的尴尬。 */
+    @media(min-width:768px){
+      #res .res-card{max-width:440px!important;margin-left:auto!important;margin-right:auto!important}
+      /* res-top 的头像组在桌面端给一个稍大但仍受 max-width 约束的尺寸，避免立绘相对卡片过大 */
+      #res .res-avatar-frame{max-width:320px!important}
+    }
+
     /* ====== 滚动行为：结果页整体跟随滚动，不再 sticky 钉顶 ======
        注意：渐变背景统一交给 body:has(#res.active) 处理，全屏宽且从顶部贴边，
        这里 .res-top 不再自己叠绿色，否则会因为有 padding 左右出现"内缩色块" */
