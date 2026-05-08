@@ -138,7 +138,7 @@
     .btn-go{display:inline-flex;align-items:center;justify-content:center;gap:10px;
       width:205px;height:50px;padding:6px 38px;border-radius:999px;line-height:24px;
       border:0;background:#050505;color:#fff;
-      font-size:clamp(20px,4.8vw,30px);font-weight:300;letter-spacing:-.035em;cursor:pointer;
+      font-size:20px;font-weight:300;letter-spacing:-.035em;cursor:pointer;
       transition:transform .15s ease,box-shadow .2s ease,background .2s ease;
       box-shadow:none;-webkit-tap-highlight-color:transparent}
     .btn-go:hover,.btn-go:focus-visible{transform:translateY(-2px);
@@ -380,7 +380,12 @@
       .wx-hint{display:none !important} /* 桌面端隐藏"请在微信打开"提示条 */
       .welcome{min-height:calc(100vh - 140px);padding-bottom:36px}
       .welcome-cta{max-width:440px;padding:0 24px}
-      .btn-go{height:clamp(56px,11.5vw,76px);font-size:clamp(20px,4vw,30px)}
+      /* ====== 桌面/平板按钮：等比放大版（不再用 clamp+vw，避免拉宽时\"字大胶囊变粗\"非等比形变） ======
+         手机基线：205×50 / font 20px（比例 0.4）。
+         平板：260×64 / 24px（比例 0.375，胶囊视觉与手机一致）。
+         同时解除 .btn-label 的 77×20 宽高死锁——那是手机精修像素，桌面放大后会把字裁掉。 */
+      .btn-go{width:260px;height:64px;padding:0 38px;font-size:24px;line-height:1}
+      .btn-go .btn-label{width:auto!important;height:auto!important;line-height:1!important}
       .btn-go .arr{width:1.05em;height:1.05em}
       .q-title{font-size:26px;line-height:1.3}
       .q-desc{font-size:15px}
@@ -423,6 +428,8 @@
     @media(min-width:1024px){
       .wrap{max-width:860px}
       .welcome h1{font-size:50px}
+      /* 大屏首页按钮：260→300 / 64→72 / 24→28，比例不变（约 0.39） */
+      .btn-go{width:300px;height:72px;font-size:28px}
     }
     /* ====== 新结果页模板样式（参考 IMG_2616 版式） ====== */
     .res-section{padding:0 20px 22px}
