@@ -208,6 +208,24 @@
     tbody tr:hover{background:var(--tea-bg-container-hover)}
 
     .auto-save-hint{display:block;min-height:16px;font-size:12px;color:var(--tea-text-success);margin:0;font-weight:400;line-height:1.4;text-align:right;white-space:nowrap}
+    /* 有未保存改动时：提示语切到警告色，吸引视线 */
+    .auto-save-hint.is-dirty{color:var(--tea-text-warning);font-weight:500}
+    /* "保存配置"按钮在 disabled 时：低对比的灰色（默认 .btn:disabled 已经处理）；
+       有改动时（.is-dirty）：橙色高亮 + 轻微脉动呼吸，让用户一眼看到 */
+    .btn.primary.is-dirty{
+      background:var(--tea-text-warning);border-color:var(--tea-text-warning);
+      box-shadow:0 0 0 0 rgba(255,120,0,.45);
+      animation:saveBtnPulse 1.6s ease-in-out infinite;
+    }
+    .btn.primary.is-dirty:hover{background:#E96C00;border-color:#E96C00}
+    .btn.primary.is-dirty:active{background:#CC5E00;border-color:#CC5E00}
+    @keyframes saveBtnPulse{
+      0%  {box-shadow:0 0 0 0   rgba(255,120,0,.55)}
+      70% {box-shadow:0 0 0 10px rgba(255,120,0,0)}
+      100%{box-shadow:0 0 0 0   rgba(255,120,0,0)}
+    }
+    /* disabled 状态下取消所有动画/阴影，保持安静 */
+    .btn.primary:disabled{background:var(--tea-bg-container);border-color:var(--tea-border-light);color:var(--tea-text-disabled);box-shadow:none;animation:none}
 
     /* ====== Modal（TEA Dialog） ====== */
     .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
@@ -302,8 +320,8 @@
       <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
       <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
       <div class="save-action">
-        <button class="btn primary" onclick="saveAll()">保存配置</button>
-        <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），也可手动点保存配置"></span>
+        <button id="saveAllBtn" class="btn primary" onclick="saveAll()" disabled>保存配置</button>
+        <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），但服务端 KV 还没更新——请点「保存配置」同步到云端"></span>
       </div>
     </div>
   </div>
@@ -2964,14 +2982,58 @@
         return false;
       }
     }
+    /* ===== 「保存配置」按钮状态：根据 cfg 与 savedConfigFingerprint 的差异，决定 disabled / 高亮 ===== */
+    function isCfgDirty(){
+      try{return configFingerprint(cfg)!==savedConfigFingerprint}catch(e){return false}
+    }
+    function refreshSaveButtonState(){
+      const btn=document.getElementById("saveAllBtn");
+      const hint=document.getElementById("autoSaveHint");
+      if(!btn)return;
+      const dirty=isCfgDirty();
+      if(dirty){
+        btn.disabled=false;
+        btn.classList.add("is-dirty");
+        btn.title="你有未同步到服务端的改动，点击保存到云端 KV";
+        if(hint){
+          hint.classList.add("is-dirty");
+          /* 没有"已自动保存…"内容时给一句默认提示；有的话保留时间戳但加"待同步"前缀 */
+          const cur=hint.textContent||"";
+          if(!cur || /^你有未保存的改动/.test(cur)){
+            hint.textContent="你有未保存的改动，请点「保存配置」同步到云端";
+          }else if(!/待同步到服务端/.test(cur)){
+            hint.textContent="待同步到服务端 · "+cur.replace(/^.*?·\s*/,"");
+          }
+        }
+      }else{
+        btn.disabled=true;
+        btn.classList.remove("is-dirty");
+        btn.title="当前配置已与服务端一致，无需保存";
+        if(hint){
+          hint.classList.remove("is-dirty");
+        }
+      }
+    }
+    /* 暴露给后续被 dirty 状态影响的入口（含 saveAll 完成、pull 完成、reset 完成等） */
+    window.__refreshSaveBtn=refreshSaveButtonState;
+
     function scheduleConfigAutoSave(){
       clearTimeout(configAutoSaveTimer);
       configAutoSaveTimer=setTimeout(()=>{
         configAutoSaveTimer=null;
         if(flushCfgToLocalStorage({refreshUI:false,silent:true,alertStorageError:false})){
           const el=document.getElementById("autoSaveHint");
-          if(el)el.textContent="已自动保存 · "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+          if(el){
+            const ts=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+            /* dirty：用户改了东西未保存 → 提示要保存；clean：本地落盘但和服务端一致 → 普通"已自动保存" */
+            if(isCfgDirty()){
+              el.textContent="本地已暂存 · "+ts+" · 请点「保存配置」同步到云端";
+            }else{
+              el.textContent="已自动保存 · "+ts;
+            }
+          }
         }
+        refreshSaveButtonState();
       },850);
     }
     function bindConfigAutoSave(){
@@ -2990,6 +3052,8 @@
           localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
         }catch(e){/* ignore */}
       });
+      /* 初始化时立刻刷一次按钮状态（首次加载默认应是 disabled） */
+      refreshSaveButtonState();
     }
 
     function collectCurrentEditorToConfig(silent,refreshUI){
@@ -3159,9 +3223,11 @@
            因此指纹要以"真正推上去的 cfg"为准重新算一次，不能直接信传进来的 nextFp。*/
         savedConfigFingerprint=configFingerprint(cfg);
         if(hint)hint.textContent=(okHint||"已保存并同步到服务端")+" · "+ts;
+        refreshSaveButtonState();
         return {ok:true};
       }
       if(hint)hint.textContent="已保存到本地，服务端同步失败 · "+ts;
+      refreshSaveButtonState();
       return {ok:false,msg:res.msg};
     }
 
@@ -3464,6 +3530,7 @@
       }else{
         alert("已恢复本地默认配置，但服务端同步失败：\n"+res.msg+"\n其他设备仍会使用旧配置。");
       }
+      refreshSaveButtonState();
     }
 
     /* ===== 历史快照：列表/切换查看/删除 ===== */
@@ -3645,6 +3712,8 @@
             if(hint)hint.textContent="题目 id 规整失败（"+(pushRes.msg||"")+"），本地已连续但云端未同步";
           }
         }
+        /* 拉完云端配置 → 一定是 clean，刷新按钮回到 disabled */
+        if(typeof refreshSaveButtonState==="function")refreshSaveButtonState();
       }catch(e){
         console.error(e);
         if(hint)hint.textContent="服务端配置解析失败，使用本地缓存";
