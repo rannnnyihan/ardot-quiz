@@ -562,7 +562,7 @@
 
       <div class="chart-card" id="companyTierCard">
         <h2 style="font-size:14px;font-weight:700;margin-bottom:6px">公司分类（自动归类）</h2>
-        <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 创业团队 / 独立设计师」四档。</div>
+        <div class="help" id="companyTierMeta">按白名单 + 关键词规则把公司归到「大厂 / 中小厂 / 独立个体」三档。</div>
         <div class="company-pie-wrap"><canvas id="companyTierChart"></canvas></div>
         <div id="companyTierLegend" class="company-pie-legend"></div>
       </div>
@@ -852,7 +852,7 @@
     }
     /* 当前公司筛选状态。值的取值：
        - "__all__"          —— 不过滤
-       - "tier:big|small|startup|indie" —— 按公司分类筛选
+       - "tier:big|small|indie" —— 按公司分类筛选（3 档）
        - "co:<归一名小写>"   —— 按某家具体公司筛选 */
     let companyFilter="__all__";
     function applyCompanyFilter(rows){
@@ -884,7 +884,38 @@
       try{renderStats()}catch(e){}
       try{renderDistribution()}catch(e){}
       try{renderChart()}catch(e){}
+      /* 公司分布饼图也要随筛选走（按用户需求 v2）：选了某个 tier 后，
+         饼图变成"该 tier 内部各家公司占比"——所以这里直接重渲染。
+         注意：renderStats() 里已经会调用 renderCompanyDistribution，但它现在
+         读的是 getSurveyDataRaw（全量），所以我们在这里再覆盖一次让它走筛选范围。 */
+      try{rerenderCompanyDistByFilter()}catch(e){}
       updateCompanyFilterMeta();
+    }
+    /* 根据当前 companyFilter 重新画"公司/团队分布"饼图：
+       - __all__：全量数据
+       - tier:X：该 tier 范围内的公司
+       - co:xxx：单家公司（饼图就一片，符合语义） */
+    function rerenderCompanyDistByFilter(){
+      const raw=getSurveyDataRaw();
+      let scoped=raw;
+      const f=companyFilter||"__all__";
+      if(f.indexOf("tier:")===0){
+        const tier=f.slice(5);
+        scoped=raw.filter(d=>{
+          const c=extractCompany(d);
+          if(!c)return false;
+          return classifyCompanyTier(normalizeCompany(c))===tier;
+        });
+      }else if(f.indexOf("co:")===0){
+        const target=f.slice(3);
+        scoped=raw.filter(d=>{
+          const c=extractCompany(d);
+          if(!c)return false;
+          return normalizeCompany(c).toLowerCase()===target;
+        });
+      }
+      const companies=scoped.map(extractCompany).filter(Boolean);
+      renderCompanyDistribution(companies,{filter:f});
     }
     /* 把当前所有公司 + 4 档塞进 companyFilterSel；切换数据源/快照后需要重新生成 */
     function refreshCompanyFilterOptions(){
@@ -892,7 +923,7 @@
       if(!sel)return;
       const rows=getSurveyDataRaw();
       const companies=rows.map(extractCompany).filter(Boolean);
-      const tierCount={big:0,small:0,startup:0,indie:0};
+      const tierCount={big:0,small:0,indie:0};
       const map=new Map();
       companies.forEach((raw)=>{
         const norm=normalizeCompany(raw);
@@ -905,7 +936,7 @@
       });
       const entries=[...map.values()].sort((a,b)=>b.val-a.val);
       let html=`<option value="__all__">全部公司（${rows.length} 条）</option>`;
-      /* 分类 4 档 */
+      /* 分类 3 档 */
       const tierOpts=TIER_ORDER.filter(t=>tierCount[t]>0).map(t=>
         `<option value="tier:${t}">分类 · ${TIER_LABELS[t]}（${tierCount[t]} 条）</option>`).join("");
       if(tierOpts)html+=`<optgroup label="按分类">${tierOpts}</optgroup>`;
@@ -1836,8 +1867,8 @@
     }
 
     function renderStats(){
-      /* 注意：顶部 4 张 stat 卡 + 公司饼图永远显示全量数据，不受公司筛选影响。
-         筛选会影响：renderDistribution / renderChart / getQuestionStats / 导出 CSV。 */
+      /* 注意：顶部 4 张 stat 卡 + 「公司分类」饼图永远显示全量数据，不受公司筛选影响。
+         筛选会影响：「公司/团队分布」饼图（v2 新增）、renderDistribution / renderChart / getQuestionStats / 导出 CSV。 */
       const data=getSurveyDataRaw();
       const n=data.length;
       document.getElementById("stTotal").textContent=n;
@@ -1861,6 +1892,9 @@
       renderCompanyTier(companies);
       /* 数据集变了（首次/快照切换/服务端刷新后），重建公司筛选下拉的选项列表 */
       try{refreshCompanyFilterOptions()}catch(e){}
+      /* 如果当前已经选了某个 tier/单家公司，公司分布饼图要立刻按筛选范围重画一次，
+         避免"切了快照后饼图还停留在全量"的视觉错位 */
+      try{rerenderCompanyDistByFilter()}catch(e){}
       renderDistribution();
     }
 
@@ -1883,8 +1917,8 @@
     ];
     /* 公司分布饼图：直接用整条梯度（最多 12 项，超出归到「其他」） */
     const COMPANY_PIE_PALETTE=CHART_BLUE_RAMP;
-    /* 公司类型：在梯度里挑 4 个等距的明度，保持「同色系不同浓度」 */
-    const COMPANY_TIER_COLORS={big:"#2E5BFF",small:"#6695FF",startup:"#9FC2FF",indie:"#CDE0FF"};
+    /* 公司类型：3 档，在梯度里挑深/中/浅，保持「同色系不同浓度」 */
+    const COMPANY_TIER_COLORS={big:"#2E5BFF",small:"#79A5FF",indie:"#CDE0FF"};
 
     function destroyChartIfAny(inst){if(inst){try{inst.destroy()}catch(e){}}return null}
 
@@ -1922,13 +1956,23 @@
       return inst;
     }
 
-    /* 公司分布：alias 归一去重后按出现次数倒序，Top 12 直显，其余合并到「其他 N 家」 */
-    function renderCompanyDistribution(companies){
+    /* 公司分布：alias 归一去重后按出现次数倒序，Top 12 直显，其余合并到「其他 N 家」
+       opts.filter（可选）：当前公司筛选值（"tier:X" / "co:xxx" / "__all__"）；
+       传入后 meta 会加一行"当前范围"提示，让用户清楚此饼图是该范围内的占比。 */
+    function renderCompanyDistribution(companies,opts){
       const meta=document.getElementById("companyDistMeta");
       const legend=document.getElementById("companyDistLegend");
       companyDistChart=destroyChartIfAny(companyDistChart);
+      const filter=(opts&&opts.filter)||"__all__";
+      let scopeLabel="";
+      if(filter.indexOf("tier:")===0){
+        const t=filter.slice(5);
+        scopeLabel=`当前范围：${TIER_LABELS[t]||t}`;
+      }else if(filter.indexOf("co:")===0){
+        scopeLabel=`当前范围：单家公司`;
+      }
       if(!companies||!companies.length){
-        if(meta)meta.textContent="尚无填写公司的提交记录。";
+        if(meta)meta.textContent=scopeLabel?`${scopeLabel}：尚无填写公司的提交记录。`:"尚无填写公司的提交记录。";
         if(legend)legend.innerHTML="<div class='note'>暂无数据</div>";
         return;
       }
@@ -1953,7 +1997,7 @@
             line+=` ⚠️ Top1 占比 ${pct}%（${top.label}），看 Q7/Q8 时建议切「按类型加权」或「按公司加权」。`;
           }
         }
-        meta.textContent=line;
+        meta.textContent=scopeLabel?`${scopeLabel} · ${line}`:line;
       }
       const TOP=12;
       let items=entries;
@@ -1966,7 +2010,7 @@
       companyDistChart=drawCompanyDoughnut("companyDistChart","companyDistLegend",items);
     }
 
-    /* 公司分类：固定 4 档颜色；未命中清单 / 自定义大厂 / 内置大厂 渲染到独立卡片三段 */
+    /* 公司分类：3 档颜色（蓝色梯度深→中→浅）；未命中清单 / 自定义大厂 / 内置大厂 渲染到独立卡片三段 */
     function renderCompanyTier(companies){
       ensureCompanyTierCardBound();
       const meta=document.getElementById("companyTierMeta");
@@ -1982,7 +2026,7 @@
         if(unBox)renderUnclassifiedList(unBox,[]);
         return;
       }
-      const tierCount={big:0,small:0,startup:0,indie:0};
+      const tierCount={big:0,small:0,indie:0};
       const unknownMap=new Map();
       companies.forEach((raw)=>{
         const norm=normalizeCompany(raw);
@@ -1998,8 +2042,8 @@
       });
       const total=companies.length;
       if(meta){
-        const big=tierCount.big||0,small=tierCount.small||0,startup=tierCount.startup||0,indie=tierCount.indie||0;
-        meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・创业团队 ${startup}・独立设计师 ${indie}。`;
+        const big=tierCount.big||0,small=tierCount.small||0,indie=tierCount.indie||0;
+        meta.textContent=`共 ${total} 条 → 大厂 ${big}・中小厂 ${small}・独立个体 ${indie}。`;
         delete meta.dataset.original;
       }
       const items=TIER_ORDER.map(t=>({label:TIER_LABELS[t],val:tierCount[t]||0,color:COMPANY_TIER_COLORS[t]})).filter(it=>it.val>0);
@@ -2141,8 +2185,8 @@
       sync();setTimeout(sync,0);setTimeout(sync,300);
     }
 
-    /* ===== 公司分类（4 档：大厂 / 中小厂 / 创业团队 / 独立设计师） =====
-       规则：alias 先归一 → 命中大厂白名单 → 命中独立设计关键词 → 命中创业团队关键词 → 否则中小厂
+    /* ===== 公司分类（3 档：大厂 / 中小厂 / 独立个体） =====
+       规则：alias 先归一 → 命中大厂白名单 → 命中独立个体关键词 → 否则中小厂兜底
        未匹配到任何规则、且也不在「中小厂兜底」前命中的，都进「中小厂」（兜底，不再单独列「未分类」）。
        但为了让你能扩充白名单，会单独列出"中小厂里没在 alias / 白名单里出现过"的公司清单，方便你补名单。 */
     const COMPANY_ALIAS={
@@ -2184,10 +2228,8 @@
     };
     /* 大厂白名单（已经过 alias 归一后的规范名小写） */
     const BIG_TECH=new Set(["腾讯","阿里巴巴","字节跳动","美团","百度","京东","网易","小米","华为","拼多多","快手","小红书","滴滴","哔哩哔哩","微软","google","adobe","apple","meta","amazon"].map(s=>s.toLowerCase()));
-    /* 独立设计 / 学生 关键词（小写后做包含匹配） */
-    const INDIE_KEYS=["独立","自由","freelance","freelancer","学生","在校","无业","个人","soho","自雇","gap"];
-    /* 创业团队关键词 */
-    const STARTUP_KEYS=["工作室","studio","创业","初创","startup","start-up","小团队"];
+    /* 独立个体关键词（小写后做包含匹配）：覆盖独立设计师 / 自由职业 / 学生 / 个人工作室 / 小团队 等 */
+    const INDIE_KEYS=["独立","自由","freelance","freelancer","学生","在校","无业","个人","soho","自雇","gap","工作室","studio","小团队"];
 
     /* ===== 用户在 admin UI 自定义的大厂白名单（持久化在 cfg.companyClassify.bigTechExtra） =====
        与 hardcode 的 BIG_TECH 合并使用；自定义项可在 admin 里随时移除，互不影响。
@@ -2281,11 +2323,13 @@
       const k=s.toLowerCase();
       if(isInBigTech(k))return "big";
       for(let i=0;i<INDIE_KEYS.length;i++)if(k.indexOf(INDIE_KEYS[i])>=0)return "indie";
-      for(let i=0;i<STARTUP_KEYS.length;i++)if(k.indexOf(STARTUP_KEYS[i])>=0)return "startup";
+      /* 注：原先有 startup 档（创业团队），现已合并：
+         - 「工作室/studio/小团队」更接近独立个体 → 已并入 INDIE_KEYS
+         - 「创业/初创/startup」无明确指向，按中小厂兜底（创业公司本身也是中小型企业） */
       return "small";
     }
-    const TIER_LABELS={big:"大厂",small:"中小厂",startup:"创业团队",indie:"独立设计师"};
-    const TIER_ORDER=["big","small","startup","indie"];
+    const TIER_LABELS={big:"大厂",small:"中小厂",indie:"独立个体"};
+    const TIER_ORDER=["big","small","indie"];
 
     /* —— Q7/Q8 加权口径（仅 admin 端，不影响问卷端 / 分享卡） —— */
     let weightMode="raw";
@@ -2298,7 +2342,7 @@
     const COMPANY_LOW_SAMPLE=3;     /* 公司人数 < 3 时视为"低样本"，参与但加 ⚠️ */
 
     function buildWeightingMeta(data){
-      const tierBucket={big:[],small:[],startup:[],indie:[]};
+      const tierBucket={big:[],small:[],indie:[]};
       const companyBucket=new Map();
       let withCompany=0;
       data.forEach((d,idx)=>{
@@ -3473,7 +3517,7 @@
       /* 在表头前追加一行 # 注释，离线分析时一眼看出样本分布、不丢上下文 */
       try{
         const compMap=new Map();
-        const tierCnt={big:0,small:0,startup:0,indie:0};
+        const tierCnt={big:0,small:0,indie:0};
         let withCo=0;
         rows.forEach((r)=>{
           const raw=extractCompany(r);
