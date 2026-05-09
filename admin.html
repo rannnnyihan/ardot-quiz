@@ -283,8 +283,11 @@
     .tier-row .tier-btn{padding:2px 10px;font-size:12px;border-radius:var(--tea-radius-sm);cursor:pointer;line-height:1.5;white-space:nowrap;transition:all .2s}
     .tier-row .tier-btn.add{border:1px solid var(--tea-text-warning);background:var(--tea-bg-warning-weak);color:var(--tea-text-warning)}
     .tier-row .tier-btn.add:hover{background:#FFE4C2}
-    .tier-row .tier-btn.remove{border:1px solid var(--tea-text-error);background:var(--tea-bg-error-weak);color:var(--tea-text-error)}
-    .tier-row .tier-btn.remove:hover{background:#FBD6D6}
+    /* 大厂列表里的按钮原来叫「移除」用红色 error 样式；现在文案改成「加入中小厂名单」，
+       本质是「在两个名单间切换」而不是删除，红色会让用户误以为点了会丢数据，所以改成
+       品牌色（蓝）系，跟「加入大厂名单」做明度区分（warning 暖色 vs brand 冷色）。 */
+    .tier-row .tier-btn.remove{border:1px solid var(--tea-brand-default);background:var(--tea-bg-brand-weak);color:var(--tea-text-brand)}
+    .tier-row .tier-btn.remove:hover{background:#D1DEF7}
     .tier-row .tier-btn.restore{border:1px solid var(--tea-brand-default);background:var(--tea-bg-brand-weak);color:var(--tea-text-brand)}
     .tier-row .tier-btn.restore:hover{background:#D1DEF7}
     .tier-row .tier-tag{font-size:12px;color:var(--tea-text-secondary);background:#F3F3F3;border:1px solid var(--tea-border-light);padding:1px 8px;border-radius:var(--tea-radius-sm)}
@@ -2029,8 +2032,8 @@
       }
       box.innerHTML=merged.map((e)=>{
         const safe=escapeHtml(e.label);
-        const meta=e.isRemovedBuiltin?`<span class="tier-meta" style="color:#b91c1c">已从大厂移除</span>`:`<span class="tier-meta">${e.val} 次</span>`;
-        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span>${meta}<button type="button" class="tier-btn add" data-action="add-bigtech" data-name="${safe}">加入大厂</button></div>`;
+        const meta=e.isRemovedBuiltin?`<span class="tier-meta" style="color:var(--tea-text-secondary)">在中小厂名单</span>`:`<span class="tier-meta">${e.val} 次</span>`;
+        return `<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span>${meta}<button type="button" class="tier-btn add" data-action="add-bigtech" data-name="${safe}">加入大厂名单</button></div>`;
       }).join("");
     }
 
@@ -2048,11 +2051,11 @@
       const rows=[];
       activeBuiltin.forEach((name)=>{
         const safe=escapeHtml(name);
-        rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-builtin" data-name="${safe}">移除</button></div>`);
+        rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-builtin" data-name="${safe}">加入中小厂名单</button></div>`);
       });
       extraArr.forEach((name)=>{
         const safe=escapeHtml(name);
-        rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-bigtech" data-name="${safe}">移除</button></div>`);
+        rows.push(`<div class="tier-row"><span class="tier-name" title="${safe}">${safe}</span><button type="button" class="tier-btn remove" data-action="remove-bigtech" data-name="${safe}">加入中小厂名单</button></div>`);
       });
       box.innerHTML=rows.join("");
     }
@@ -2071,10 +2074,10 @@
         msg=changed?`已加入大厂白名单：${name}`:`${name} 已在白名单中`;
       }else if(action==="remove-bigtech"){
         changed=removeExtraBigTech(name);
-        msg=changed?`已从大厂白名单移除：${name}`:`${name} 不在自定义白名单`;
+        msg=changed?`已加入中小厂名单：${name}`:`${name} 不在自定义白名单`;
       }else if(action==="remove-builtin"){
         changed=removeBuiltinBigTech(name);
-        msg=changed?`已从大厂移除：${name}（已归入中小厂，可在左侧重新加入）`:`${name} 已不在大厂`;
+        msg=changed?`已加入中小厂名单：${name}（可在左侧重新加入大厂）`:`${name} 已不在大厂`;
       }else if(action==="restore-builtin"){
         changed=restoreBuiltinBigTech(name);
         msg=changed?`已恢复内置大厂：${name}`:`${name} 未停用`;
