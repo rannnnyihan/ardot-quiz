@@ -1870,9 +1870,18 @@
       return c2||"";
     }
 
-    /* 调色板：分布饼图最多展示 Top 12，超出归到「其他」一项；颜色循环够用即可 */
-    const COMPANY_PIE_PALETTE=["#d7a062","#7d5832","#c46a47","#e6b673","#9e6e3a","#a98a5c","#6b8e7f","#7a4f8b","#3f6f8a","#b25c5c","#8aa66e","#c89c66"];
-    const COMPANY_TIER_COLORS={big:"#a7651f",small:"#d7a062",startup:"#7a4f8b",indie:"#6b8e7f"};
+    /* ===== 统一配色系统（蓝色单色相梯度，参考 Figma/Looker Studio 风格） =====
+       原则：所有图表共用同一组 12 阶蓝色梯度，从深 #2E5BFF 渐变到浅 #E2EAFF；
+       既保证视觉系统统一，又能在饼图/柱状图里通过明度差区分大小。
+       Top1（最深）总是数据最大那一项，Top N 越靠后颜色越浅，符合数据视觉常识。 */
+    const CHART_BLUE_RAMP=[
+      "#2E5BFF","#4070FF","#5384FF","#6695FF","#79A5FF","#8CB4FF",
+      "#9FC2FF","#B0CDFF","#BFD7FF","#CDE0FF","#D9E7FF","#E5EDFF"
+    ];
+    /* 公司分布饼图：直接用整条梯度（最多 12 项，超出归到「其他」） */
+    const COMPANY_PIE_PALETTE=CHART_BLUE_RAMP;
+    /* 公司类型：在梯度里挑 4 个等距的明度，保持「同色系不同浓度」 */
+    const COMPANY_TIER_COLORS={big:"#2E5BFF",small:"#6695FF",startup:"#9FC2FF",indie:"#CDE0FF"};
 
     function destroyChartIfAny(inst){if(inst){try{inst.destroy()}catch(e){}}return null}
 
@@ -2668,8 +2677,19 @@
     }
 
     function palette(n){
-      const base=["#c46a1a","#e8a050","#5b8def","#7bc1a8","#b889d8","#f28c8c","#7fb5ff","#9bc96b","#f0b94d","#8ec9d6"];
-      const arr=[];for(let i=0;i<n;i++)arr.push(base[i%base.length]);return arr;
+      /* 复用全局 CHART_BLUE_RAMP（12 阶蓝色梯度），保持 admin 内所有图表配色一致。
+         为了在柱状图相邻柱之间也有足够区分度，n<=12 时直接按"等距抽样"取色，
+         而不是顺序前 n 项——这样即使只画 3 根柱，也能拿到深/中/浅三档而不是
+         三根都靠近最深的同色调。 */
+      const base=CHART_BLUE_RAMP;
+      const arr=[];
+      if(n<=base.length){
+        const step=base.length/n;
+        for(let i=0;i<n;i++)arr.push(base[Math.min(base.length-1,Math.floor(i*step))]);
+      }else{
+        for(let i=0;i<n;i++)arr.push(base[i%base.length]);
+      }
+      return arr;
     }
 
     function setStatsMode(mode){
