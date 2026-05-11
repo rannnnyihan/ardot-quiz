@@ -475,6 +475,11 @@
           "label": "智能排版",
           "scoreRole": "d3",
           "scoreValue": 1
+        },
+        {
+          "key": "OTHER",
+          "label": "其他",
+          "isOther": true
         }
       ],
       "_designNote": "Q8 多选。15 类 AI 能力按主导维度分桶：A/B/O 文/图生 UI、智能排版→d3；C/D 设计稿↔代码、N AI 生设计系统/组件→d4（系统化复用，跨工程协作）；E/L 文生图/3D 概念→d1；F/G/H/I/M 抠图/重绘/增强/视频/3D→d2；J/K 文/动效→d6（动效=工作流末端表达）。"

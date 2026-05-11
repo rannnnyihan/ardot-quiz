@@ -196,6 +196,15 @@
     .chip:hover{border-color:#d5cfc5;background:#fdfcfa;transform:translateY(-1px)}
     .chip:active{transform:translateY(0) scale(.97)}
     .chip-name{font-size:14px;font-weight:600;color:#3d3d4a;line-height:1.2;word-break:break-word}
+    /* 「其他」chip 选中后内嵌 input：与 chip-name 同尺寸/位置，无独立边框，跟 chip 外壳合二为一 */
+    .chip-other-input{
+      width:100%;border:none;outline:none;background:transparent;
+      font-size:14px;font-weight:600;color:#3d3d4a;line-height:1.2;
+      text-align:center;padding:0;margin:0;font-family:inherit;
+      -webkit-appearance:none;appearance:none;
+    }
+    .chip-other-input::placeholder{color:#a5a5b2;font-weight:500}
+    .chip.chip-other.sel .chip-other-input{color:#8f4a10}
     .chip-check{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#c46a1a;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700;opacity:0;transform:scale(.5);transition:opacity .18s,transform .22s cubic-bezier(.2,1.6,.4,1)}
     .chip.sel{border-color:#c46a1a;background:#fff7ed;box-shadow:0 0 0 1px #c46a1a,0 4px 12px rgba(196,106,26,.12)}
     .chip.sel .chip-name{color:#8f4a10}
@@ -1042,6 +1051,12 @@
     }
     body.quiz-on-q .chip .chip-name{color:#1a1d1a!important}
     body.quiz-on-q .chip.sel .chip-name{color:#1a1d1a!important;font-weight:600}
+    /* 「其他」内嵌 input 在答题态下与 chip-name 同字号/字色，input 自身的浏览器默认样式被消除 */
+    body.quiz-on-q .chip .chip-other-input{
+      color:#1a1d1a!important;background:transparent!important;border:none!important;
+      font-weight:600!important;text-align:center!important;
+    }
+    body.quiz-on-q .chip.sel .chip-other-input{color:#1a1d1a!important;font-weight:600!important}
     /* 答题态 chip 选中态布局（按设计稿）：
        - 文字水平居中（chip 内部 justify-content:center）
        - 选中时绿色对勾以「绝对定位」贴在文字左侧（left:10px、垂直居中），不挤压文字位置
@@ -2272,7 +2287,8 @@
             {key:"L",label:"文生3D",scoreRole:"d1",scoreValue:1},
             {key:"M",label:"图生3D",scoreRole:"d2",scoreValue:1},
             {key:"N",label:"AI生设计系统/组件",scoreRole:"d4",scoreValue:1},
-            {key:"O",label:"智能排版",scoreRole:"d3",scoreValue:1}
+            {key:"O",label:"智能排版",scoreRole:"d3",scoreValue:1},
+            {key:"OTHER",label:"其他",isOther:true}
           ]},
           q9:{type:"single",title:"说到AI，你现在的态度是？",desc:"",mapsToRoles:true,options:[
             {key:"A",label:"A. 能替我做的都替我做，我只想早点下班",scoreRole:"d2",scoreValue:1},
@@ -2647,12 +2663,37 @@
           /* 纵向长文案题保留 "A. xxx" 原文；其它（q8/q11 工具名）剥掉字母前缀 */
           const raw=String(opt.label||"");
           const name=isVerticalMulti?raw:raw.replace(/^[A-Za-z]\.\s*/,"");
+          /* 「其他」选项：跟其他 chip 同形状，但选中后会原地切换为输入框。
+             - 未选中：显示「其他」文字
+             - 选中  ：隐藏文字，显示同尺寸内嵌 input；input 失焦后若为空 → 自动取消选中
+             - 用户必须在 input 里填入内容才能进入下一题（在 pkMulti / oiOther 里校验） */
+          if(opt.isOther){
+            const otherTxt=String(A[qid+"__other"]||"");
+            const isSel=selected.includes(opt.key);
+            return `<div class="chip chip-other${active}" data-v="${opt.key}" data-other="1" onclick="pkMulti(this,event)">
+              <span class="chip-name chip-other-label"${isSel?' style="display:none"':''}>${name}</span>
+              <input type="text" class="chip-other-input" maxlength="40"
+                     placeholder="请输入..." value="${otherTxt.replace(/"/g,"&quot;")}"
+                     ${isSel?"":'style="display:none"'}
+                     onclick="event.stopPropagation()"
+                     oninput="oiOther(this)" onblur="obOther(this)" />
+              <span class="chip-check" aria-hidden="true">✓</span>
+            </div>`;
+          }
           return `<div class="chip${active}" data-v="${opt.key}" onclick="pkMulti(this)"><span class="chip-name">${name}</span><span class="chip-check" aria-hidden="true">✓</span></div>`;
         }).join("");
         wrap.appendChild(grid);
         scene.insertBefore(wrap,qa);
         const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
-        if(btn)btn.disabled=selected.length<minSelect;
+        if(btn){
+          /* 走共用校验：除了 minSelect，还要判断「其他」是否已填字 */
+          let disabled=selected.length<minSelect;
+          if(!disabled&&selected.includes("OTHER")){
+            const t=String(A[qid+"__other"]||"").trim();
+            if(!t)disabled=true;
+          }
+          btn.disabled=disabled;
+        }
         return;
       }
       if(q.type==="rank"){
@@ -2857,20 +2898,41 @@
       const b=document.getElementById("b"+S);
       if(b)b.disabled=false;
     }
-    function pkMulti(el){
+    function pkMulti(el,ev){
       /* 找到包含 data-q 的容器：新版 .chip-wrap 或旧版 .opts */
       const g=el.closest("[data-q]")||el.parentElement;
       const qid=g.dataset.q;
       const minSelect=safePositiveInt(g.dataset.min,3);
       const key=el.dataset.v;
+      const isOther=el.dataset.other==="1";
       const selected=Array.isArray(A[qid])?A[qid].slice():[];
       const idx=selected.indexOf(key);
       if(idx!==-1){
+        /* 「其他」chip 选中态下的点击：如果点的是 input 本身，被 stopPropagation 拦了不会进这；
+           如果点的是 chip 外壳（非 input），视为取消选中（也清空缓存的输入） */
         selected.splice(idx,1);
         el.classList.remove("sel");
+        if(isOther){
+          A[qid+"__other"]="";
+          const lbl=el.querySelector(".chip-other-label");
+          const inp=el.querySelector(".chip-other-input");
+          if(lbl)lbl.style.display="";
+          if(inp){inp.value="";inp.style.display="none";}
+        }
       }else{
         selected.push(key);
         el.classList.add("sel");
+        if(isOther){
+          /* 切换为输入态：隐藏文字、显示 input、立刻聚焦让用户填 */
+          const lbl=el.querySelector(".chip-other-label");
+          const inp=el.querySelector(".chip-other-input");
+          if(lbl)lbl.style.display="none";
+          if(inp){
+            inp.style.display="";
+            /* 100ms 后聚焦避免 chip 切换动画期间被屏蔽（移动端键盘体验） */
+            setTimeout(()=>{try{inp.focus();}catch(e){}},80);
+          }
+        }
       }
       A[qid]=selected;
       /* 同步计数器 UI（如果是新版 chip-wrap） */
@@ -2880,8 +2942,56 @@
         if(cur)cur.textContent=String(selected.length);
         counter.classList.toggle("ok",selected.length>=minSelect);
       }
+      updateMultiNextBtn(qid,selected,minSelect);
+    }
+    /* 「其他」输入框：实时把内容存到 A[qid+"__other"]，并刷新「下一题」按钮可用态 */
+    function oiOther(inp){
+      const chip=inp.closest(".chip");
+      const wrap=inp.closest("[data-q]");
+      if(!chip||!wrap)return;
+      const qid=wrap.dataset.q;
+      const minSelect=safePositiveInt(wrap.dataset.min,3);
+      A[qid+"__other"]=String(inp.value||"").trim();
+      updateMultiNextBtn(qid,Array.isArray(A[qid])?A[qid]:[],minSelect);
+    }
+    /* 失焦时若 input 为空，视为用户没真的想选「其他」→ 自动取消选中态，回到「其他」文字 */
+    function obOther(inp){
+      const v=String(inp.value||"").trim();
+      if(v)return; // 有内容就保留选中态
+      const chip=inp.closest(".chip");
+      const wrap=inp.closest("[data-q]");
+      if(!chip||!wrap)return;
+      const qid=wrap.dataset.q;
+      const minSelect=safePositiveInt(wrap.dataset.min,3);
+      const key=chip.dataset.v;
+      const selected=Array.isArray(A[qid])?A[qid].slice():[];
+      const idx=selected.indexOf(key);
+      if(idx!==-1)selected.splice(idx,1);
+      A[qid]=selected;
+      A[qid+"__other"]="";
+      chip.classList.remove("sel");
+      const lbl=chip.querySelector(".chip-other-label");
+      if(lbl)lbl.style.display="";
+      inp.style.display="none";
+      const counter=wrap.querySelector(".chip-counter");
+      if(counter){
+        const cur=counter.querySelector(".chip-cur");
+        if(cur)cur.textContent=String(selected.length);
+        counter.classList.toggle("ok",selected.length>=minSelect);
+      }
+      updateMultiNextBtn(qid,selected,minSelect);
+    }
+    /* 共用：根据 selected + 「其他」必填规则刷新「下一题」按钮可用态。
+       规则：选了「其他」就必须填了内容（A[qid__other] 非空）才能下一题。 */
+    function updateMultiNextBtn(qid,selected,minSelect){
       const b=document.getElementById("b"+S);
-      if(b)b.disabled=selected.length<minSelect;
+      if(!b)return;
+      let disabled=selected.length<minSelect;
+      if(!disabled&&selected.includes("OTHER")){
+        const t=String(A[qid+"__other"]||"").trim();
+        if(!t)disabled=true;
+      }
+      b.disabled=disabled;
     }
     /* q7 专用：点击顺序 = 排名；再点一次取消，其它项序号自动重排 */
     function pkOrdered(el){
@@ -3110,6 +3220,9 @@
       answers.q12=String(A.q12||"");
       /* 提交前弹窗收集到的公司信息（必填）。answers.company 与顶层 company 各冗余一份，admin 任一都能读到 */
       answers.company=String(A.company||"");
+      /* q7/q8 多选题里的「其他」自由填写（OTHER 选项）。冗余进 answers，admin 看原始数据时直接可见。 */
+      answers.q7__other=String(A.q7__other||"");
+      answers.q8__other=String(A.q8__other||"");
       const q11Arr=Array.isArray(A.q11)?A.q11.slice(0,3):[];
       const q8Arr=Array.isArray(A.q8)?A.q8.slice(0,3):[];
       const d={
