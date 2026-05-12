@@ -374,9 +374,14 @@
         {
           "key": "Z",
           "label": "Z. Stable Diffusion"
+        },
+        {
+          "key": "OTHER",
+          "label": "其他",
+          "isOther": true
         }
       ],
-      "_designNote": "Q7 工具偏好题，不参与 6 维计分（用 Figma 不代表你 d3 痛）。仅作为受众画像数据收集。"
+      "_designNote": "Q7 工具偏好题，不参与 6 维计分（用 Figma 不代表你 d3 痛）。仅作为受众画像数据收集。OTHER 选项允许用户自填工具名，文本存入 answers.q7__other。"
     },
     "q8": {
       "type": "multi",

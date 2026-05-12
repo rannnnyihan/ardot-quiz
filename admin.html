@@ -691,7 +691,10 @@
             {key:"E",label:"E. Sketch"},
             {key:"F",label:"F. Adobe"},
             {key:"G",label:"G. Canva"},
-            {key:"I",label:"I. Midjourney"}
+            {key:"I",label:"I. Midjourney"},
+            /* OTHER：多选题尾部「其他」自填项；用户在 quiz 端点击会就地变 input，
+               文本存入 answers.q7__other（单条字符串）。该选项不计分，仅作画像收集。 */
+            {key:"OTHER",label:"其他",isOther:true}
           ]},
           q8:{type:"multi",minSelect:1,title:"如果 AI 今晚真的替你加班，希望它能靠谱的做什么？",desc:"多选",mapsToRoles:true,scoreKind:"optionRole",options:[
             {key:"A",label:"文生 UI",scoreRole:"d3",scoreValue:1},
@@ -708,7 +711,10 @@
             {key:"L",label:"文生3D",scoreRole:"d1",scoreValue:1},
             {key:"M",label:"图生3D",scoreRole:"d2",scoreValue:1},
             {key:"N",label:"AI生设计系统/组件",scoreRole:"d4",scoreValue:1},
-            {key:"O",label:"智能排版",scoreRole:"d3",scoreValue:1}
+            {key:"O",label:"智能排版",scoreRole:"d3",scoreValue:1},
+            /* OTHER：多选题尾部「其他」自填项；用户在 quiz 端点击会就地变 input，
+               文本存入 answers.q8__other（单条字符串）。该选项不参与角色加分。 */
+            {key:"OTHER",label:"其他",isOther:true}
           ]},
           q9:{type:"single",minSelect:1,title:"说到AI，你现在的态度是？",desc:"",mapsToRoles:true,scoreKind:"optionRole",options:[
             {key:"A",label:"A. 能替我做的都替我做，我只想早点下班",scoreRole:"d2",scoreValue:1},
@@ -2431,7 +2437,43 @@
         const entries=ds.labels.map((l,idx)=>({label:ds.shortLabels[idx],val:ds.values[idx],full:l})).sort((a,b)=>b.val-a.val);
         const max=Math.max(...entries.map(e=>e.val),1);
         title.textContent=`${displayQid(activeQid).toUpperCase()} 多选分布（至少选 ${ds.minSelect}，${ds.valid}/${ds.total} 有效）`;
-        box.innerHTML=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+        const distHtml=entries.map((e)=>`<div class="dist-row"><span title="${e.full}">${e.label}</span><div class="dist-bar"><div class="dist-fill" style="width:${Math.round((e.val/max)*100)}%"></div></div><span>${e.val}</span></div>`).join("");
+        /* 「其他」自填文本汇总：仅当该题包含 isOther/OTHER 选项时展示；
+           读取顶层 record[qid+"__other"] 与 record.answers[qid+"__other"]，去空白去重统计后按频次倒序展示。
+           使用 displayQid 取真实存储 qid，避免连续化重命名后字段对不上。 */
+        const hasOther=(q.options||[]).some((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+        let otherHtml="";
+        if(hasOther){
+          const realQid=displayQid(activeQid); // 当前题在数据里的真实 id（如 q7/q8）
+          const fld=realQid+"__other";
+          const arr=getSurveyData();
+          const counter=new Map();
+          let totalFilled=0;
+          arr.forEach((rec)=>{
+            let v="";
+            if(rec&&typeof rec==="object"){
+              v=String(rec[fld]||(rec.answers&&rec.answers[fld])||"").trim();
+            }
+            if(!v)return;
+            totalFilled++;
+            counter.set(v,(counter.get(v)||0)+1);
+          });
+          const items=[...counter.entries()].sort((a,b)=>b[1]-a[1]);
+          if(totalFilled===0){
+            otherHtml=`<div class="split"></div><div class="stem-title">「其他」自填文本</div><div class="note">本题暂无用户自填文本</div>`;
+          }else{
+            const rows=items.slice(0,80).map(([txt,cnt])=>{
+              const safe=escapeHtml(txt);
+              const tag=cnt>1?` <span style="color:#888;font-weight:500">×${cnt}</span>`:"";
+              return `<div class="stem-stat"><div class="stem-title" style="font-weight:500">${safe}${tag}</div></div>`;
+            }).join("");
+            const more=items.length>80?`<div class="note" style="margin-top:8px">仅展示前 80 条，共 ${items.length} 条不同自填</div>`:"";
+            otherHtml=`<div class="split"></div>`
+              +`<div class="stem-title">「其他」自填文本（${totalFilled} 人填写 · ${items.length} 条不同内容）</div>`
+              +rows+more;
+          }
+        }
+        box.innerHTML=distHtml+otherHtml;
       }else if(q.type==="rank"){
         title.textContent=`${displayQid(activeQid).toUpperCase()} 排序分布（按名次统计）`;
         box.innerHTML=ds.matrix.map((row,posIdx)=>{
@@ -3755,6 +3797,15 @@
         const rawOrder=(raw.meta&&Array.isArray(raw.meta.questionOrder))?raw.meta.questionOrder:Object.keys(raw.questions||{});
         const rawIsCanonical=rawOrder.every((id,i)=>id==="q"+(i+1))&&Object.keys(raw.questions||{}).length===rawOrder.length;
 
+        /* 检查云端 q7/q8 多选题是否缺「其他(OTHER)」自填项；缺则后面自动补齐并 push。
+           q7/q8 在产品上已确认要支持「其他」自填文本（quiz-h5 端代码已就绪），
+           只是 KV 里的旧版题库还没这个选项。这里靠加载侧自检自愈，避免把空白选项推给用户。 */
+        const missingOtherQids=["q7","q8"].filter((qid)=>{
+          const qq=raw.questions&&raw.questions[qid];
+          if(!qq||qq.type!=="multi"||!Array.isArray(qq.options))return false;
+          return !qq.options.some((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+        });
+
         localStorage.setItem(CFG_KEY, JSON.stringify(res.data));
         cfg=loadCfg(); // 走一次 merge/migrate + canonicalize，本地 cfg 一定是连续 id
         savedConfigFingerprint=configFingerprint(cfg); // 以服务端当前版为"已保存基线"
@@ -3777,6 +3828,37 @@
             if(hint)hint.textContent="题目 id 已自动规整为 q1~qN ✅ 后续新增/删除/拖拽都会保持连续";
           }else{
             if(hint)hint.textContent="题目 id 规整失败（"+(pushRes.msg||"")+"），本地已连续但云端未同步";
+          }
+        }
+
+        /* 云端 q7/q8 缺「其他」选项 → 用本地 defaultConfig 里的 OTHER 选项补齐后 push 一次，
+           让线上 quiz-h5 立刻能看到「其他」chip。补齐策略：仅在末尾追加 OTHER，不改其他选项内容。*/
+        if(missingOtherQids.length){
+          const fallback=defaultConfig();
+          let touched=false;
+          missingOtherQids.forEach((qid)=>{
+            const qDst=cfg.questions&&cfg.questions[qid];
+            const qSrc=fallback.questions&&fallback.questions[qid];
+            if(!qDst||!qSrc)return;
+            const otherSrc=(qSrc.options||[]).find((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+            if(!otherSrc)return;
+            qDst.options=Array.isArray(qDst.options)?qDst.options:[];
+            const hasOther=qDst.options.some((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+            if(!hasOther){
+              qDst.options.push(JSON.parse(JSON.stringify(otherSrc)));
+              touched=true;
+            }
+          });
+          if(touched){
+            if(hint)hint.textContent="检测到云端 "+missingOtherQids.join("/")+" 缺「其他」自填选项，正在自动补齐…";
+            renderQList();fillEditor();
+            const pushRes=await pushConfigToServer();
+            if(pushRes.ok){
+              savedConfigFingerprint=configFingerprint(cfg);
+              if(hint)hint.textContent="已为 "+missingOtherQids.join("/")+" 补齐「其他」自填选项 ✅ 用户端刷新即可看到";
+            }else{
+              if(hint)hint.textContent="「其他」选项补齐失败（"+(pushRes.msg||"")+"），可手动点「保存配置」重试";
+            }
           }
         }
         /* 拉完云端配置 → 一定是 clean，刷新按钮回到 disabled */
