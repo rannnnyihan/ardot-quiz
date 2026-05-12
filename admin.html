@@ -2929,6 +2929,40 @@
         box.innerHTML=`<div class="help">文本原始回答（最新优先，最多显示 80 条）</div>${lines||"<div class='note'>暂无文本回答</div>"}`;
         return;
       }
+      /* 多选题若含「其他(OTHER)」选项 → 在图表统计区下方列出所有用户自填文本，
+         去空白后按填写频次倒序展示，重复内容合并 ×N。让运营在「2. 查看结果数据统计」标签页里
+         不只看到 OTHER 的人数比例，还能看到具体填了什么工具/需求。
+         字段：record.answers[qid+"__other"]，兼容旧顶层字段 record[qid+"__other"]。 */
+      if(ds.type==="multi"&&qid){
+        const qq=q;
+        const hasOther=Array.isArray(qq.options)&&qq.options.some((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+        if(hasOther){
+          const fld=qid+"__other";
+          const arr=getSurveyData();
+          const counter=new Map();
+          let totalFilled=0;
+          arr.forEach((rec)=>{
+            if(!rec||typeof rec!=="object")return;
+            const v=String((rec.answers&&rec.answers[fld])||rec[fld]||"").trim();
+            if(!v)return;
+            totalFilled++;
+            counter.set(v,(counter.get(v)||0)+1);
+          });
+          const items=[...counter.entries()].sort((a,b)=>b[1]-a[1]);
+          if(totalFilled===0){
+            box.innerHTML=`<div class="help">「其他」自填文本</div><div class="note">本题暂无用户自填文本</div>`;
+          }else{
+            const rows=items.slice(0,200).map(([txt,cnt])=>{
+              const safe=escapeHtml(txt);
+              const tag=cnt>1?` <span style="color:#888;font-weight:500">×${cnt}</span>`:"";
+              return `<div class="stem-stat"><div class="stem-title" style="font-weight:500">${safe}${tag}</div></div>`;
+            }).join("");
+            const more=items.length>200?`<div class="note" style="margin-top:8px">仅展示前 200 条，共 ${items.length} 条不同自填</div>`:"";
+            box.innerHTML=`<div class="help">「其他」自填文本（${totalFilled} 人填写 · ${items.length} 条不同内容，按频次倒序）</div>`+rows+more;
+          }
+          return;
+        }
+      }
       box.innerHTML="";
     }
 
@@ -3522,17 +3556,32 @@
       const direct=q.type==="text"
         ? normalizeSurveyValue(item,qid)
         :(item&&item.answers&&item.answers[qid]!==undefined ? item.answers[qid] : normalizeSurveyValue(item,qid));
+      /* 「其他」自填文本：含 isOther/OTHER 的题（如 q7/q8 multi），把用户填的文本一起带进 CSV，
+         否则离线分析只能看到「OTHER」key 而看不到具体自填了什么。字段优先取 answers[qid+"__other"]，
+         兼容历史顶层字段 item[qid+"__other"]。 */
+      const hasOtherOpt=Array.isArray(q.options)&&q.options.some((o)=>o&&(o.isOther===true||o.key==="OTHER"));
+      let otherText="";
+      if(hasOtherOpt&&item&&typeof item==="object"){
+        const fld=qid+"__other";
+        otherText=String((item.answers&&item.answers[fld])||item[fld]||"").trim();
+      }
+      let cell;
       if(Array.isArray(direct)){
         if(q.type==="rank"){
           const labels=(q.options||[]).reduce((acc,opt)=>{acc[opt.key]=opt.label;return acc;},{});
-          return direct.map((key)=>labels[key]?`${key}:${labels[key]}`:String(key)).join(" > ");
+          cell=direct.map((key)=>labels[key]?`${key}:${labels[key]}`:String(key)).join(" > ");
+        }else{
+          cell=direct.join(" | ");
         }
-        return direct.join(" | ");
+      }else if(direct&&typeof direct==="object"){
+        try{cell=JSON.stringify(direct);}catch(e){cell=String(direct);}
+      }else{
+        cell=String(direct==null?"":direct);
       }
-      if(direct&&typeof direct==="object"){
-        try{return JSON.stringify(direct);}catch(e){return String(direct);}
+      if(otherText){
+        cell=cell?(cell+" | 其他:"+otherText):("其他:"+otherText);
       }
-      return String(direct==null?"":direct);
+      return cell;
     }
     function exportRawAnswerOrderCsv(){
       const rows=getSurveyData();
