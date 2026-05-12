@@ -185,14 +185,14 @@
     .chip-counter.full,.chip-counter.ok{background:#fff4e0;border-color:#e0b87a}
     .chip-counter.full .chip-counter-txt b,.chip-counter.ok .chip-counter-txt b{color:#a05b16}
     .chip-counter.full .chip-counter-hint,.chip-counter.ok .chip-counter-hint{color:#a46d30}
-    .chip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .chip-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
     /* 纵向单列形态（q1~q6 这种文字长的多选题用） */
     .chip-grid.chip-grid-v{grid-template-columns:1fr;gap:10px}
     .chip-grid.chip-grid-v .chip{min-height:52px;padding:14px 44px 14px 16px;justify-content:flex-start;text-align:left}
     .chip-grid.chip-grid-v .chip-name{font-size:14px;line-height:1.45;text-align:left;width:100%}
     .chip-grid.chip-grid-v .chip-check{top:50%;right:12px;transform:translateY(-50%) scale(.5)}
     .chip-grid.chip-grid-v .chip.sel .chip-check{transform:translateY(-50%) scale(1)}
-    .chip{position:relative;display:flex;align-items:center;justify-content:center;min-height:54px;padding:10px 12px;border-radius:12px;border:1.5px solid #e8e5e0;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .15s cubic-bezier(.2,.7,.3,1),border-color .18s,background .18s,box-shadow .18s,color .18s;text-align:center}
+    .chip{position:relative;display:flex;align-items:center;justify-content:center;min-height:54px;min-width:0;padding:10px 12px;border-radius:12px;border:1.5px solid #e8e5e0;background:#fff;cursor:pointer;user-select:none;-webkit-user-select:none;transition:transform .15s cubic-bezier(.2,.7,.3,1),border-color .18s,background .18s,box-shadow .18s,color .18s;text-align:center}
     .chip:hover{border-color:#d5cfc5;background:#fdfcfa;transform:translateY(-1px)}
     .chip:active{transform:translateY(0) scale(.97)}
     .chip-name{font-size:14px;font-weight:600;color:#3d3d4a;line-height:1.2;word-break:break-word}
@@ -205,6 +205,29 @@
     }
     .chip-other-input::placeholder{color:#a5a5b2;font-weight:500}
     .chip.chip-other.sel .chip-other-input{color:#8f4a10}
+    /* 「其他」chip 浮起态（输入态 + 文字态有内容共用）：按内容自适应增长，不影响其他 chip 的列宽。
+       做法：chip 用 absolute 浮在原位置之上（JS 写入 left/top + max-width），width:auto
+       让其按内容增长，但内容超过 max-width 时换行（不再溢出 chip 边框）。
+       注意：答题态下 body.quiz-on-q .chip 用 !important 写了居中布局，此处必须同样用 !important 覆盖。 */
+    .chip-grid{position:relative} /* 给绝对定位的 chip 提供参考系 */
+    .chip.chip-other.is-floating,
+    body.quiz-on-q .chip.chip-other.is-floating{
+      position:absolute!important;
+      width:auto!important;
+      height:auto!important; /* 允许多行高度自适应 */
+      justify-content:flex-start!important;text-align:left!important;
+      padding:14px 16px!important;
+      z-index:5;
+      white-space:normal!important; /* 允许换行 */
+      word-break:break-word!important; /* 长串无空格字符也能断行 */
+      overflow-wrap:anywhere!important;
+    }
+    /* 浮起态下 label 多行显示，不省略 */
+    .chip.chip-other.is-floating .chip-other-label{white-space:normal;overflow:visible;text-overflow:clip;max-width:none;word-break:break-word;overflow-wrap:anywhere}
+    .chip.chip-other.is-editing .chip-other-input,
+    body.quiz-on-q .chip.chip-other.is-editing .chip-other-input{text-align:left!important;width:auto!important;min-width:48px;max-width:100%}
+    /* 文字态（非浮起、有内容但宽度不够）：长文本省略，避免撑破 chip 单元格（min-width:0 让 flex 项可收缩） */
+    .chip.chip-other .chip-other-label{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .chip-check{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:#c46a1a;color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700;opacity:0;transform:scale(.5);transition:opacity .18s,transform .22s cubic-bezier(.2,1.6,.4,1)}
     .chip.sel{border-color:#c46a1a;background:#fff7ed;box-shadow:0 0 0 1px #c46a1a,0 4px 12px rgba(196,106,26,.12)}
     .chip.sel .chip-name{color:#8f4a10}
@@ -410,7 +433,7 @@
       .opt{padding:18px 22px;border-radius:12px}
       .opt:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,26,46,.06)}
       .opt-t{font-size:15px}
-      .chip-grid{grid-template-columns:repeat(4,1fr);gap:12px}
+      .chip-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
       .chip-grid.chip-grid-v{grid-template-columns:1fr;gap:12px}
       .chip-grid.chip-grid-v .chip{min-height:58px;padding:16px 48px 16px 18px}
       .chip-grid.chip-grid-v .chip-name{font-size:15px}
@@ -2270,7 +2293,8 @@
             {key:"W",label:"W. Cursor"},
             {key:"X",label:"X. Claude Design"},
             {key:"Y",label:"Y. Runway"},
-            {key:"Z",label:"Z. Pika"}
+            {key:"Z",label:"Z. Pika"},
+            {key:"OTHER",label:"其他",isOther:true}
           ]},
           q8:{type:"multi",minSelect:1,title:"如果 AI 今晚真的替你加班，希望它能靠谱的做什么？",desc:"多选",mapsToRoles:true,options:[
             {key:"A",label:"文生 UI",scoreRole:"d3",scoreValue:1},
@@ -2642,6 +2666,9 @@
       if(q.type==="multi"){
         const minSelect=safePositiveInt(q.minSelect,3);
         const selected=Array.isArray(A[qid])?A[qid]:[];
+        const otherTxtInit=String(A[qid+"__other"]||"").trim();
+        /* 计数器：固定项 + (其他若已填则算 1) */
+        const effInit=selected.filter((k)=>k!=="OTHER").length+(otherTxtInit?1:0);
         /* 外层 wrap：计数器 + chip 网格 */
         const wrap=document.createElement("div");
         wrap.className="chip-wrap";
@@ -2650,8 +2677,8 @@
         wrap.dataset.min=String(minSelect);
         const counter=document.createElement("div");
         counter.className="chip-counter";
-        counter.innerHTML=`<span class="chip-counter-txt">已选 <b class="chip-cur">${selected.length}</b>（至少 ${minSelect} 项）</span>`;
-        if(selected.length>=minSelect)counter.classList.add("ok");
+        counter.innerHTML=`<span class="chip-counter-txt">已选 <b class="chip-cur">${effInit}</b>（至少 ${minSelect} 项）</span>`;
+        if(effInit>=minSelect)counter.classList.add("ok");
         wrap.appendChild(counter);
         const grid=document.createElement("div");
         grid.className="chip-grid";
@@ -2663,20 +2690,22 @@
           /* 纵向长文案题保留 "A. xxx" 原文；其它（q8/q11 工具名）剥掉字母前缀 */
           const raw=String(opt.label||"");
           const name=isVerticalMulti?raw:raw.replace(/^[A-Za-z]\.\s*/,"");
-          /* 「其他」选项：跟其他 chip 同形状，但选中后会原地切换为输入框。
-             - 未选中：显示「其他」文字
-             - 选中  ：隐藏文字，显示同尺寸内嵌 input；input 失焦后若为空 → 自动取消选中
-             - 用户必须在 input 里填入内容才能进入下一题（在 pkMulti / oiOther 里校验） */
+          /* 「其他」选项：单条自由文本。三种态共用一个 chip 容器：
+             - 文字态（无内容）：显示「其他」文字，点击 → 进入输入态
+             - 输入态：显示 input（focus），失焦时若有内容 → 切到「文字态（有内容）」；为空 → 退回「其他」文字态
+             - 文字态（有内容）：显示已填写文字（选中态），点击 → 内容回填到 input 进入输入态
+             数据：A[qid+"__other"] = 字符串（空 = 未填） */
           if(opt.isOther){
             const otherTxt=String(A[qid+"__other"]||"");
-            const isSel=selected.includes(opt.key);
-            return `<div class="chip chip-other${active}" data-v="${opt.key}" data-other="1" onclick="pkMulti(this,event)">
-              <span class="chip-name chip-other-label"${isSel?' style="display:none"':''}>${name}</span>
+            const isSel=!!otherTxt;
+            const safe=otherTxt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+            return `<div class="chip chip-other${isSel?" sel":""}" data-v="${opt.key}" data-other="1" onclick="pkOtherSlot(this,event)">
+              <span class="chip-name chip-other-label">${isSel?safe:name}</span>
               <input type="text" class="chip-other-input" maxlength="40"
-                     placeholder="请输入..." value="${otherTxt.replace(/"/g,"&quot;")}"
-                     ${isSel?"":'style="display:none"'}
+                     placeholder="请输入..." value=""
+                     style="display:none"
                      onclick="event.stopPropagation()"
-                     oninput="oiOther(this)" onblur="obOther(this)" />
+                     oninput="oiOther(this)" onkeydown="onOtherKey(event,this)" onblur="obOther(this)" />
               <span class="chip-check" aria-hidden="true">✓</span>
             </div>`;
           }
@@ -2684,15 +2713,19 @@
         }).join("");
         wrap.appendChild(grid);
         scene.insertBefore(wrap,qa);
+        /* 若「其他」已有保存内容，初始化时也让它浮起，按内容自适应宽度（避免被 1fr cell 裁切成省略号） */
+        const otherSlot=grid.querySelector(".chip-other.sel");
+        if(otherSlot){
+          /* 等下一帧布局完成再读取位置，否则 getBoundingClientRect 可能为 0 */
+          requestAnimationFrame(()=>{
+            ensureOtherFloating(otherSlot);
+            otherSlot.style.minWidth=""; /* 清掉 min-width，让 width:max-content 按 label 文本自适应 */
+          });
+        }
         const btn=document.getElementById("b"+QID_TO_SCENE[qid]);
         if(btn){
-          /* 走共用校验：除了 minSelect，还要判断「其他」是否已填字 */
-          let disabled=selected.length<minSelect;
-          if(!disabled&&selected.includes("OTHER")){
-            const t=String(A[qid+"__other"]||"").trim();
-            if(!t)disabled=true;
-          }
-          btn.disabled=disabled;
+          /* 走共用校验（基于 effective 计数：固定项 + __others 自定义项） */
+          btn.disabled=effInit<minSelect;
         }
         return;
       }
@@ -2904,94 +2937,206 @@
       const qid=g.dataset.q;
       const minSelect=safePositiveInt(g.dataset.min,3);
       const key=el.dataset.v;
-      const isOther=el.dataset.other==="1";
       const selected=Array.isArray(A[qid])?A[qid].slice():[];
       const idx=selected.indexOf(key);
       if(idx!==-1){
-        /* 「其他」chip 选中态下的点击：如果点的是 input 本身，被 stopPropagation 拦了不会进这；
-           如果点的是 chip 外壳（非 input），视为取消选中（也清空缓存的输入） */
         selected.splice(idx,1);
         el.classList.remove("sel");
-        if(isOther){
-          A[qid+"__other"]="";
-          const lbl=el.querySelector(".chip-other-label");
-          const inp=el.querySelector(".chip-other-input");
-          if(lbl)lbl.style.display="";
-          if(inp){inp.value="";inp.style.display="none";}
-        }
       }else{
         selected.push(key);
         el.classList.add("sel");
-        if(isOther){
-          /* 切换为输入态：隐藏文字、显示 input、立刻聚焦让用户填 */
-          const lbl=el.querySelector(".chip-other-label");
-          const inp=el.querySelector(".chip-other-input");
-          if(lbl)lbl.style.display="none";
-          if(inp){
-            inp.style.display="";
-            /* 100ms 后聚焦避免 chip 切换动画期间被屏蔽（移动端键盘体验） */
-            setTimeout(()=>{try{inp.focus();}catch(e){}},80);
-          }
-        }
       }
       A[qid]=selected;
       /* 同步计数器 UI（如果是新版 chip-wrap） */
       const counter=g.querySelector(".chip-counter");
       if(counter){
         const cur=counter.querySelector(".chip-cur");
-        if(cur)cur.textContent=String(selected.length);
-        counter.classList.toggle("ok",selected.length>=minSelect);
+        if(cur)cur.textContent=String(getEffectiveCount(qid,selected));
+        counter.classList.toggle("ok",getEffectiveCount(qid,selected)>=minSelect);
       }
       updateMultiNextBtn(qid,selected,minSelect);
     }
-    /* 「其他」输入框：实时把内容存到 A[qid+"__other"]，并刷新「下一题」按钮可用态 */
-    function oiOther(inp){
-      const chip=inp.closest(".chip");
-      const wrap=inp.closest("[data-q]");
-      if(!chip||!wrap)return;
+    /* 「其他」按钮槽：单条自由文本。三态：
+       - 文字态（无内容）：显示「其他」文字 → 点击进入输入态
+       - 输入态：显示 input → 输入 + 失焦/回车（有内容）→ 切到「文字态（有内容）」
+       - 文字态（有内容）：显示已填写文字（选中态）→ 点击 → 内容回填到 input 进入输入态
+       入口：点 chip 外壳（input 自身 click 已 stopPropagation） */
+    function pkOtherSlot(el,ev){
+      const lbl=el.querySelector(".chip-other-label");
+      const inp=el.querySelector(".chip-other-input");
+      if(!inp||!lbl)return;
+      const wrap=el.closest("[data-q]");
+      if(!wrap)return;
       const qid=wrap.dataset.q;
       const minSelect=safePositiveInt(wrap.dataset.min,3);
-      A[qid+"__other"]=String(inp.value||"").trim();
+      const inputting=inp.style.display!=="none";
+      if(inputting){
+        /* 已经在输入态又点了外壳：什么都不做，让 input 继续被编辑 */
+        try{inp.focus();}catch(e){}
+        return;
+      }
+      /* 进入输入态：把已有文本（如果有）回填到 input；同时清空持久态以便编辑过程中可被重写 */
+      const cur=String(A[qid+"__other"]||"");
+      lbl.style.display="none";
+      inp.style.display="";
+      inp.value=cur;
+      el.classList.add("sel");
+      el.classList.add("is-editing"); /* 标记输入态（用于 input 内部样式） */
+      ensureOtherFloating(el); /* 让 chip 浮起，按内容增长，不影响其他 chip */
+      autosizeOtherInput(inp); /* 初始化 input 宽度 + chip max-width */
+      setTimeout(()=>{try{inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}catch(e){}},20);
+      /* 暂时不改 A[qid+"__other"]：等失焦/回车再决定保留还是清空 */
       updateMultiNextBtn(qid,Array.isArray(A[qid])?A[qid]:[],minSelect);
     }
-    /* 失焦时若 input 为空，视为用户没真的想选「其他」→ 自动取消选中态，回到「其他」文字 */
-    function obOther(inp){
-      const v=String(inp.value||"").trim();
-      if(v)return; // 有内容就保留选中态
-      const chip=inp.closest(".chip");
+    /* 「其他」slot input 实时输入：刷新「下一题」按钮 + 自适应宽度 */
+    function oiOther(inp){
       const wrap=inp.closest("[data-q]");
-      if(!chip||!wrap)return;
+      if(!wrap)return;
       const qid=wrap.dataset.q;
       const minSelect=safePositiveInt(wrap.dataset.min,3);
-      const key=chip.dataset.v;
-      const selected=Array.isArray(A[qid])?A[qid].slice():[];
-      const idx=selected.indexOf(key);
-      if(idx!==-1)selected.splice(idx,1);
-      A[qid]=selected;
-      A[qid+"__other"]="";
-      chip.classList.remove("sel");
-      const lbl=chip.querySelector(".chip-other-label");
-      if(lbl)lbl.style.display="";
-      inp.style.display="none";
-      const counter=wrap.querySelector(".chip-counter");
-      if(counter){
-        const cur=counter.querySelector(".chip-cur");
-        if(cur)cur.textContent=String(selected.length);
-        counter.classList.toggle("ok",selected.length>=minSelect);
-      }
-      updateMultiNextBtn(qid,selected,minSelect);
+      /* 实时把 input 当前值同步到 A[qid+"__other"]，便于 updateMultiNextBtn 读取 */
+      A[qid+"__other"]=String(inp.value||"").trim();
+      syncOtherSelectionState(qid);
+      updateMultiCounter(wrap,qid);
+      updateMultiNextBtn(qid,Array.isArray(A[qid])?A[qid]:[],minSelect);
+      /* 输入态：根据内容宽度自适应调整 input 宽度与 chip 跨列数 */
+      autosizeOtherInput(inp);
     }
-    /* 共用：根据 selected + 「其他」必填规则刷新「下一题」按钮可用态。
-       规则：选了「其他」就必须填了内容（A[qid__other] 非空）才能下一题。 */
+    /* 让「其他」chip 进入浮起态：absolute 浮在原 cell 位置之上，按内容自适应增长。
+       浮起态在「输入中」和「已填写文字态」共用，这样填完字也能保持自适应宽度，且永不影响其他 chip 的列宽。 */
+    function ensureOtherFloating(slot){
+      if(!slot||slot.classList.contains("is-floating"))return;
+      const grid=slot.parentElement;
+      if(!grid)return;
+      /* 读浮起前 cell 的位置 / 宽度（必须在加 is-floating 之前读，避免 absolute 后位置变 0,0） */
+      const r0=slot.getBoundingClientRect();
+      const gr=grid.getBoundingClientRect();
+      const left=r0.left-gr.left;
+      const top=r0.top-gr.top;
+      const baseW=r0.width;
+      slot.classList.add("is-floating");
+      slot.style.left=left+"px";
+      slot.style.top=top+"px";
+      slot.style.minWidth=baseW+"px"; /* 起步宽度 = 原 cell 宽，文本超过则按 max-content 增长 */
+      /* max-width = 容器右边到 chip.left 的距离，限制不溢出容器 */
+      const gridW=grid.getBoundingClientRect().width;
+      slot.style.maxWidth=Math.max(80,gridW-left)+"px";
+    }
+    /* 输入态：用镜像 span 测文本宽 → 写入 input.style.width，让 input 按内容自适应 */
+    function autosizeOtherInput(inp){
+      const slot=inp.closest(".chip-other");
+      if(!slot)return;
+      const grid=slot.parentElement;
+      if(!grid)return;
+      let mirror=document.getElementById("__chipOtherMirror");
+      if(!mirror){
+        mirror=document.createElement("span");
+        mirror.id="__chipOtherMirror";
+        mirror.style.cssText="position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:pre;pointer-events:none";
+        document.body.appendChild(mirror);
+      }
+      const cs=window.getComputedStyle(inp);
+      mirror.style.font=cs.font;
+      mirror.style.letterSpacing=cs.letterSpacing;
+      mirror.style.textTransform=cs.textTransform;
+      mirror.textContent=inp.value||inp.placeholder||"";
+      const textW=mirror.getBoundingClientRect().width;
+      /* 计算 chip 当前可用最大内宽：max-width - 左右 padding；input 宽度不得超过该值，
+         否则单行 input 会把 chip 撑爆（CSS 设的 width:auto 对 input 内联宽度无效）。 */
+      const leftPx=parseFloat(slot.style.left||"0")||0;
+      const gridW=grid.getBoundingClientRect().width;
+      const maxChipW=Math.max(80,gridW-leftPx);
+      slot.style.maxWidth=maxChipW+"px";
+      const slotCS=window.getComputedStyle(slot);
+      const padX=parseFloat(slotCS.paddingLeft||"0")+parseFloat(slotCS.paddingRight||"0");
+      const maxInputW=Math.max(40,maxChipW-padX);
+      const inputW=Math.min(maxInputW,Math.max(60,Math.ceil(textW+8))); /* +8px 光标余量；不超过 chip 内宽 */
+      inp.style.width=inputW+"px";
+    }
+    /* 回车 = 直接失焦（提交内容） */
+    function onOtherKey(ev,inp){
+      if(ev.key!=="Enter"&&ev.keyCode!==13)return;
+      ev.preventDefault();
+      try{inp.blur();}catch(e){}
+    }
+    /* 失焦：根据 input 内容定夺
+       - 有内容 → 切到「文字态（有内容）」：input 隐藏，label 显示文字；chip 保持浮起 + 按内容宽度
+       - 无内容 → 退回「其他」文字态：input 隐藏，label 显示「其他」；chip 卸下浮起，回到 grid cell */
+    function obOther(inp){
+      const wrap=inp.closest("[data-q]");
+      const slot=inp.closest(".chip-other");
+      if(!wrap||!slot)return;
+      const qid=wrap.dataset.q;
+      const minSelect=safePositiveInt(wrap.dataset.min,3);
+      const v=String(inp.value||"").trim();
+      const lbl=slot.querySelector(".chip-other-label");
+      A[qid+"__other"]=v;
+      inp.style.display="none";
+      inp.style.width=""; /* 清掉 input 的自适应宽度，由 label 接管 chip 的内容宽度 */
+      slot.classList.remove("is-editing"); /* 退出输入态（label 显示） */
+      if(v){
+        /* 有内容：保持浮起 + 按内容宽度。需要按 label 的实际文字宽度更新 min-width，
+           让 chip 跟着 label 的「人人...」长度自适应。 */
+        if(lbl){lbl.textContent=v;lbl.style.display="";}
+        slot.classList.add("sel");
+        /* 浮起态由 ensureOtherFloating 已设过 left/top；min-width 改为基于 label 文本宽度的估算
+           （宽度由 CSS width:max-content 自动计算；这里把 min-width 清掉，避免文字短于原 cell 时仍占 cell 宽） */
+        slot.style.minWidth="";
+        /* 重新刷新 max-width = 容器右边 - chip.left */
+        const grid=slot.parentElement;
+        if(grid){
+          const leftPx=parseFloat(slot.style.left||"0")||0;
+          const gridW=grid.getBoundingClientRect().width;
+          slot.style.maxWidth=Math.max(80,gridW-leftPx)+"px";
+        }
+      }else{
+        /* 无内容：完全卸下浮起，回到 grid cell */
+        slot.classList.remove("is-floating");
+        slot.style.left="";
+        slot.style.top="";
+        slot.style.minWidth="";
+        slot.style.maxWidth="";
+        if(lbl){lbl.textContent="其他";lbl.style.display="";}
+        slot.classList.remove("sel");
+      }
+      syncOtherSelectionState(qid);
+      updateMultiCounter(wrap,qid);
+      updateMultiNextBtn(qid,Array.isArray(A[qid])?A[qid]:[],minSelect);
+    }
+    /* 维持 A[qid] 中 OTHER 标记与 __other 字符串的一致性 */
+    function syncOtherSelectionState(qid){
+      const txt=String(A[qid+"__other"]||"").trim();
+      const sel=Array.isArray(A[qid])?A[qid].slice():[];
+      const has=sel.indexOf("OTHER");
+      if(txt&&has===-1)sel.push("OTHER");
+      if(!txt&&has!==-1)sel.splice(has,1);
+      A[qid]=sel;
+    }
+    /* 计数：固定项数 + (其他若已填则算 1) */
+    function getEffectiveCount(qid,selected){
+      const txt=String(A[qid+"__other"]||"").trim();
+      const base=(selected||[]).filter((k)=>k!=="OTHER").length;
+      return base+(txt?1:0);
+    }
+    /* 同步顶部计数器 UI */
+    function updateMultiCounter(wrap,qid){
+      const counter=wrap.querySelector(".chip-counter");
+      if(!counter)return;
+      const minSelect=safePositiveInt(wrap.dataset.min,3);
+      const sel=Array.isArray(A[qid])?A[qid]:[];
+      const eff=getEffectiveCount(qid,sel);
+      const cur=counter.querySelector(".chip-cur");
+      if(cur)cur.textContent=String(eff);
+      counter.classList.toggle("ok",eff>=minSelect);
+    }
+    /* 共用：刷新「下一题」按钮可用态。基于有效计数：固定项 + 其他（已填）。
+       特别地：如果当前 input 处于输入态（未失焦）且有内容，也算 1，避免误禁用。 */
     function updateMultiNextBtn(qid,selected,minSelect){
       const b=document.getElementById("b"+S);
       if(!b)return;
-      let disabled=selected.length<minSelect;
-      if(!disabled&&selected.includes("OTHER")){
-        const t=String(A[qid+"__other"]||"").trim();
-        if(!t)disabled=true;
-      }
-      b.disabled=disabled;
+      const txt=String(A[qid+"__other"]||"").trim();
+      const eff=(selected||[]).filter((k)=>k!=="OTHER").length+(txt?1:0);
+      b.disabled=eff<minSelect;
     }
     /* q7 专用：点击顺序 = 排名；再点一次取消，其它项序号自动重排 */
     function pkOrdered(el){
@@ -3220,9 +3365,9 @@
       answers.q12=String(A.q12||"");
       /* 提交前弹窗收集到的公司信息（必填）。answers.company 与顶层 company 各冗余一份，admin 任一都能读到 */
       answers.company=String(A.company||"");
-      /* q7/q8 多选题里的「其他」自由填写（OTHER 选项）。冗余进 answers，admin 看原始数据时直接可见。 */
-      answers.q7__other=String(A.q7__other||"");
-      answers.q8__other=String(A.q8__other||"");
+      /* q7/q8 多选题里的「其他」自由填写（单条字符串）。 */
+      answers.q7__other=String(A.q7__other||"").trim();
+      answers.q8__other=String(A.q8__other||"").trim();
       const q11Arr=Array.isArray(A.q11)?A.q11.slice(0,3):[];
       const q8Arr=Array.isArray(A.q8)?A.q8.slice(0,3):[];
       const d={
