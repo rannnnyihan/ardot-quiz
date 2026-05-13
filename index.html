@@ -77,6 +77,14 @@
       </div>
     </div>
     <div class="nav-right">
+      <!-- 「问卷预览」入口：仅在 URL 带 ?admin=1 时显示（由下方脚本控制 display），
+           供运营/设计自查 quiz-h5 文案、题序、角色映射用，新窗口打开 quiz-h5.html?preview=1，
+           quiz 端识别 preview=1 后会跳过 /api/submit + 顶部加黄色提示条，不污染统计。 -->
+      <a id="navQuizPreview" href="quiz-h5.html?preview=1" target="_blank" rel="noopener"
+         class="btn-nav btn-download" style="display:none" title="新窗口打开 quiz-h5 预览（不写入数据）">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6c1.5-2.5 4-3.5 6-3.5s4.5 1 6 3.5c-1.5 2.5-4 3.5-6 3.5S3.5 8.5 2 6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="6" cy="6" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        问卷预览
+      </a>
       <button class="btn-nav btn-download">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7m0 0L3.5 5.5M6 8l2.5-2.5M1.5 10.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         下载客户端
@@ -119,5 +127,21 @@
       </div>
     </div>
   </aside>
+  <script>
+    /* 「问卷预览」入口仅对运营自己可见：URL 带 ?admin=1 时显示，
+       一旦展示过，会写一个 sessionStorage 标记，本次会话内即使去掉参数也保留显示，
+       方便在站内点其他链接跳走再回来时不用反复贴参数。 */
+    (function(){
+      try{
+        var key="ardot_show_quiz_preview";
+        var qs=new URLSearchParams(location.search);
+        if(qs.get("admin")==="1")sessionStorage.setItem(key,"1");
+        if(sessionStorage.getItem(key)==="1"){
+          var a=document.getElementById("navQuizPreview");
+          if(a)a.style.display="inline-flex";
+        }
+      }catch(e){}
+    })();
+  </script>
 </body>
 </html>
