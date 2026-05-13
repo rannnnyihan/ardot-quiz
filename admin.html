@@ -322,6 +322,9 @@
       <button class="btn" onclick="refreshData()">刷新统计</button>
       <button class="btn" onclick="exportRawAnswerOrderCsv()">导出原始作答顺序 CSV</button>
       <button class="btn" onclick="clearSurveyData()">清空收集数据</button>
+      <!-- 一键打开 quiz-h5 预览：?preview=1 在 quiz 端会跳过 /api/submit 与本地 pending 缓存，
+           只用于运营自查问卷文案/题序/选项/角色映射，避免污染统计。 -->
+      <button class="btn" onclick="window.open('quiz-h5.html?preview=1','_blank','noopener')" title="新窗口打开 quiz-h5 预览页（不写入数据）">预览 quiz-h5</button>
       <div class="save-action">
         <button id="saveAllBtn" class="btn primary" onclick="saveAll()" disabled>保存配置</button>
         <span id="autoSaveHint" class="auto-save-hint" title="编辑后会自动写入浏览器本地配置（与 quiz 共用键），但服务端 KV 还没更新——请点「保存配置」同步到云端"></span>

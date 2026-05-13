@@ -1976,6 +1976,28 @@
       var force=params.get("force");
       window.__IS_WX__=isWeixin||isMiniProgram||force==="wx";
       window.__IS_MINI__=isMiniProgram;
+      /* 预览模式：admin 后台「预览 quiz-h5」按钮会在 URL 上挂 ?preview=1。
+         作用：① 不写 /api/submit；② 不补发 pending；③ 顶部加一条提示条，
+         运营预览不会污染真实数据。 */
+      window.__PREVIEW__=params.get("preview")==="1";
+      if(window.__PREVIEW__){
+        var addBar=function(){
+          if(document.getElementById("previewBar"))return;
+          var bar=document.createElement("div");
+          bar.id="previewBar";
+          bar.textContent="预览模式 · 本次作答不会写入数据";
+          bar.style.cssText="position:fixed;left:0;right:0;top:0;z-index:200000;"
+            +"background:#fff7ed;color:#8f5d24;border-bottom:1px solid #f0d9a8;"
+            +"font-size:12px;font-weight:600;text-align:center;line-height:1;"
+            +"padding:8px 12px;letter-spacing:.02em;"
+            +"font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif;";
+          (document.body||document.documentElement).appendChild(bar);
+          /* 给 body 顶部留出条幅高度，避免遮住 nav-logo */
+          try{document.body.style.paddingTop=(parseFloat(getComputedStyle(document.body).paddingTop)||0)+30+"px";}catch(e){}
+        };
+        if(document.body){addBar();}
+        else{document.addEventListener("DOMContentLoaded",addBar,{once:true});}
+      }
       // 若是"强制 wx"在浏览器调试，显示提示条
       if(!isWeixin && force==="wx"){
         var h=document.getElementById("wxHint");
@@ -3412,11 +3434,18 @@
       });
     }
     function postSurveyWithRetry(d){
+      /* 预览模式（admin "预览 quiz-h5" 按钮，URL 带 ?preview=1）：
+         不调 /api/submit，也不写 localStorage 的 pending 队列，避免运营自查时污染统计。
+         其余流程（角色计算、海报渲染、跳页）保持完全一致，所见即所得。 */
+      if(window.__PREVIEW__){try{console.log("[preview] skip postSurvey",d&&d.sessionId||"");}catch(e){}return;}
       try{
         postSurveyOnce(d).catch(()=>{queuePending(d)});
       }catch(e){queuePending(d)}
     }
     function flushPendingSurveys(){
+      /* 预览模式不补发 pending，避免运营在预览页"顺手"把上次离线真实作答的尾巴推上去，
+         给上一条记录加上一个 preview 时间戳的二次写入。 */
+      if(window.__PREVIEW__)return;
       const q=readPending();
       if(!q.length)return;
       writePending([]);
